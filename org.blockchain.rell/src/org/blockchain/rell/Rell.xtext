@@ -1,0 +1,20 @@
+grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
+
+generate rell "http://www.blockchain.org/rell/Rell"
+
+Model:
+	entities+=Entity*;
+
+Entity:
+	'class' name=ID ('extends' superType=[Entity])? '{'
+	attributes+=Attribute*
+	'}';
+
+Attribute:
+	modificator=Prefix?  name=ID ':' type=PrimitiveType ';';
+
+PrimitiveType:'text'|'pubkey'|'json';
+	
+
+	
+Prefix:'key'|'index';
