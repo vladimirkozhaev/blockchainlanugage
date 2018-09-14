@@ -11,10 +11,10 @@ Entity:
 	'}';
 
 Attribute:
-	modificator=Prefix?  name=ID ':' type=PrimitiveType ';';
+	modificator=Prefix? name=ID ':' type=PrimitiveType ';';
 
-PrimitiveType:'text'|'pubkey'|'json';
-	
+PrimitiveType:
+	'text' | 'integer' | 'json' | 'byte_array';
 
-	
-Prefix:'key'|'index';
+Prefix:
+	'key' | 'index';

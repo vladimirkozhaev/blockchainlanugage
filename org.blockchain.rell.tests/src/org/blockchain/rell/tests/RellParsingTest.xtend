@@ -21,7 +21,12 @@ class RellParsingTest {
 	@Test
 	def void loadModel() {
 		val result = parseHelper.parse('''
-			Hello Xtext!
+			class test {
+				field1:text;
+				field2:integer;
+				field3:byte_array;
+				field4:json;
+			}
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
