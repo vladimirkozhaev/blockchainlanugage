@@ -48,4 +48,21 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+	@Test
+	def void testClassReferenceFields() {
+		val result = parseHelper.parse('''
+			class test{
+				bbbb:test;
+				sex:text;
+			}
+			
+			class test1{
+				xxx:test1;
+				ssss:text;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
 }

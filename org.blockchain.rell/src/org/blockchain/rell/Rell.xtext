@@ -10,11 +10,23 @@ Entity:
 	attributes+=Attribute*
 	'}';
 
+//OpDefinition : "operation" ID "(" RelAttribute* ")" "{" Statement* "}";
+//
+//RelAttribute:
+//	
+//;
+//
+//Statement:
+//	
+//;
+
 Attribute:
 	modificator=Prefix? name=ID ':' type=PrimitiveType ';';
 
 PrimitiveType:
-	Text | Integer | Json | ByteArray;
+	{PrimitiveType} Text | {PrimitiveType} Integer | {PrimitiveType} Json | {PrimitiveType} ByteArray|EntityType;
+
+EntityType:entity=[Entity];
 
 Json:
 	'json';
