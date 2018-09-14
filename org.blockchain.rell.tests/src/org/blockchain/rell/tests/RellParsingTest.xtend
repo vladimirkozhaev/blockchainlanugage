@@ -19,13 +19,29 @@ class RellParsingTest {
 	ParseHelper<Model> parseHelper
 	
 	@Test
-	def void loadModel() {
+	def void testSimpleClassWithPrimitiveTypes() {
 		val result = parseHelper.parse('''
 			class test {
 				field1:text;
 				field2:integer;
 				field3:byte_array;
 				field4:json;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	@Test
+	def void testSimpleClassWithPrimitiveTypesMnemonics() {
+		val result = parseHelper.parse('''
+			class test {
+				field1:pubkey;
+				
+				fieldx:name;	
+				field2:guid;
+				field3:timestamp;
+				field4:signer;
 			}
 		''')
 		Assert.assertNotNull(result)

@@ -14,7 +14,19 @@ Attribute:
 	modificator=Prefix? name=ID ':' type=PrimitiveType ';';
 
 PrimitiveType:
-	'text' | 'integer' | 'json' | 'byte_array';
+	Text | Integer | Json | ByteArray;
+
+Json:
+	'json';
+
+Integer:
+	'integer' | 'timestamp';
+
+Text:
+	'text' | 'tuid' | 'name';
+
+ByteArray:
+	'byte_array' | 'signer' | 'guid' | 'pubkey';
 
 Prefix:
 	'key' | 'index';
