@@ -17,7 +17,7 @@ import org.junit.runner.RunWith
 class RellParsingTest {
 	@Inject
 	ParseHelper<Model> parseHelper
-	
+
 	@Test
 	def void testSimpleClassWithPrimitiveTypes() {
 		val result = parseHelper.parse('''
@@ -32,6 +32,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
 	@Test
 	def void testSimpleClassWithPrimitiveTypesMnemonics() {
 		val result = parseHelper.parse('''
@@ -48,6 +49,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
 	@Test
 	def void testClassReferenceFields() {
 		val result = parseHelper.parse('''
@@ -60,6 +62,28 @@ class RellParsingTest {
 				xxx:test1;
 				ssss:text;
 			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	@Test
+	def void testOperations() {
+		val result = parseHelper.parse('''
+			class Test{
+				sex:Test;
+				box:text;
+			}
+			
+			operation test(sex:Test,box:text){
+				
+			}
+			
+			operation test1(sex:Test,box:text){
+				
+			}
+			
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors

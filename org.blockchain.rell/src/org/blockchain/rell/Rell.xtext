@@ -3,30 +3,34 @@ grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
 generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
-	entities+=Entity*;
+	entities+=Entity*
+	operations+=OpDefinition*;
 
 Entity:
 	'class' name=ID ('extends' superType=[Entity])? '{'
 	attributes+=Attribute*
 	'}';
 
-//OpDefinition : "operation" ID "(" RelAttribute* ")" "{" Statement* "}";
-//
-//RelAttribute:
-//	
-//;
-//
-//Statement:
-//	
-//;
+OpDefinition:
+	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" "}";
+
+RelAttrubutesList:
+	value+=RelAttribute (',' value+=RelAttribute)*;
+
+RelAttribute:
+	name=ID ':' reference=TypeReference;
 
 Attribute:
-	modificator=Prefix? name=ID ':' type=PrimitiveType ';';
+	modificator=Prefix? name=ID ':' type=TypeReference ';';
+
+TypeReference:
+	primitive=PrimitiveType | entity=EntityType;
 
 PrimitiveType:
-	{PrimitiveType} Text | {PrimitiveType} Integer | {PrimitiveType} Json | {PrimitiveType} ByteArray|EntityType;
+	Text | Integer | Json | ByteArray;
 
-EntityType:entity=[Entity];
+EntityType:
+	entity=[Entity];
 
 Json:
 	'json';
