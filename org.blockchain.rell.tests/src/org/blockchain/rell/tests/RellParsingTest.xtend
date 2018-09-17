@@ -102,7 +102,7 @@ class RellParsingTest {
 			}
 			
 			operation test1(sex:Test,box:text){
-				update sex;
+				update sex (id=2,id=1);
 			}
 			
 		''')

@@ -18,10 +18,10 @@ Statement:
 	Relational ';';
 
 Relational:
-	Update | Delete | Create ;
+	Update | Delete | Create;
 
 Update:
-	'update' entity=ID;
+	'update' entity=ID '(' expressions=ExpressionsModel? ')';
 
 Delete:
 	'delete' entity=ID;
@@ -29,11 +29,24 @@ Delete:
 Create:
 	'create' entity=ID;
 
+ExpressionsModel:
+	elements+=AbstractElement (',' elements+=AbstractElement*)?;
+
+AbstractElement:
+	Variable | Expression;
+
+Variable:
+	name=ID '=' expression=Expression;
+
+Expression:
+	value=INT;
+
 RelAttrubutesList:
 	value+=RelAttribute (',' value+=RelAttribute)*;
 
 RelAttribute:
-	name=ID ':' reference=TypeReference;
+	name=ID ':'
+	reference=TypeReference;
 
 Attribute:
 	modificator=Prefix? name=ID ':' type=TypeReference ';';
