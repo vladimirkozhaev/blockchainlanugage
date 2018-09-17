@@ -89,6 +89,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
 	@Test
 	def void testOperationsWithNotEmptyStatement() {
 		val result = parseHelper.parse('''
@@ -98,11 +99,11 @@ class RellParsingTest {
 			}
 			
 			operation test(sex:Test,box:text){
-				
+				update sex (id=true+15);
 			}
 			
 			operation test1(sex:Test,box:text){
-				update sex (id=2,id=1);
+				update sex (test,id=1);
 			}
 			
 		''')

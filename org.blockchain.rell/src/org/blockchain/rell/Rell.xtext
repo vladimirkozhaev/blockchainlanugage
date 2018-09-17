@@ -39,14 +39,27 @@ Variable:
 	name=ID '=' expression=Expression;
 
 Expression:
-	value=INT;
+	PlusOrMinus;
+
+PlusOrMinus returns Expression:
+	MulOrDiv (({Plus.left=current} '+' | {Minus.left=current} '-')
+	right=MulOrDiv)*;
+
+Atomic returns Expression:
+	{IntConstant} value=INT |
+	{StringConstant} value=STRING |
+	{BoolConstant} value=('true' | 'false') |
+	{VariableRef} variable=[Variable];
+
+MulOrDiv returns Expression:
+	Atomic (({MulOrDiv.left=current} op=('*' | '/'))
+	right=Atomic)*;
 
 RelAttrubutesList:
 	value+=RelAttribute (',' value+=RelAttribute)*;
 
 RelAttribute:
-	name=ID ':'
-	reference=TypeReference;
+	name=ID ':' reference=TypeReference;
 
 Attribute:
 	modificator=Prefix? name=ID ':' type=TypeReference ';';
