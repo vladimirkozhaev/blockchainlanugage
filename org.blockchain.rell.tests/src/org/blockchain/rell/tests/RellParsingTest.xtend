@@ -89,4 +89,25 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+	@Test
+	def void testOperationsWithNotEmptyStatement() {
+		val result = parseHelper.parse('''
+			class Test{
+				sex:Test;
+				box:text;
+			}
+			
+			operation test(sex:Test,box:text){
+				
+			}
+			
+			operation test1(sex:Test,box:text){
+				update sex;
+			}
+			
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
 }

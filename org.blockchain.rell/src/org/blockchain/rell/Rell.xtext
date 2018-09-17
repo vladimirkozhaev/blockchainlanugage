@@ -12,7 +12,22 @@ Entity:
 	'}';
 
 OpDefinition:
-	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" "}";
+	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
+
+Statement:
+	Relational ';';
+
+Relational:
+	Update | Delete | Create ;
+
+Update:
+	'update' entity=ID;
+
+Delete:
+	'delete' entity=ID;
+
+Create:
+	'create' entity=ID;
 
 RelAttrubutesList:
 	value+=RelAttribute (',' value+=RelAttribute)*;
