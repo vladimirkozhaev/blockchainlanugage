@@ -21,25 +21,43 @@ Relational:
 	Update | Delete | Create;
 
 Update:
-	'update' entity=ID '(' expressions=ExpressionsModel? ')';
+	'update' entity=ID '(' expressions=ExpressionsModel? ')' '{' variableList+=VariableInit
+	(',' variableList+=VariableInit*)? '}';
 
 Delete:
-	'delete' entity=ID;
+	'delete' entity=ID '(' expressions=ExpressionsModel? ')';
 
 Create:
-	'create' entity=ID;
+	'create' entity=ID '(' expressions=ExpressionsModel? ')';
 
 ExpressionsModel:
-	elements+=AbstractElement (',' elements+=AbstractElement*)?;
+	elements+=ConditionElements (',' elements+=ConditionElements*)?;
 
-AbstractElement:
-	Variable | Expression;
+ConditionElements:
+	compareName=ID ('==' | '!=' | '>' | '<' | '>=' | '<=') expr=Expression;
 
-Variable:
+	//AbstractElement:
+//	Variable | Expression;
+//
+VariableInit:
 	name=ID '=' expression=Expression;
 
 Expression:
-	PlusOrMinus;
+	Or;
+
+Or returns Expression:
+	And ({Or.left=current} "||" right=And)*;
+
+And returns Expression:
+	Equality ({And.left=current} "&&" right=Equality)*;
+
+Equality returns Expression:
+	Comparison ({Equality.left=current} op=("==" | "!=")
+	right=Comparison)*;
+
+Comparison returns Expression:
+	PlusOrMinus ({Comparison.left=current} op=(">=" | "<=" | ">" | "<")
+	right=PlusOrMinus)*;
 
 PlusOrMinus returns Expression:
 	MulOrDiv (({Plus.left=current} '+' | {Minus.left=current} '-')
@@ -49,7 +67,7 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} variable=[Variable];
+	{VariableRef} variable=ID;
 
 MulOrDiv returns Expression:
 	Atomic (({MulOrDiv.left=current} op=('*' | '/'))

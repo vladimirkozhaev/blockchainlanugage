@@ -94,17 +94,25 @@ class RellParsingTest {
 	def void testOperationsWithNotEmptyStatement() {
 		val result = parseHelper.parse('''
 			class Test{
-				sex:Test;
-				box:text;
+				test:text;
+				sex:integer;
+				box:json;
 			}
 			
-			operation test(sex:Test,box:text){
-				update sex (id=true+15);
+			operation test_update(sex:Test,box:Test){
+				update test(sex==1,box==5+10){box=5};
 			}
 			
-			operation test1(sex:Test,box:text){
-				update sex (test,id=1);
+			operation test_del(sex:Test,box:Test){
+				delete test(sex==1,box==5+10);
 			}
+			
+			operation test_create(sex:Test,box:Test){
+				delete test(sex==1,box==5+10);
+			}
+			
+			
+
 			
 		''')
 		Assert.assertNotNull(result)
