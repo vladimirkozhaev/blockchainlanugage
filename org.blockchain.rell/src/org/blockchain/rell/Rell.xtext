@@ -15,10 +15,10 @@ OpDefinition:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	Relational ';';
+	(Relational|Variable) ';';
 
 Relational:
-	Update | Delete | Create;
+	Update | Delete | Create ;
 
 Update:
 	'update' entity=ID '(' expressions=ExpressionsModel? ')' '{' variableList+=VariableInit
@@ -80,7 +80,10 @@ RelAttribute:
 	name=ID ':' reference=TypeReference;
 
 Attribute:
-	modificator=Prefix? name=ID ':' type=TypeReference ';';
+	modificator=Prefix? variable=Variable ';';
+
+Variable:
+	name=ID ':' type=TypeReference ;
 
 TypeReference:
 	primitive=PrimitiveType | entity=EntityType;

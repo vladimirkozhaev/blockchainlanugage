@@ -101,6 +101,7 @@ class RellParsingTest {
 			
 			operation test_update(sex:Test,box:Test){
 				update test(sex==1,box==5+10){box=5};
+				test:Text;
 			}
 			
 			operation test_del(sex:Test,box:Test){
