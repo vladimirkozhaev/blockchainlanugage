@@ -94,23 +94,23 @@ class RellParsingTest {
 	def void testOperationsWithNotEmptyStatement() {
 		val result = parseHelper.parse('''
 			class Test{
-				test:text;
-				sex:integer;
-				box:json;
-			}
-			
-			operation test_update(sex:Test,box:Test){
-				update test(sex==1,box==5+10){box=5};
-				test:Text;
-			}
-			
-			operation test_del(sex:Test,box:Test){
-				delete test(sex==1,box==5+10);
-			}
-			
-			operation test_create(sex:Test,box:Test){
-				delete test(sex==1,box==5+10);
-			}
+							test:text;
+							sex:integer;
+							box:json;
+						}
+						
+						operation test_update(sex:Test,box:Test){
+							update test(sex==1,box==5+10){box=5};
+							test:Test;
+						}
+						
+						operation test_del(sex:Test,box:Test){
+							delete test(sex==1,box==5+10);
+						}
+						
+						operation test_create(sex:Test,box:Test){
+							delete test(sex==not box or jazz and sex ,box==5+10);
+						}
 			
 			
 

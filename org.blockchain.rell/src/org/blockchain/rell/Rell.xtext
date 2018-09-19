@@ -43,13 +43,13 @@ VariableInit:
 	name=ID '=' expression=Expression;
 
 Expression:
-	Or;
+	"not"? Or;
 
 Or returns Expression:
-	And ({Or.left=current} "||" right=And)*;
+	And ({Or.left=current} "or" right=And)*;
 
 And returns Expression:
-	Equality ({And.left=current} "&&" right=Equality)*;
+	Equality ({And.left=current} "and" right=Equality)*;
 
 Equality returns Expression:
 	Comparison ({Equality.left=current} op=("==" | "!=")
