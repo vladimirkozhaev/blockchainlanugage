@@ -15,10 +15,10 @@ OpDefinition:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	(Relational|Variable) ';';
+	(Relational | Variable) ';';
 
 Relational:
-	Update | Delete | Create ;
+	Update | Delete | Create;
 
 Update:
 	'update' entity=ID '(' expressions=ExpressionsModel? ')' '{' variableList+=VariableInit
@@ -43,7 +43,7 @@ VariableInit:
 	name=ID '=' expression=Expression;
 
 Expression:
-	"not"? Or;
+	Or;
 
 Or returns Expression:
 	And ({Or.left=current} "or" right=And)*;
@@ -70,8 +70,13 @@ Atomic returns Expression:
 	{VariableRef} variable=ID;
 
 MulOrDiv returns Expression:
-	Atomic (({MulOrDiv.left=current} op=('*' | '/'))
-	right=Atomic)*;
+	Primary ({MulOrDiv.left=current} op=('*' | '/')
+	right=Primary)*;
+
+Primary returns Expression:
+	'(' Expression ')' |
+	{Not} "not" expression=Primary |
+	Atomic;
 
 RelAttrubutesList:
 	value+=RelAttribute (',' value+=RelAttribute)*;
@@ -83,7 +88,7 @@ Attribute:
 	modificator=Prefix? variable=Variable ';';
 
 Variable:
-	name=ID ':' type=TypeReference ;
+	name=ID ':' type=TypeReference;
 
 TypeReference:
 	primitive=PrimitiveType | entity=EntityType;
