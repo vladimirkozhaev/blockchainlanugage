@@ -3,15 +3,15 @@ grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
 generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
-	entities+=Entity*
-	operations+=OpDefinition*;
+	entities+=Class*
+	operations+=Operation*;
 
-Entity:
-	'class' name=ID ('extends' superType=[Entity])? '{'
+Class:
+	'class' name=ID ('extends' superType=[Class])? '{'
 	attributes+=Attribute*
 	'}';
 
-OpDefinition:
+Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
@@ -97,7 +97,7 @@ PrimitiveType:
 	Text | Integer | Json | ByteArray;
 
 EntityType:
-	entity=[Entity];
+	entity=[Class];
 
 Json:
 	'json';
