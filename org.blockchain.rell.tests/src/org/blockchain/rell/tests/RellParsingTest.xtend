@@ -113,18 +113,32 @@ class RellParsingTest {
 						}
 			
 			
-
+			
 			
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
 	@Test
 	def void testNotAndBrackets() {
 		val result = parseHelper.parse('''
 			operation sex (test:integer){
 				update sex(test==1,sex == not (sex or box)){sex=1};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	@Test
+	def void testVariablesInsideOperations() {
+		val result = parseHelper.parse('''
+			operation test(){
+				sex:integer;
+				update test(id==sex){id=1};
 			}
 		''')
 		Assert.assertNotNull(result)

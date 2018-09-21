@@ -15,7 +15,7 @@ OpDefinition:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	(Relational | Variable) ';';
+	(Relational | VariableDeclaration) ';';
 
 Relational:
 	Update | Delete | Create;
@@ -85,9 +85,9 @@ RelAttribute:
 	name=ID ':' reference=TypeReference;
 
 Attribute:
-	modificator=Prefix? variable=Variable ';';
+	modificator=Prefix? variable=VariableDeclaration ';';
 
-Variable:
+VariableDeclaration:
 	name=ID ':' type=TypeReference;
 
 TypeReference:
