@@ -3,23 +3,41 @@
  */
 package org.blockchain.rell.validation
 
+import org.blockchain.rell.rell.RellPackage
+import org.blockchain.rell.rell.TheClass
+import org.eclipse.xtext.validation.Check
 
 /**
- * This class contains custom validation rules. 
- *
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
+ * Custom validation rules. 
+ * 
+ * see http://www.eclipse.org/Xtext/documentation.html#validation
  */
 class RellValidator extends AbstractRellValidator {
+
+	public static val FORWARD_REFERENCE = "org.example.expressions.ForwardReference";
+
+	public static val WRONG_TYPE = "org.example.expressions.WrongType";
+
+	public static val HIERARCHY_CYCLE = "org.blockchain.rell.entities.HierarchyCycle";
+
 	
-//	public static val INVALID_NAME = 'invalidName'
-//
-//	@Check
-//	def checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.name.charAt(0))) {
-//			warning('Name should start with a capital', 
-//					RellPackage.Literals.GREETING__NAME,
-//					INVALID_NAME)
-//		}
-//	}
-	
+
+	@Check
+	def checkNoCycleClassHierarhy(TheClass theClass) {
+		if (theClass.superType === null) {
+			return;
+		}
+		val visitedClasses = <TheClass>newHashSet();
+		visitedClasses.add(theClass);
+		var current = theClass.superType
+		while (current !== null) {
+			if (visitedClasses.contains(current)) {
+				error("cycle in hierarchy of entity '" + current.name + "'", RellPackage::eINSTANCE.theClass_SuperType,HIERARCHY_CYCLE)
+				return
+			}
+			visitedClasses.add(current)
+			current = current.superType
+		}
+
+	}
 }

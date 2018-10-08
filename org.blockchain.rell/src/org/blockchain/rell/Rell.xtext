@@ -3,11 +3,11 @@ grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
 generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
-	entities+=Class*
+	entities+=TheClass*
 	operations+=Operation*;
 
-Class:
-	'class' name=ID ('extends' superType=[Class])? '{'
+TheClass:
+	'class' name=ID ('extends' superType=[TheClass])? '{'
 	attributes+=Attribute*
 	'}';
 
@@ -15,7 +15,10 @@ Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	(Relational | VariableDeclaration) ';';
+	(Relational | Variable) ';';
+
+Variable:
+	declaration=VariableDeclaration '=' expression=Expression;
 
 Relational:
 	Update | Delete | Create;
@@ -67,7 +70,7 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} variable=ID;
+	{VariableRef} variable=[Variable];
 
 MulOrDiv returns Expression:
 	Primary ({MulOrDiv.left=current} op=('*' | '/')
@@ -97,7 +100,7 @@ PrimitiveType:
 	Text | Integer | Json | ByteArray;
 
 EntityType:
-	entity=[Class];
+	entity=[TheClass];
 
 Json:
 	'json';
