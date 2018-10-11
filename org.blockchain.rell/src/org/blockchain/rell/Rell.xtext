@@ -39,9 +39,7 @@ ExpressionsModel:
 ConditionElements:
 	compareName=ID ('==' | '!=' | '>' | '<' | '>=' | '<=') expr=Expression;
 
-	//AbstractElement:
-//	Variable | Expression;
-//
+
 VariableInit:
 	name=ID '=' expression=Expression;
 
@@ -70,7 +68,7 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} variable=[Variable];
+	{VariableRef} variable=[VariableDeclaration];
 
 MulOrDiv returns Expression:
 	Primary ({MulOrDiv.left=current} op=('*' | '/')
@@ -82,10 +80,9 @@ Primary returns Expression:
 	Atomic;
 
 RelAttrubutesList:
-	value+=RelAttribute (',' value+=RelAttribute)*;
+	value+=VariableDeclaration (',' value+=VariableDeclaration)*;
 
-RelAttribute:
-	name=ID ':' reference=TypeReference;
+
 
 Attribute:
 	modificator=Prefix? variable=VariableDeclaration ';';
