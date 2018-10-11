@@ -68,7 +68,7 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} variable=[VariableDeclaration];
+	{VariableRef} variable=[Variable];
 
 MulOrDiv returns Expression:
 	Primary ({MulOrDiv.left=current} op=('*' | '/')

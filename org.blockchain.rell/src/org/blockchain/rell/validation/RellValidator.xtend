@@ -9,6 +9,7 @@ import org.eclipse.xtext.validation.Check
 import org.blockchain.rell.rell.VariableRef
 
 import static extension org.example.expressions.typing.ExpressionsModelUtil.*
+import org.blockchain.rell.rell.Operation
 
 /**
  * Custom validation rules. 
@@ -23,17 +24,6 @@ class RellValidator extends AbstractRellValidator {
 
 	public static val HIERARCHY_CYCLE = "org.blockchain.rell.entities.HierarchyCycle";
 
-	@Check
-	def void checkForwardReference(VariableRef varRef) {
-		val variable = varRef.getVariable()
-		if (variable.name !== null && !varRef.variablesDefinedBefore.contains(
-				variable)) {
-			error("variable forward reference not allowed: '"
-					+ variable.name + "'",
-					RellPackage::eINSTANCE.variableRef_Variable,
-					FORWARD_REFERENCE, variable.name)
-		}
-	}
 		
 
 
