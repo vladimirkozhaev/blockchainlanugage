@@ -8,16 +8,107 @@
       fileExtensions="rell" ecorePackage="Rell.ecore#/">
     <genClasses ecoreClass="Rell.ecore#//Model">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Model/entities"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Model/operations"/>
     </genClasses>
-    <genClasses ecoreClass="Rell.ecore#//Entity">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//Entity/name"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Rell.ecore#//Entity/superType"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Entity/attributes"/>
+    <genClasses ecoreClass="Rell.ecore#//TheClass">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//TheClass/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Rell.ecore#//TheClass/superType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//TheClass/attributes"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Operation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//Operation/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Operation/parameters"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Operation/statements"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Statement"/>
+    <genClasses ecoreClass="Rell.ecore#//Variable">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Variable/declaration"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Variable/expression"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Relational">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//Relational/entity"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Relational/expressions"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Update">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Update/variableList"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Delete"/>
+    <genClasses ecoreClass="Rell.ecore#//Create"/>
+    <genClasses ecoreClass="Rell.ecore#//ExpressionsModel">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//ExpressionsModel/elements"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//ConditionElements">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//ConditionElements/compareName"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//ConditionElements/expr"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//VariableInit">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//VariableInit/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//VariableInit/expression"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Expression"/>
+    <genClasses ecoreClass="Rell.ecore#//RelAttrubutesList">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//RelAttrubutesList/value"/>
     </genClasses>
     <genClasses ecoreClass="Rell.ecore#//Attribute">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//Attribute/modificator"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//Attribute/name"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//Attribute/type"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Attribute/variable"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//VariableDeclaration">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//VariableDeclaration/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//VariableDeclaration/type"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//TypeReference">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//TypeReference/primitive"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//TypeReference/entity"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//EntityType">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Rell.ecore#//EntityType/entity"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Or">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Or/left"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Or/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//And">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//And/left"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//And/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Equality">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Equality/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//Equality/op"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Equality/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Comparison">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Comparison/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//Comparison/op"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Comparison/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Plus">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Plus/left"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Plus/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Minus">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Minus/left"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Minus/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//IntConstant">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//IntConstant/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//StringConstant">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//StringConstant/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//BoolConstant">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//BoolConstant/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//VariableRef">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Rell.ecore#//VariableRef/variable"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//MulOrDiv">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//MulOrDiv/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Rell.ecore#//MulOrDiv/op"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//MulOrDiv/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Rell.ecore#//Not">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Rell.ecore#//Not/expression"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

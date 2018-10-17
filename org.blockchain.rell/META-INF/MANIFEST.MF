@@ -16,15 +16,16 @@ Require-Bundle: org.eclipse.xtext,
  org.eclipse.emf.common,
  org.eclipse.xtend.lib;bundle-version="2.14.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Export-Package: org.blockchain.rell.scoping,
- org.blockchain.rell.services,
- org.blockchain.rell.serializer,
+Export-Package: org.blockchain.rell,
  org.blockchain.rell.generator,
  org.blockchain.rell.parser.antlr,
- org.blockchain.rell,
- org.blockchain.rell.rell.impl,
  org.blockchain.rell.parser.antlr.internal,
  org.blockchain.rell.rell,
+ org.blockchain.rell.rell.impl,
  org.blockchain.rell.rell.util,
+ org.blockchain.rell.scoping,
+ org.blockchain.rell.serializer,
+ org.blockchain.rell.services,
+ org.blockchain.rell.typing,
  org.blockchain.rell.validation
 Import-Package: org.apache.log4j

@@ -6,10 +6,6 @@ package org.blockchain.rell.validation
 import org.blockchain.rell.rell.RellPackage
 import org.blockchain.rell.rell.TheClass
 import org.eclipse.xtext.validation.Check
-import org.blockchain.rell.rell.VariableRef
-
-import static extension org.example.expressions.typing.ExpressionsModelUtil.*
-import org.blockchain.rell.rell.Operation
 
 /**
  * Custom validation rules. 

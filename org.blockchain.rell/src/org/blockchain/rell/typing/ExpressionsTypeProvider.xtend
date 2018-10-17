@@ -10,7 +10,12 @@ import org.blockchain.rell.rell.Minus
 import org.blockchain.rell.rell.MulOrDiv
 import org.blockchain.rell.rell.Not
 import org.blockchain.rell.rell.Or
+import org.blockchain.rell.rell.Plus
 import org.blockchain.rell.rell.StringConstant
+import org.blockchain.rell.rell.Variable
+import org.blockchain.rell.rell.VariableRef
+
+import static extension org.blockchain.rell.typing.ExpressionsModelUtil.*
 
 class ExpressionsTypeProvider {
 	public static val stringType = new StringType
@@ -32,29 +37,29 @@ class ExpressionsTypeProvider {
 		}
 	}
 
-//	def dispatch ExpressionsType typeFor(Plus e) {
-//		val leftType = e.left.typeFor
-//		val rightType = e.right?.typeFor
-//		if (leftType == stringType || rightType == stringType)
-//			stringType
-//		else
-//			intType
-//	}
-//	
-////	def dispatch ExpressionsType typeFor(Variable variable) {
-////		variable?.expression?.typeFor
-////	}
-//	
-//	def dispatch ExpressionsType typeFor(VariableRef varRef) {
-//		if (varRef.variable == null || 
-//				!(varRef.variablesDefinedBefore.contains(varRef.variable)))
-//			return null
-//		else
-//			return varRef.variable.typeFor
-//	}
-//	
-//	def isInt(ExpressionsType type) { type == intType }
-//	def isString(ExpressionsType type) { type == stringType }
-//	def isBoolean(ExpressionsType type) { type == boolType }
+	def dispatch ExpressionsType typeFor(Plus e) {
+		val leftType = e.left.typeFor
+		val rightType = e.right?.typeFor
+		if (leftType == stringType || rightType == stringType)
+			stringType
+		else
+			intType
+	}
+	
+	def dispatch ExpressionsType typeFor(Variable variable) {
+		variable?.expression?.typeFor
+	}
+	
+	def dispatch ExpressionsType typeFor(VariableRef varRef) {
+		if (varRef.variable === null || 
+				!(variablesDefinedBefore(varRef).contains(varRef.variable)))
+			return null
+		else
+			return varRef.variable.typeFor
+	}
+	
+	def isInt(ExpressionsType type) { type == intType }
+	def isString(ExpressionsType type) { type == stringType }
+	def isBoolean(ExpressionsType type) { type == boolType }
 
 }

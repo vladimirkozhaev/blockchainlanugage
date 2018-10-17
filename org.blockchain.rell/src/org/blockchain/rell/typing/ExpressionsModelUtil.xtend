@@ -1,4 +1,4 @@
-package org.example.expressions.typing
+package org.blockchain.rell.typing
 
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.ExpressionsModel
