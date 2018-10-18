@@ -1,5 +1,5 @@
 package org.blockchain.rell.typing
 
-interface ExpressionsType {
+interface RellType {
 	override String toString()
 }

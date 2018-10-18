@@ -8,7 +8,7 @@ import static org.eclipse.emf.ecore.util.EcoreUtil.*
 
 import static extension org.eclipse.xtext.EcoreUtil2.*
 
-class ExpressionsModelUtil {
+class RellModelUtil {
 	
 	def static variablesDefinedBefore(Expression e) {
 		val allElements = e.getContainerOfType(typeof(ExpressionsModel)).elements

@@ -1,5 +1,5 @@
 package org.blockchain.rell.typing
 
-class BoolType implements ExpressionsType {
+class BoolType implements RellType {
 	override toString() { "boolean" }
 }

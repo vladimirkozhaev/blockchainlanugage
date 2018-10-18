@@ -3,8 +3,20 @@
  */
 package org.blockchain.rell.validation
 
+import com.google.inject.Inject
+import org.blockchain.rell.rell.Comparison
+import org.blockchain.rell.rell.Equality
+import org.blockchain.rell.rell.Expression
+import org.blockchain.rell.rell.Minus
+import org.blockchain.rell.rell.MulOrDiv
+import org.blockchain.rell.rell.Or
+import org.blockchain.rell.rell.Plus
 import org.blockchain.rell.rell.RellPackage
 import org.blockchain.rell.rell.TheClass
+import org.blockchain.rell.typing.RellModelUtil
+import org.blockchain.rell.typing.RellType
+import org.blockchain.rell.typing.RellTypeProvider
+import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.validation.Check
 
 /**
@@ -13,6 +25,9 @@ import org.eclipse.xtext.validation.Check
  * see http://www.eclipse.org/Xtext/documentation.html#validation
  */
 class RellValidator extends AbstractRellValidator {
+	
+	@Inject extension RellModelUtil
+	@Inject extension RellTypeProvider
 
 	public static val FORWARD_REFERENCE = "org.example.expressions.ForwardReference";
 
@@ -20,8 +35,9 @@ class RellValidator extends AbstractRellValidator {
 
 	public static val HIERARCHY_CYCLE = "org.blockchain.rell.entities.HierarchyCycle";
 
-		
+	protected static val ISSUE_CODE_PREFIX = "org.example.expressions."
 
+	public static val TYPE_MISMATCH = ISSUE_CODE_PREFIX + "TypeMismatch"
 
 	@Check
 	def checkNoCycleClassHierarhy(TheClass theClass) {
@@ -33,12 +49,92 @@ class RellValidator extends AbstractRellValidator {
 		var current = theClass.superType
 		while (current !== null) {
 			if (visitedClasses.contains(current)) {
-				error("cycle in hierarchy of entity '" + current.name + "'", RellPackage::eINSTANCE.theClass_SuperType,HIERARCHY_CYCLE)
+				error("cycle in hierarchy of entity '" + current.name + "'", RellPackage::eINSTANCE.theClass_SuperType,
+					HIERARCHY_CYCLE)
 				return
 			}
 			visitedClasses.add(current)
 			current = current.superType
 		}
 
+	}
+
+	@Check
+	def checkType(Or or) {
+		checkExpectedBoolean(or.left, RellPackage.Literals.OR__LEFT)
+		checkExpectedBoolean(or.right, RellPackage.Literals.OR__RIGHT)
+	}
+
+	@Check
+	def checkType(MulOrDiv mulOrDiv) {
+		checkExpectedInt(mulOrDiv.left, RellPackage.Literals.MUL_OR_DIV__LEFT)
+		checkExpectedInt(mulOrDiv.right, RellPackage.Literals.MUL_OR_DIV__RIGHT)
+	}
+
+	@Check
+	def checkType(Minus minus) {
+		checkExpectedInt(minus.left, RellPackage.Literals.MINUS__LEFT)
+		checkExpectedInt(minus.right, RellPackage.Literals.MINUS__RIGHT)
+	}
+
+	@Check def checkType(Equality equality) {
+		val leftType = getTypeAndCheckNotNull(equality.left, RellPackage.Literals.EQUALITY__LEFT)
+		val rightType = getTypeAndCheckNotNull(equality.right, RellPackage.Literals.EQUALITY__RIGHT)
+		checkExpectedSame(leftType, rightType)
+	}
+
+	@Check def checkType(Comparison comparison) {
+		val leftType = getTypeAndCheckNotNull(comparison.left, RellPackage.Literals.COMPARISON__LEFT)
+		val rightType = getTypeAndCheckNotNull(comparison.right, RellPackage.Literals.COMPARISON__RIGHT)
+		checkExpectedSame(leftType, rightType)
+		checkNotBoolean(leftType, RellPackage.Literals.COMPARISON__LEFT)
+		checkNotBoolean(rightType, RellPackage.Literals.COMPARISON__RIGHT)
+	}
+
+	@Check def checkType(Plus plus) {
+		val leftType = getTypeAndCheckNotNull(plus.left, RellPackage.Literals.PLUS__LEFT)
+		val rightType = getTypeAndCheckNotNull(plus.right, RellPackage.Literals.PLUS__RIGHT)
+		if (leftType.isInt || rightType.isInt || (!leftType.isString && !rightType.isString)) {
+			checkNotBoolean(leftType, RellPackage.Literals.PLUS__LEFT)
+			checkNotBoolean(rightType, RellPackage.Literals.PLUS__RIGHT)
+		}
+	}
+
+	def private checkExpectedSame(RellType left, RellType right) {
+		if (right !== null && left !== null && right != left) {
+			error("expected the same type, but was " + left + ", " + right,
+				RellPackage.Literals.EQUALITY.getEIDAttribute(), TYPE_MISMATCH)
+		}
+	}
+
+	def private checkNotBoolean(RellType type, EReference reference) {
+		if (type.isBoolean) {
+			error("cannot be boolean", reference, TYPE_MISMATCH)
+		}
+	}
+
+	def private checkExpectedBoolean(Expression exp, EReference reference) {
+		checkExpectedType(exp, RellTypeProvider.BOOL_TYPE, reference)
+	}
+
+	def private checkExpectedInt(Expression exp, EReference reference) {
+		checkExpectedType(exp, RellTypeProvider.INT_TYPE, reference)
+	}
+
+	def private checkExpectedType(Expression exp, RellType expectedType, EReference reference) {
+		val actualType = getTypeAndCheckNotNull(exp, reference)
+		if (actualType != expectedType)
+			error(
+				"expected " + expectedType + " type, but was " + actualType,
+				reference,
+				TYPE_MISMATCH
+			)
+	}
+
+	def private RellType getTypeAndCheckNotNull(Expression exp, EReference reference) {
+		val type = exp?.typeFor
+		if (type === null)
+			error("null type", reference, TYPE_MISMATCH)
+		return type;
 	}
 }
