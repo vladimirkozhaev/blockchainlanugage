@@ -17,7 +17,6 @@ import org.junit.runner.RunWith
 class RellParsingTest {
 	@Inject
 	ParseHelper<Model> parseHelper
-	
 
 	@Test
 	def void testSimpleClassWithPrimitiveTypes() {

@@ -39,7 +39,6 @@ ExpressionsModel:
 ConditionElements:
 	compareName=ID ('==' | '!=' | '>' | '<' | '>=' | '<=') expr=Expression;
 
-
 VariableInit:
 	name=ID '=' expression=Expression;
 
@@ -82,8 +81,6 @@ Primary returns Expression:
 RelAttrubutesList:
 	value+=VariableDeclaration (',' value+=VariableDeclaration)*;
 
-
-
 Attribute:
 	modificator=Prefix? variable=VariableDeclaration ';';
 
@@ -94,10 +91,13 @@ TypeReference:
 	primitive=PrimitiveType | entity=EntityType;
 
 PrimitiveType:
-	Text | Integer | Json | ByteArray;
+	Text | Integer | Json | ByteArray | Boolean;
 
 EntityType:
 	entity=[TheClass];
+
+Boolean:
+	'bool';
 
 Json:
 	'json';
