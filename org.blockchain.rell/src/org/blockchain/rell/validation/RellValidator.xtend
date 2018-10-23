@@ -13,6 +13,10 @@ import org.blockchain.rell.rell.Or
 import org.blockchain.rell.rell.Plus
 import org.blockchain.rell.rell.RellPackage
 import org.blockchain.rell.rell.TheClass
+import org.blockchain.rell.rell.TypeReference
+import org.blockchain.rell.rell.Variable
+import org.blockchain.rell.rell.VariableInit
+import org.blockchain.rell.rell.VariableRef
 import org.blockchain.rell.typing.RellModelUtil
 import org.blockchain.rell.typing.RellType
 import org.blockchain.rell.typing.RellTypeProvider
@@ -25,8 +29,8 @@ import org.eclipse.xtext.validation.Check
  * see http://www.eclipse.org/Xtext/documentation.html#validation
  */
 class RellValidator extends AbstractRellValidator {
+
 	
-	@Inject extension RellModelUtil
 	@Inject extension RellTypeProvider
 
 	public static val FORWARD_REFERENCE = "org.example.expressions.ForwardReference";
@@ -38,6 +42,16 @@ class RellValidator extends AbstractRellValidator {
 	protected static val ISSUE_CODE_PREFIX = "org.example.expressions."
 
 	public static val TYPE_MISMATCH = ISSUE_CODE_PREFIX + "TypeMismatch"
+	
+	@Check
+	def void checkForwardReference(VariableRef varDecl) {
+		
+		if (!RellModelUtil.variablesDefinedBefore(varDecl).contains(varDecl.variable))
+			error("variable forward reference not allowed: '" + varDecl.variable.name + "'",
+				RellPackage.eINSTANCE.variableRef_Variable,
+				FORWARD_REFERENCE,
+				varDecl.variable.name)
+	}
 
 	@Check
 	def checkNoCycleClassHierarhy(TheClass theClass) {
@@ -57,6 +71,11 @@ class RellValidator extends AbstractRellValidator {
 			current = current.superType
 		}
 
+	}
+
+	@Check
+	def typeReferenceImpl(TypeReference typeReference){
+		
 	}
 
 	@Check
@@ -81,6 +100,24 @@ class RellValidator extends AbstractRellValidator {
 		val leftType = getTypeAndCheckNotNull(equality.left, RellPackage.Literals.EQUALITY__LEFT)
 		val rightType = getTypeAndCheckNotNull(equality.right, RellPackage.Literals.EQUALITY__RIGHT)
 		checkExpectedSame(leftType, rightType)
+	}
+
+	@Check def checkVariable(Variable variable) {
+		val typeDecl = variable.declaration.type;
+		val typeExpr = variable.expression;
+		if (typeExpr !== null) {
+			checkExpectedSame(typeDecl.typeFor, typeExpr.typeFor);
+		}
+	}
+	
+	@Check def checkVariable(VariableInit init) {
+		val typeDecl = init.name;
+		val typeExpr = init.expression;
+		if (typeExpr !== null) {
+			val typeDeclType=typeDecl.typeFor
+			val typeExprType=typeExpr.typeFor
+			checkExpectedSame(typeDeclType, typeExprType);
+		}
 	}
 
 	@Check def checkType(Comparison comparison) {

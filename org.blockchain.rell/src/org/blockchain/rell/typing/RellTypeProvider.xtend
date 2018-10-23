@@ -11,68 +11,78 @@ import org.blockchain.rell.rell.MulOrDiv
 import org.blockchain.rell.rell.Not
 import org.blockchain.rell.rell.Or
 import org.blockchain.rell.rell.Plus
+import org.blockchain.rell.rell.PrimitiveType
 import org.blockchain.rell.rell.StringConstant
+import org.blockchain.rell.rell.TypeReference
 import org.blockchain.rell.rell.Variable
+import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableRef
 
-import org.blockchain.rell.rell.VariableDeclaration
-import static extension org.blockchain.rell.typing.RellModelUtil.*
+import static org.blockchain.rell.typing.RellModelUtil.*
 
 class RellTypeProvider {
-	
-	
+
 	public static val STRING_TYPE = new StringType
 	public static val INT_TYPE = new IntType
 	public static val BOOL_TYPE = new BoolType
 
 	def dispatch RellType typeFor(Expression e) {
 		switch (e) {
-			StringConstant: org.blockchain.rell.typing.RellTypeProvider.STRING_TYPE
-			IntConstant: org.blockchain.rell.typing.RellTypeProvider.INT_TYPE
-			BoolConstant: org.blockchain.rell.typing.RellTypeProvider.BOOL_TYPE
-			Not: org.blockchain.rell.typing.RellTypeProvider.BOOL_TYPE
-			MulOrDiv: org.blockchain.rell.typing.RellTypeProvider.INT_TYPE
-			Minus: org.blockchain.rell.typing.RellTypeProvider.INT_TYPE
-			Comparison: org.blockchain.rell.typing.RellTypeProvider.BOOL_TYPE
-			Equality: org.blockchain.rell.typing.RellTypeProvider.BOOL_TYPE
-			And: org.blockchain.rell.typing.RellTypeProvider.BOOL_TYPE
-			Or: org.blockchain.rell.typing.RellTypeProvider.BOOL_TYPE
+			StringConstant: RellTypeProvider.STRING_TYPE
+			IntConstant: RellTypeProvider.INT_TYPE
+			BoolConstant: RellTypeProvider.BOOL_TYPE
+			Not: RellTypeProvider.BOOL_TYPE
+			MulOrDiv: RellTypeProvider.INT_TYPE
+			Minus: RellTypeProvider.INT_TYPE
+			Comparison: RellTypeProvider.BOOL_TYPE
+			Equality: RellTypeProvider.BOOL_TYPE
+			And: RellTypeProvider.BOOL_TYPE
+			Or: RellTypeProvider.BOOL_TYPE
+			default:null
+			
 		}
 	}
 
 	def dispatch RellType typeFor(VariableDeclaration declaration) {
-		val primitive=declaration.type.primitive
+		val primitive = declaration.type.primitive
 		if (primitive !== null) {
 
-			switch (primitive) {
-			case "text":org.blockchain.rell.typing.RellTypeProvider.STRING_TYPE
-			case "tuid":org.blockchain.rell.typing.RellTypeProvider.STRING_TYPE
-			case "name":org.blockchain.rell.typing.RellTypeProvider.STRING_TYPE
-			case "integer":org.blockchain.rell.typing.RellTypeProvider.INT_TYPE 
-			case "timestamp":org.blockchain.rell.typing.RellTypeProvider.INT_TYPE
-			default:null
-			
-//			"text": stringType
-//			IntConstant: intType
-//			BoolConstant: boolType
-//			Not: boolType
-//			MulOrDiv: intType
-//			Minus: intType
-//			Comparison: boolType
-//			Equality: boolType
-//			And: boolType
-//			Or: boolType
-			}
+			primitive.typeFor
+
+		}else if (declaration.type.entityType!==null){
+			null;
 		}
+
 	}
 
 	def dispatch RellType typeFor(Plus e) {
 		val leftType = e.left.typeFor
 		val rightType = e.right?.typeFor
-		if (leftType == org.blockchain.rell.typing.RellTypeProvider.STRING_TYPE || rightType == org.blockchain.rell.typing.RellTypeProvider.STRING_TYPE)
-			org.blockchain.rell.typing.RellTypeProvider.STRING_TYPE
+		if (leftType == RellTypeProvider.STRING_TYPE || rightType == RellTypeProvider.STRING_TYPE)
+			RellTypeProvider.STRING_TYPE
 		else
-			org.blockchain.rell.typing.RellTypeProvider.INT_TYPE
+			RellTypeProvider.INT_TYPE
+	}
+
+	def dispatch RellType typeFor(TypeReference e) {
+		if (e.primitive!=null){
+			e.primitive.typeFor;
+		}else{
+			null;
+		}
+
+	}
+
+	def typeFor(PrimitiveType primitiveType) {
+		switch (primitiveType.primitiveType) {
+			case "text": RellTypeProvider.STRING_TYPE
+			case "tuid": RellTypeProvider.STRING_TYPE
+			case "name": RellTypeProvider.STRING_TYPE
+			case "integer": RellTypeProvider.INT_TYPE
+			case "timestamp": RellTypeProvider.INT_TYPE
+			case "bool": RellTypeProvider.BOOL_TYPE
+		}
+
 	}
 
 	def dispatch RellType typeFor(Variable variable) {
@@ -80,16 +90,16 @@ class RellTypeProvider {
 	}
 
 	def dispatch RellType typeFor(VariableRef varRef) {
-		if (varRef.variable === null || !(variablesDefinedBefore(varRef).contains(varRef.variable)))
+		if (varRef.variable === null)
 			return null
 		else
 			return varRef.variable.typeFor
 	}
 
-	def isInt(RellType type) { type == org.blockchain.rell.typing.RellTypeProvider.INT_TYPE }
+	def isInt(RellType type) { type == RellTypeProvider.INT_TYPE }
 
-	def isString(RellType type) { type == org.blockchain.rell.typing.RellTypeProvider.STRING_TYPE }
+	def isString(RellType type) { type == RellTypeProvider.STRING_TYPE }
 
-	def isBoolean(RellType type) { type == org.blockchain.rell.typing.RellTypeProvider.BOOL_TYPE }
+	def isBoolean(RellType type) { type == RellTypeProvider.BOOL_TYPE }
 
 }

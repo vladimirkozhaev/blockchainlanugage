@@ -3,8 +3,8 @@ package org.blockchain.rell.tests
 import com.google.inject.Inject
 import com.google.inject.Provider
 import org.blockchain.rell.services.RellGrammarAccess
-import org.blockchain.rell.typing.ExpressionsType
-import org.blockchain.rell.typing.ExpressionsTypeProvider
+import org.blockchain.rell.typing.RellType
+import org.blockchain.rell.typing.RellTypeProvider
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.xtext.ParserRule
@@ -12,16 +12,14 @@ import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.util.StringInputStream
-import org.junit.Assert
+import static org.junit.Assert.*;
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import static extension org.junit.Assert.*
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(RellInjectorProvider))
 class ExpressionsTypeProviderTest {
-	@Inject extension ExpressionsTypeProvider
+	@Inject extension RellTypeProvider
 	@Inject Provider<ResourceSet> rsp
 	@Inject
 	RellGrammarAccess ga;
@@ -46,51 +44,52 @@ class ExpressionsTypeProviderTest {
 
 	// @Test def void varBoolRef1() { assertStringType("field2:name", ga.variableDeclarationRule) }
 	@Test def void testIsInt() {
-		(ExpressionsTypeProvider::intType).isInt.assertTrue
+		assertTrue((RellTypeProvider::INT_TYPE).isInt)
 	}
 
 	@Test def void testIsString() {
-		(ExpressionsTypeProvider::stringType).isString.assertTrue
+		assertTrue((RellTypeProvider::STRING_TYPE).isString)
 	}
 
 	@Test def void testIsBool() {
-		(ExpressionsTypeProvider::boolType).isBoolean.assertTrue
+		assertTrue((RellTypeProvider::BOOL_TYPE).isBoolean)
 	}
 
 	def assertStringType(CharSequence input, ParserRule rule) {
-		input.assertType(ExpressionsTypeProvider::stringType, rule)
+		input.assertType(RellTypeProvider::STRING_TYPE, rule)
 	}
 
 	def assertStringType(CharSequence input) {
-		input.assertType(ExpressionsTypeProvider::stringType, ga.expressionRule)
+		input.assertType(RellTypeProvider::STRING_TYPE, ga.expressionRule)
 	}
 
 	def assertIntType(CharSequence input, ParserRule rule) {
-		input.assertType(ExpressionsTypeProvider::intType, rule)
+		input.assertType(RellTypeProvider::INT_TYPE, rule)
 	}
 
 	def assertIntType(CharSequence input) {
-		input.assertType(ExpressionsTypeProvider::intType)
+		input.assertType(RellTypeProvider::INT_TYPE)
 	}
 
 	def assertBoolType(CharSequence input) {
-		input.assertType(ExpressionsTypeProvider::boolType, ga.expressionRule)
+		assertType(input, RellTypeProvider::BOOL_TYPE, ga.expressionRule)
 	}
 
 	def assertBoolType(CharSequence input, ParserRule rule) {
-		input.assertType(ExpressionsTypeProvider::boolType, ga.expressionRule)
+		input.assertType(RellTypeProvider::BOOL_TYPE, ga.expressionRule)
 	}
 
 	def assertUnknownType(CharSequence input) {
 		input.assertType(null)
 	}
 
-	def assertType(CharSequence input, ExpressionsType expectedType) {
+	def assertType(CharSequence input, RellType expectedType) {
 
-		assertType(input, expectedType, ga.expressionRule)
+		assertType(input, expectedType, ga.expressionRule);
+	// assertType(input, expectedType, ga.expressionRule)
 	}
 
-	def assertType(CharSequence input, ExpressionsType expectedType, ParserRule rule) {
+	def assertType(CharSequence input, RellType expectedType, ParserRule rule) {
 
 		var rs = rsp.get()
 		var r = rs.createResource(URI.createURI("test.rell"));
@@ -99,11 +98,11 @@ class ExpressionsTypeProviderTest {
 		r.load(new StringInputStream(input.toString()), null)
 		r.getErrors // test if empty
 		var errors = r.errors
-		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 		var contents = r.getContents;
 		println(contents)
 		var model = r.getContents.get(0)
-		model.typeFor.assertSame(expectedType)
+		assertSame(model.typeFor, expectedType)
 	}
 
 }

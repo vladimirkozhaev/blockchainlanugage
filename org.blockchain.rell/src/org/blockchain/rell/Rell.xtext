@@ -15,10 +15,10 @@ Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	(Relational | Variable) ';';
+	(Relational | Variable | VariableInit) ';';
 
 Variable:
-	declaration=VariableDeclaration '=' expression=Expression;
+	declaration=VariableDeclaration (('=' expression=Expression)?);
 
 Relational:
 	Update | Delete | Create;
@@ -40,7 +40,7 @@ ConditionElements:
 	compareName=ID ('==' | '!=' | '>' | '<' | '>=' | '<=') expr=Expression;
 
 VariableInit:
-	name=ID '=' expression=Expression;
+	name=[VariableDeclaration] '=' expression=Expression;
 
 Expression:
 	Or;
@@ -88,13 +88,13 @@ VariableDeclaration:
 	name=ID ':' type=TypeReference;
 
 TypeReference:
-	primitive=PrimitiveType | entity=EntityType;
+	primitive=PrimitiveType | entityType=EntityType;
 
 PrimitiveType:
-	Text | Integer | Json | ByteArray | Boolean;
+	primitiveType=(Text | Integer | Json | ByteArray | Boolean);
 
 EntityType:
-	entity=[TheClass];
+	entityRef=[TheClass];
 
 Boolean:
 	'bool';
