@@ -4,11 +4,14 @@
 package org.blockchain.rell.validation
 
 import com.google.inject.Inject
+import java.util.Collections
+import java.util.List
 import org.blockchain.rell.rell.Comparison
 import org.blockchain.rell.rell.Equality
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.Minus
 import org.blockchain.rell.rell.MulOrDiv
+import org.blockchain.rell.rell.Operation
 import org.blockchain.rell.rell.Or
 import org.blockchain.rell.rell.Plus
 import org.blockchain.rell.rell.RellPackage
@@ -22,6 +25,7 @@ import org.blockchain.rell.typing.RellType
 import org.blockchain.rell.typing.RellTypeProvider
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.validation.Check
+import java.util.stream.Collectors
 
 /**
  * Custom validation rules. 
@@ -30,7 +34,6 @@ import org.eclipse.xtext.validation.Check
  */
 class RellValidator extends AbstractRellValidator {
 
-	
 	@Inject extension RellTypeProvider
 
 	public static val FORWARD_REFERENCE = "org.example.expressions.ForwardReference";
@@ -39,18 +42,35 @@ class RellValidator extends AbstractRellValidator {
 
 	public static val HIERARCHY_CYCLE = "org.blockchain.rell.entities.HierarchyCycle";
 
+	public static val MORE_TNAN_ONE_VARIABLE = "org.blockchain.rell.variables.Copy"
+
 	protected static val ISSUE_CODE_PREFIX = "org.example.expressions."
 
 	public static val TYPE_MISMATCH = ISSUE_CODE_PREFIX + "TypeMismatch"
-	
+
 	@Check
 	def void checkForwardReference(VariableRef varDecl) {
-		
-		if (!RellModelUtil.variablesDefinedBefore(varDecl).contains(varDecl.variable))
-			error("variable forward reference not allowed: '" + varDecl.variable.name + "'",
-				RellPackage.eINSTANCE.variableRef_Variable,
-				FORWARD_REFERENCE,
-				varDecl.variable.name)
+//		
+//		if (!RellModelUtil.variablesDefinedBefore(varDecl).contains(varDecl.variable))
+//			error("variable forward reference not allowed: '" + varDecl.variable.name + "'",
+//				RellPackage.eINSTANCE.variableRef_Variable,
+//				FORWARD_REFERENCE,
+//				varDecl.variable.name)
+	}
+
+	@Check
+	def void checkOperation(Operation operation) {
+		val List<String> variableInitList = newArrayList;
+
+		operation.parameters.value.forEach[element, index|variableInitList.add(element.name)]
+
+		val copyVariables = variableInitList.stream.
+			filter[element|Collections.frequency(variableInitList, element) > 1].collect(Collectors.toSet) // st[element,index|]
+		if (copyVariables.size > 0) {
+			error("more than one variable in operation " + operation.name + "  parameters :" + copyVariables + "'",
+				RellPackage::eINSTANCE.operation_Parameters, HIERARCHY_CYCLE)
+		}
+
 	}
 
 	@Check
@@ -74,8 +94,7 @@ class RellValidator extends AbstractRellValidator {
 	}
 
 	@Check
-	def typeReferenceImpl(TypeReference typeReference){
-		
+	def typeReferenceImpl(TypeReference typeReference) {
 	}
 
 	@Check
@@ -109,13 +128,13 @@ class RellValidator extends AbstractRellValidator {
 			checkExpectedSame(typeDecl.typeFor, typeExpr.typeFor);
 		}
 	}
-	
+
 	@Check def checkVariable(VariableInit init) {
 		val typeDecl = init.name;
 		val typeExpr = init.expression;
 		if (typeExpr !== null) {
-			val typeDeclType=typeDecl.typeFor
-			val typeExprType=typeExpr.typeFor
+			val typeDeclType = typeDecl.typeFor
+			val typeExprType = typeExpr.typeFor
 			checkExpectedSame(typeDeclType, typeExprType);
 		}
 	}

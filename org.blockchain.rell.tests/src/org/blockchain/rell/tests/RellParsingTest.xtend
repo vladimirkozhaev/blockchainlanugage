@@ -11,12 +11,15 @@ import org.eclipse.xtext.testing.util.ParseHelper
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.blockchain.rell.rell.ExpressionsModel
+import org.blockchain.rell.typing.RellModelUtil
 
 @RunWith(XtextRunner)
 @InjectWith(RellInjectorProvider)
 class RellParsingTest {
 	@Inject
 	ParseHelper<Model> parseHelper
+	@Inject extension RellModelUtil
 
 	@Test
 	def void testSimpleClassWithPrimitiveTypes() {
@@ -145,4 +148,6 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
+
 }

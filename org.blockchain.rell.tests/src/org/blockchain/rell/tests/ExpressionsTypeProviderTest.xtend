@@ -86,7 +86,7 @@ class ExpressionsTypeProviderTest {
 	def assertType(CharSequence input, RellType expectedType) {
 
 		assertType(input, expectedType, ga.expressionRule);
-	// assertType(input, expectedType, ga.expressionRule)
+	
 	}
 
 	def assertType(CharSequence input, RellType expectedType, ParserRule rule) {
