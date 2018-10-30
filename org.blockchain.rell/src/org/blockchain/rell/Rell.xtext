@@ -3,11 +3,11 @@ grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
 generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
-	entities+=TheClass*
+	entities+=ClassDefinition*
 	operations+=Operation*;
 
-TheClass:
-	'class' name=ID ('extends' superType=[TheClass])? '{'
+ClassDefinition:
+	'class' name=ID ('extends' superType=[ClassDefinition])? '{'
 	attributes+=Attribute*
 	'}';
 
@@ -15,7 +15,7 @@ Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	(Relational | Variable | VariableInit) ';';
+	({Relational} relation=Relational | {Variable} variable=Variable | {VariableInit} varInit=VariableInit) ';';
 
 Variable:
 	declaration=VariableDeclaration (('=' expression=Expression)?);
@@ -24,26 +24,26 @@ Relational:
 	Update | Delete | Create;
 
 Update:
-	'update' entity=ID '(' expressions=ExpressionsModel? ')' '{' variableList+=VariableInit
+	'update' entity=ID '(' conditions=Conditions? ')' '{' variableList+=VariableInit
 	(',' variableList+=VariableInit*)? '}';
 
 Delete:
-	'delete' entity=ID '(' expressions=ExpressionsModel? ')';
+	'delete' entity=ID '(' conditions=Conditions? ')';
 
 Create:
-	'create' entity=ID '(' expressions=ExpressionsModel? ')';
+	'create' entity=ID '(' conditions=Conditions? ')';
 
-ExpressionsModel:
-	elements+=ConditionElements (',' elements+=ConditionElements*)?;
+Conditions:
+	elements+=ConditionElement (',' elements+=ConditionElement*)?;
 
-ConditionElements:
+ConditionElement:
 	compareName=ID ('==' | '!=' | '>' | '<' | '>=' | '<=') expr=Expression;
 
 VariableInit:
 	name=[VariableDeclaration] '=' expression=Expression;
 
 Expression:
-	Or;
+	or=Or;
 
 Or returns Expression:
 	And ({Or.left=current} "or" right=And)*;
@@ -88,13 +88,13 @@ VariableDeclaration:
 	name=ID ':' type=TypeReference;
 
 TypeReference:
-	primitive=PrimitiveType | entityType=EntityType;
+	primitive=PrimitiveType | entityType=ClassType;
 
 PrimitiveType:
 	primitiveType=(Text | Integer | Json | ByteArray | Boolean);
 
-EntityType:
-	entityRef=[TheClass];
+ClassType:
+	entityRef=[ClassDefinition];
 
 Boolean:
 	'bool';

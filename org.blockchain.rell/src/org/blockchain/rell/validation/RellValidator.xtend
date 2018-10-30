@@ -4,8 +4,8 @@
 package org.blockchain.rell.validation
 
 import com.google.inject.Inject
-import java.util.Collections
 import java.util.List
+import org.blockchain.rell.rell.ClassDefinition
 import org.blockchain.rell.rell.Comparison
 import org.blockchain.rell.rell.Equality
 import org.blockchain.rell.rell.Expression
@@ -15,7 +15,6 @@ import org.blockchain.rell.rell.Operation
 import org.blockchain.rell.rell.Or
 import org.blockchain.rell.rell.Plus
 import org.blockchain.rell.rell.RellPackage
-import org.blockchain.rell.rell.TheClass
 import org.blockchain.rell.rell.TypeReference
 import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableInit
@@ -23,9 +22,9 @@ import org.blockchain.rell.rell.VariableRef
 import org.blockchain.rell.typing.RellModelUtil
 import org.blockchain.rell.typing.RellType
 import org.blockchain.rell.typing.RellTypeProvider
+import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.validation.Check
-import java.util.stream.Collectors
 
 /**
  * Custom validation rules. 
@@ -35,7 +34,9 @@ import java.util.stream.Collectors
 class RellValidator extends AbstractRellValidator {
 
 	@Inject extension RellTypeProvider
-
+	@Inject extension RellModelUtil
+	
+	
 	public static val FORWARD_REFERENCE = "org.example.expressions.ForwardReference";
 
 	public static val WRONG_TYPE = "org.example.expressions.WrongType";
@@ -60,30 +61,34 @@ class RellValidator extends AbstractRellValidator {
 
 	@Check
 	def void checkOperation(Operation operation) {
-		val List<String> variableInitList = newArrayList;
-
-		operation.parameters.value.forEach[element, index|variableInitList.add(element.name)]
-
-		val copyVariables = variableInitList.stream.
-			filter[element|Collections.frequency(variableInitList, element) > 1].collect(Collectors.toSet) // st[element,index|]
-		if (copyVariables.size > 0) {
-			error("more than one variable in operation " + operation.name + "  parameters :" + copyVariables + "'",
-				RellPackage::eINSTANCE.operation_Parameters, HIERARCHY_CYCLE)
-		}
+		val List<VariableReferenceInfo> variableDeclarations=operation.usedVariables;
+		println("-------------------------------------")
+		variableDeclarations.forEach[varReferenceInfo,i|println("i:"+i+"," +varReferenceInfo)]
+		
+//		val List<String> variableInitList = newArrayList;
+//
+//		operation.parameters.value.forEach[element, index|variableInitList.add(element.name)]
+//
+//		val copyVariables = variableInitList.stream.
+//			filter[element|Collections.frequency(variableInitList, element) > 1].collect(Collectors.toSet) // st[element,index|]
+//		if (copyVariables.size > 0) {
+//			error("more than one variable in operation " + operation.name + "  parameters :" + copyVariables + "'",
+//				RellPackage::eINSTANCE.operation_Parameters, HIERARCHY_CYCLE)
+//		}
 
 	}
 
 	@Check
-	def checkNoCycleClassHierarhy(TheClass theClass) {
+	def checkNoCycleClassHierarhy(ClassDefinition theClass) {
 		if (theClass.superType === null) {
 			return;
 		}
-		val visitedClasses = <TheClass>newHashSet();
+		val visitedClasses = <ClassDefinition>newHashSet();
 		visitedClasses.add(theClass);
-		var current = theClass.superType
+		var current = theClass
 		while (current !== null) {
 			if (visitedClasses.contains(current)) {
-				error("cycle in hierarchy of entity '" + current.name + "'", RellPackage::eINSTANCE.theClass_SuperType,
+				error("cycle in hierarchy of entity '" + current.name + "'", RellPackage::eINSTANCE.classDefinition_SuperType,
 					HIERARCHY_CYCLE)
 				return
 			}
