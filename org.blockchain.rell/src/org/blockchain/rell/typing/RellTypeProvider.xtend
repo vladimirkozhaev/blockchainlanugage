@@ -18,8 +18,6 @@ import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableRef
 
-import static org.blockchain.rell.typing.RellModelUtil.*
-
 class RellTypeProvider {
 
 	public static val STRING_TYPE = new StringType

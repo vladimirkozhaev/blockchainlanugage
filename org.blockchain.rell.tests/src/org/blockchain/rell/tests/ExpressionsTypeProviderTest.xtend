@@ -99,8 +99,6 @@ class ExpressionsTypeProviderTest {
 		r.getErrors // test if empty
 		var errors = r.errors
 		assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
-		var contents = r.getContents;
-		println(contents)
 		var model = r.getContents.get(0)
 		assertSame(model.typeFor, expectedType)
 	}

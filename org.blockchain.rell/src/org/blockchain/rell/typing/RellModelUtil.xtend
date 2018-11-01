@@ -25,9 +25,15 @@ class RellModelUtil {
 	def List<VariableReferenceInfo> usedVariables(Operation operation) {
 		val List<VariableReferenceInfo> variables = newArrayList
 
-		operation.parameters.value.stream.forEach([x|variables.add(new VariableReferenceInfo(x, true, true, false))])
-
-		operation.statements.forEach[el|variables.addAll(usedVariables(el))];
+		if (operation.parameters!==null){
+			operation.parameters.value.forEach([x|{
+				variables.add(new VariableReferenceInfo(x, true, true, false))
+			}])			
+		}
+		if (operation.statements!==null){
+			operation.statements.forEach[el|variables.addAll(usedVariables(el))];
+			
+		}
 		variables
 	}
 
@@ -36,18 +42,34 @@ class RellModelUtil {
 		val List<VariableReferenceInfo> variables = newArrayList
 
 		switch (statement) {
-			case statement instanceof Variable: {
-				variables.addAll((statement as Variable).usedVariables)
+			case statement.variable!==null: {
+				variables.addAll((statement.variable).usedVariables)
 			}
-			case statement instanceof VariableInit: {
-				variables.add(new VariableReferenceInfo((statement as VariableInit).name, false, true, false))
+			case statement.varInit!==null: {
+				variables.add(new VariableReferenceInfo((statement.varInit).name, false, true, false))
 			}
 			default: {
-				variables.addAll((statement as Relational).usedVariables)
+				variables.addAll((statement.relation).usedVariables)
 			}
 		}
 
 		variables;
+	}
+
+	def List<VariableReferenceInfo> usedVariables(Relational relation) {
+		switch (relation) {
+			case (relation instanceof Update): {
+				(relation as Update).usedVariables
+
+			}
+			case (relation instanceof Delete): {
+				(relation as Delete).usedVariables
+
+			}
+			default: {
+				(relation as Create).usedVariables
+			}
+		}
 	}
 
 	def List<VariableReferenceInfo> usedVariables(Update update) {
@@ -72,7 +94,7 @@ class RellModelUtil {
 	def List<VariableReferenceInfo> usedVariables(Variable variable) {
 		val List<VariableReferenceInfo> array = new ArrayList
 		val varRefInfo = new VariableReferenceInfo(variable.declaration, true, false, false);
-		array.add(new VariableReferenceInfo(variable.declaration, true, false, false))
+		array.add(varRefInfo)
 		if (variable.expression !== null) {
 			varRefInfo.isInit = true;
 			array.addAll(usedVariables(variable.expression));
@@ -92,41 +114,42 @@ class RellModelUtil {
 	def List<VariableReferenceInfo> usedVariables(Expression expression) {
 		var List<VariableReferenceInfo> variables = newArrayList;
 		switch (expression) {
-			case (expression instanceof Or): {
+			case (expression.or instanceof Or): {
 				variables = usedVariables((expression as Or).left)
 				variables.addAll(usedVariables((expression as Or).right))
 			}
-			case (expression instanceof And): {
+			case (expression.or instanceof And): {
 				variables = usedVariables((expression as And).left)
 				variables.addAll(usedVariables((expression as Or).right))
 			}
-			case (expression instanceof Equality): {
+			case (expression.or instanceof Equality): {
 				variables = usedVariables((expression as Equality).left)
 				variables.addAll(usedVariables((expression as Equality).right))
 			}
-			case (expression instanceof Equality): {
+			case (expression.or instanceof Equality): {
 				variables = usedVariables((expression as Equality).left)
 				variables.addAll(usedVariables((expression as Equality).right))
 			}
-			case (expression instanceof Comparison): {
+			case (expression.or instanceof Comparison): {
 				variables = usedVariables((expression as Comparison).left)
 				variables.addAll(usedVariables((expression as Comparison).right))
 			}
-			case (expression instanceof Plus): {
+			case (expression.or instanceof Plus): {
 				variables = usedVariables((expression as Plus).left)
 				variables.addAll(usedVariables((expression as Plus).right))
 			}
-			case (expression instanceof Minus): {
+			case (expression.or instanceof Minus): {
 				variables = usedVariables((expression as Plus).left)
 				variables.addAll(usedVariables((expression as Plus).right))
 			}
-			case (expression instanceof MulOrDiv): {
+			case (expression.or instanceof MulOrDiv): {
 				variables = usedVariables((expression as MulOrDiv).left)
 				variables.addAll(usedVariables((expression as MulOrDiv).right))
 			}
-			case (expression instanceof VariableRef): {
-				variables.add(new VariableReferenceInfo((expression as VariableRef).variable,false,false,true))
+			case (expression.or instanceof VariableRef): {
+				variables.add(new VariableReferenceInfo((expression.or as VariableRef).value,false,false,true))
 			}
+			
 			default:
 				new ArrayList<Variable>()
 		}

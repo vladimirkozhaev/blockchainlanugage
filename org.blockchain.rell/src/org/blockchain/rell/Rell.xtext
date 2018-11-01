@@ -15,7 +15,7 @@ Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	({Relational} relation=Relational | {Variable} variable=Variable | {VariableInit} varInit=VariableInit) ';';
+	( relation=Relational |  variable=Variable | varInit=VariableInit) ';';
 
 Variable:
 	declaration=VariableDeclaration (('=' expression=Expression)?);
@@ -67,7 +67,7 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} variable=[VariableDeclaration];
+	{VariableRef} value=[VariableDeclaration];
 
 MulOrDiv returns Expression:
 	Primary ({MulOrDiv.left=current} op=('*' | '/')

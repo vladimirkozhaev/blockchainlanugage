@@ -25,6 +25,7 @@ import org.blockchain.rell.typing.RellTypeProvider
 import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.validation.Check
+import java.util.ArrayList
 
 /**
  * Custom validation rules. 
@@ -37,44 +38,44 @@ class RellValidator extends AbstractRellValidator {
 	@Inject extension RellModelUtil
 	
 	
-	public static val FORWARD_REFERENCE = "org.example.expressions.ForwardReference";
+	protected static val ISSUE_CODE_PREFIX = "org.blockchain.rell."
+	
+	public static val FORWARD_REFERENCE = ISSUE_CODE_PREFIX+"expressions.ForwardReference";
 
-	public static val WRONG_TYPE = "org.example.expressions.WrongType";
+	public static val WRONG_TYPE = ISSUE_CODE_PREFIX+"WrongType";
 
-	public static val HIERARCHY_CYCLE = "org.blockchain.rell.entities.HierarchyCycle";
+	public static val HIERARCHY_CYCLE = ISSUE_CODE_PREFIX+"HierarchyCycle";
 
-	public static val MORE_TNAN_ONE_VARIABLE = "org.blockchain.rell.variables.Copy"
-
-	protected static val ISSUE_CODE_PREFIX = "org.example.expressions."
+	public static val MORE_TNAN_ONE_VARIABLE = ISSUE_CODE_PREFIX+"Copy"
 
 	public static val TYPE_MISMATCH = ISSUE_CODE_PREFIX + "TypeMismatch"
-
-	@Check
-	def void checkForwardReference(VariableRef varDecl) {
-//		
-//		if (!RellModelUtil.variablesDefinedBefore(varDecl).contains(varDecl.variable))
-//			error("variable forward reference not allowed: '" + varDecl.variable.name + "'",
-//				RellPackage.eINSTANCE.variableRef_Variable,
-//				FORWARD_REFERENCE,
-//				varDecl.variable.name)
-	}
+	
+	
 
 	@Check
 	def void checkOperation(Operation operation) {
-		val List<VariableReferenceInfo> variableDeclarations=operation.usedVariables;
-		println("-------------------------------------")
-		variableDeclarations.forEach[varReferenceInfo,i|println("i:"+i+"," +varReferenceInfo)]
 		
-//		val List<String> variableInitList = newArrayList;
-//
-//		operation.parameters.value.forEach[element, index|variableInitList.add(element.name)]
-//
-//		val copyVariables = variableInitList.stream.
-//			filter[element|Collections.frequency(variableInitList, element) > 1].collect(Collectors.toSet) // st[element,index|]
-//		if (copyVariables.size > 0) {
-//			error("more than one variable in operation " + operation.name + "  parameters :" + copyVariables + "'",
-//				RellPackage::eINSTANCE.operation_Parameters, HIERARCHY_CYCLE)
-//		}
+		val List<VariableReferenceInfo> variableDeclarations=operation.usedVariables;
+		
+		variableDeclarations.reverse;
+		
+		for (var i = 0 ; i < variableDeclarations.length ; i++) {
+  			val element=variableDeclarations.get(i);
+  			val sublistToCheck=new ArrayList(variableDeclarations.subList(i,variableDeclarations.length));
+  			var boolean isDeclared=false
+  			for (var j=0;j<sublistToCheck.length;j++){
+  				if (sublistToCheck.get(j).variableDeclaration==element.variableDeclaration&&sublistToCheck.get(j).isDeclared){
+  					isDeclared=true
+  				}
+  			}
+  			
+  			if (!isDeclared){
+  				error("Forward reference " + element.variableDeclaration.name,	RellPackage::eINSTANCE.operation_Statements, FORWARD_REFERENCE)
+  				
+  			}
+
+		}
+		
 
 	}
 
