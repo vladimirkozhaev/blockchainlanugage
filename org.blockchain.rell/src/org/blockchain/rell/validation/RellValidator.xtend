@@ -4,6 +4,7 @@
 package org.blockchain.rell.validation
 
 import com.google.inject.Inject
+import java.util.ArrayList
 import java.util.List
 import org.blockchain.rell.rell.ClassDefinition
 import org.blockchain.rell.rell.Comparison
@@ -18,14 +19,12 @@ import org.blockchain.rell.rell.RellPackage
 import org.blockchain.rell.rell.TypeReference
 import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableInit
-import org.blockchain.rell.rell.VariableRef
 import org.blockchain.rell.typing.RellModelUtil
 import org.blockchain.rell.typing.RellType
 import org.blockchain.rell.typing.RellTypeProvider
 import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.validation.Check
-import java.util.ArrayList
 
 /**
  * Custom validation rules. 

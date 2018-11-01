@@ -111,50 +111,62 @@ class RellModelUtil {
 		variables
 	}
 
-	def List<VariableReferenceInfo> usedVariables(Expression expression) {
+
+	def List<VariableReferenceInfo> processExpression(Expression expression){
 		var List<VariableReferenceInfo> variables = newArrayList;
 		switch (expression) {
-			case (expression.or instanceof Or): {
+			case (expression instanceof Or): {
 				variables = usedVariables((expression as Or).left)
 				variables.addAll(usedVariables((expression as Or).right))
 			}
-			case (expression.or instanceof And): {
+			case (expression instanceof And): {
 				variables = usedVariables((expression as And).left)
 				variables.addAll(usedVariables((expression as Or).right))
 			}
-			case (expression.or instanceof Equality): {
+			case (expression instanceof Equality): {
 				variables = usedVariables((expression as Equality).left)
 				variables.addAll(usedVariables((expression as Equality).right))
 			}
-			case (expression.or instanceof Equality): {
+			case (expression instanceof Equality): {
 				variables = usedVariables((expression as Equality).left)
 				variables.addAll(usedVariables((expression as Equality).right))
 			}
-			case (expression.or instanceof Comparison): {
+			case (expression instanceof Comparison): {
 				variables = usedVariables((expression as Comparison).left)
 				variables.addAll(usedVariables((expression as Comparison).right))
 			}
-			case (expression.or instanceof Plus): {
+			case (expression instanceof Plus): {
 				variables = usedVariables((expression as Plus).left)
 				variables.addAll(usedVariables((expression as Plus).right))
 			}
-			case (expression.or instanceof Minus): {
+			case (expression instanceof Minus): {
 				variables = usedVariables((expression as Plus).left)
 				variables.addAll(usedVariables((expression as Plus).right))
 			}
-			case (expression.or instanceof MulOrDiv): {
+			case (expression instanceof MulOrDiv): {
 				variables = usedVariables((expression as MulOrDiv).left)
 				variables.addAll(usedVariables((expression as MulOrDiv).right))
 			}
-			case (expression.or instanceof VariableRef): {
-				variables.add(new VariableReferenceInfo((expression.or as VariableRef).value,false,false,true))
+			case (expression instanceof VariableRef): {
+				variables.add(new VariableReferenceInfo((expression as VariableRef).value,false,false,true))
 			}
 			
 			default:
-				new ArrayList<Variable>()
+				variables=new ArrayList<VariableReferenceInfo>()
+		}
+		variables
+	}
+
+	def List<VariableReferenceInfo> usedVariables(Expression expression) {
+		
+		val or = expression.or
+		if (or!==null){
+			processExpression(or);
+		}else{
+			processExpression(expression);
+			
 		}
 
-		variables
 
 	}
 }

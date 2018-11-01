@@ -88,10 +88,10 @@ class RellTypeProvider {
 	}
 
 	def dispatch RellType typeFor(VariableRef varRef) {
-		if (varRef.variable === null)
+		if (varRef.value === null)
 			return null
 		else
-			return varRef.variable.typeFor
+			return varRef.value.typeFor
 	}
 
 	def isInt(RellType type) { type == RellTypeProvider.INT_TYPE }
