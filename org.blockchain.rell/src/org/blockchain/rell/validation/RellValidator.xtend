@@ -35,46 +35,60 @@ class RellValidator extends AbstractRellValidator {
 
 	@Inject extension RellTypeProvider
 	@Inject extension RellModelUtil
-	
-	
+
 	protected static val ISSUE_CODE_PREFIX = "org.blockchain.rell."
-	
-	public static val FORWARD_REFERENCE = ISSUE_CODE_PREFIX+"expressions.ForwardReference";
 
-	public static val WRONG_TYPE = ISSUE_CODE_PREFIX+"WrongType";
+	public static val FORWARD_REFERENCE = ISSUE_CODE_PREFIX + "ForwardReference";
 
-	public static val HIERARCHY_CYCLE = ISSUE_CODE_PREFIX+"HierarchyCycle";
+	public static val NOT_INIT_VARIABLE = ISSUE_CODE_PREFIX + "NotInitVariable";
 
-	public static val MORE_TNAN_ONE_VARIABLE = ISSUE_CODE_PREFIX+"Copy"
+	public static val WRONG_TYPE = ISSUE_CODE_PREFIX + "WrongType";
+
+	public static val HIERARCHY_CYCLE = ISSUE_CODE_PREFIX + "HierarchyCycle";
+
+	public static val MORE_TNAN_ONE_VARIABLE = ISSUE_CODE_PREFIX + "Copy"
 
 	public static val TYPE_MISMATCH = ISSUE_CODE_PREFIX + "TypeMismatch"
-	
-	
 
 	@Check
 	def void checkOperation(Operation operation) {
-		
-		val List<VariableReferenceInfo> variableDeclarations=operation.usedVariables;
-		
+
+		val List<VariableReferenceInfo> variableDeclarations = operation.usedVariables;
+
 		variableDeclarations.reverse;
-		
-		for (var i = 0 ; i < variableDeclarations.length ; i++) {
-  			val element=variableDeclarations.get(i);
-  			val sublistToCheck=new ArrayList(variableDeclarations.subList(i,variableDeclarations.length));
-  			var boolean isDeclared=false
-  			for (var j=0;j<sublistToCheck.length;j++){
-  				if (sublistToCheck.get(j).variableDeclaration==element.variableDeclaration&&sublistToCheck.get(j).isDeclared){
-  					isDeclared=true
-  				}
-  			}
-  			
-  			if (!isDeclared){
-  				error("Forward reference " + element.variableDeclaration.name,	RellPackage::eINSTANCE.operation_Statements, FORWARD_REFERENCE)
-  				
-  			}
+
+		for (var i = 0; i < variableDeclarations.length; i++) {
+			val element = variableDeclarations.get(i);
+			val sublistToCheck = new ArrayList(variableDeclarations.subList(i, variableDeclarations.length));
+			var boolean isDeclared = false
+			var boolean isInit = false;
+			for (var j = 0; j < sublistToCheck.length; j++) {
+				if (sublistToCheck.get(j).variableDeclaration == element.variableDeclaration) {
+					if (sublistToCheck.get(j).isDeclared) {
+						isDeclared = true
+					}
+
+					if (sublistToCheck.get(j).isInit) {
+						isInit = true;
+					}
+
+				}
+
+			}
+
+			if (!isDeclared) {
+				error("Forward reference " + element.variableDeclaration.name,
+					RellPackage::eINSTANCE.operation_Statements, FORWARD_REFERENCE)
+
+			}
+
+			if ((!isInit) && element.isUsed) {
+				error("Variable is not init " + element.variableDeclaration.name,
+					RellPackage::eINSTANCE.operation_Statements, NOT_INIT_VARIABLE)
+
+			}
 
 		}
-		
 
 	}
 
@@ -88,8 +102,8 @@ class RellValidator extends AbstractRellValidator {
 		var current = theClass
 		while (current !== null) {
 			if (visitedClasses.contains(current)) {
-				error("cycle in hierarchy of entity '" + current.name + "'", RellPackage::eINSTANCE.classDefinition_SuperType,
-					HIERARCHY_CYCLE)
+				error("cycle in hierarchy of entity '" + current.name + "'",
+					RellPackage::eINSTANCE.classDefinition_SuperType, HIERARCHY_CYCLE)
 				return
 			}
 			visitedClasses.add(current)
