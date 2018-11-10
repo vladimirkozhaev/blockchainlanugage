@@ -24,23 +24,25 @@ Relational:
 	Update | Delete | Create;
 
 Update:
-	'update' entity=ID '(' conditions=Conditions? ')' '{' variableList+=VariableInit
+	'update' entity=[ClassDefinition] '(' conditions=Conditions? ')' '{' variableList+=VariableInit
 	(',' variableList+=VariableInit*)? '}';
 
+
 Delete:
-	'delete' entity=ID '(' conditions=Conditions? ')';
+	'delete' entity=[ClassDefinition] '(' conditions=Conditions? ')';
 
 Create:
-	'create' entity=ID '(' conditions=Conditions? ')';
+	'create' entity=[ClassDefinition] '(' conditions=Conditions? ')';
 
 Conditions:
 	elements+=ConditionElement (',' elements+=ConditionElement*)?;
 
 ConditionElement:
-	compareName=ID ('==' | '!=' | '>' | '<' | '>=' | '<=') expr=Expression;
+	name=ID ('==' | '!=' | '>' | '<' | '>=' | '<=') expr=Expression;
 
 VariableInit:
 	name=[VariableDeclaration] '=' expression=Expression;
+
 
 Expression:
 	or=Or;
