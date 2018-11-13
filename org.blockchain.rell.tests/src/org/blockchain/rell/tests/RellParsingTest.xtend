@@ -5,6 +5,8 @@ package org.blockchain.rell.tests
 
 import com.google.inject.Inject
 import org.blockchain.rell.rell.Model
+import org.blockchain.rell.scoping.RellIndex
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.testing.util.ParseHelper
@@ -17,7 +19,29 @@ import org.junit.runner.RunWith
 class RellParsingTest {
 	@Inject
 	ParseHelper<Model> parseHelper
+	@Inject extension RellIndex
 	
+	@Test def void testExportedEObjectDescriptions() {
+		println("parser is:" + parseHelper)
+		val result = parseHelper.parse('''class test {
+						field1:text;
+						field2:integer;
+						field3:byte_array;
+						field4:json;
+					}
+		''')
+		Assert.assertNotNull(result)
+		result.assertExportedEObjectDescriptions("test, test.field1, test.field2, test.field3, test.field4")
+	// before SmallJavaResourceDescriptionsStrategy the output was
+	// "C, C.f, C.m, C.m.p, C.m.v, A"
+	}
+
+	def private assertExportedEObjectDescriptions(EObject o, CharSequence expected) {
+		Assert.assertEquals(
+			expected.toString,
+			o.getExportedEObjectDescriptions.map[qualifiedName].join(", ")
+		)
+	}
 
 	@Test
 	def void testSimpleClassWithPrimitiveTypes() {
@@ -146,6 +170,5 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-
 
 }
