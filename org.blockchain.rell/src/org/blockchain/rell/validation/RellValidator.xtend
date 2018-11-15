@@ -98,7 +98,7 @@ class RellValidator extends AbstractRellValidator {
 			return;
 		}
 		val visitedClasses = <ClassDefinition>newHashSet();
-		visitedClasses.add(theClass);
+		
 		var current = theClass
 		while (current !== null) {
 			if (visitedClasses.contains(current)) {
