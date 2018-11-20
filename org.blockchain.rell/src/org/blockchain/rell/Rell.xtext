@@ -8,14 +8,17 @@ Model:
 
 ClassDefinition:
 	'class' name=ID ('extends' superType=[ClassDefinition])? '{'
-	attributes+=Attribute*
+	attributeListField+=AttributeListField*
 	'}';
+
+AttributeListField:
+	prefix=Prefix? attributeList+=RelAttrubutesList ';';
 
 Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	( relation=Relational |  variable=Variable | varInit=VariableInit) ';';
+	(relation=Relational | variable=Variable | varInit=VariableInit) ';';
 
 Variable:
 	declaration=VariableDeclaration (('=' expression=Expression)?);
@@ -26,7 +29,6 @@ Relational:
 Update:
 	'update' entity=[ClassDefinition] '(' conditions=Conditions? ')' '{' variableList+=VariableInit
 	(',' variableList+=VariableInit*)? '}';
-
 
 Delete:
 	'delete' entity=[ClassDefinition] '(' conditions=Conditions? ')';
@@ -42,7 +44,6 @@ ConditionElement:
 
 VariableInit:
 	name=[VariableDeclaration] '=' expression=Expression;
-
 
 Expression:
 	or=Or;
@@ -65,12 +66,6 @@ PlusOrMinus returns Expression:
 	MulOrDiv (({Plus.left=current} '+' | {Minus.left=current} '-')
 	right=MulOrDiv)*;
 
-Atomic returns Expression:
-	{IntConstant} value=INT |
-	{StringConstant} value=STRING |
-	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=[VariableDeclaration];
-
 MulOrDiv returns Expression:
 	Primary ({MulOrDiv.left=current} op=('*' | '/')
 	right=Primary)*;
@@ -80,17 +75,21 @@ Primary returns Expression:
 	{Not} "not" expression=Primary |
 	Atomic;
 
+Atomic returns Expression:
+	{IntConstant} value=INT |
+	{StringConstant} value=STRING |
+	{BoolConstant} value=('true' | 'false') |
+	{VariableRef} value=[VariableDeclaration] ;
+
+
 RelAttrubutesList:
 	value+=VariableDeclaration (',' value+=VariableDeclaration)*;
-
-Attribute:
-	modificator=Prefix? variable=VariableDeclaration ';';
 
 VariableDeclaration:
 	name=ID ':' type=TypeReference;
 
 TypeReference:
-	primitive=PrimitiveType | entityType=ClassType;
+	primitive=PrimitiveType | entityType=ClassType ;
 
 PrimitiveType:
 	primitiveType=(Text | Integer | Json | ByteArray | Boolean);

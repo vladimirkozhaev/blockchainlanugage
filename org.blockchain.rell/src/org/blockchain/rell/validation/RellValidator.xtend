@@ -76,7 +76,7 @@ class RellValidator extends AbstractRellValidator {
 
 			}
 
-			if (!isDeclared) {
+			if (!isDeclared ) {
 				error("Forward reference " + element.variableDeclaration.name,
 					RellPackage::eINSTANCE.operation_Statements, FORWARD_REFERENCE)
 

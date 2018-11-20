@@ -9,6 +9,7 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.scoping.Scopes
+import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
 
 /**
  * This class contains custom scoping description.
@@ -16,7 +17,7 @@ import org.eclipse.xtext.scoping.Scopes
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#scoping
  * on how and when to use it.
  */
-class RellScopeProvider extends AbstractRellScopeProvider  {
+class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 	override getScope(EObject context, EReference reference) {
 		// We want to define the Scope for the Element's superElement cross-reference
@@ -25,11 +26,15 @@ class RellScopeProvider extends AbstractRellScopeProvider  {
 			// EcoreUtil2 provides useful functionality to do that
 			// For example searching for all elements within the root Object's tree
 			val EObject rootElement = EcoreUtil2.getRootContainer(context)
-			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, context.class)
+			var candidates = EcoreUtil2.getAllContentsOfType(rootElement, context.class)
 			// Create IEObjectDescriptions and puts them into an IScope instance
+			candidates.remove(context)
 			return Scopes.scopeFor(candidates)
 		}
 		return super.getScope(context, reference);
 	}
 
+	
 }
+
+

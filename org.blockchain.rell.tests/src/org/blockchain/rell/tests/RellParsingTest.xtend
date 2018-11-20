@@ -22,7 +22,6 @@ class RellParsingTest {
 	@Inject extension RellIndex
 	
 	@Test def void testExportedEObjectDescriptions() {
-		println("parser is:" + parseHelper)
 		val result = parseHelper.parse('''class test {
 						field1:text;
 						field2:integer;
@@ -32,8 +31,6 @@ class RellParsingTest {
 		''')
 		Assert.assertNotNull(result)
 		result.assertExportedEObjectDescriptions("test, test.field1, test.field2, test.field3, test.field4")
-	// before SmallJavaResourceDescriptionsStrategy the output was
-	// "C, C.f, C.m, C.m.p, C.m.v, A"
 	}
 
 	def private assertExportedEObjectDescriptions(EObject o, CharSequence expected) {
@@ -69,6 +66,39 @@ class RellParsingTest {
 				field3:timestamp;
 				field4:signer;
 			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	@Test
+	def void testFieldsCommaList() {
+		val result = parseHelper.parse('''
+			class test {
+									key field1:name,field11:pubkey;
+									
+									fieldx:name;	
+									field2:guid;
+									field3:timestamp;
+									field4:signer;
+								}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	@Test
+	def void testKeyField() {
+		val result = parseHelper.parse('''
+			class test {
+									key field1:pubkey;
+									
+									fieldx:name;	
+									field2:guid;
+									field3:timestamp;
+									field4:signer;
+								}
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
@@ -136,10 +166,6 @@ class RellParsingTest {
 						operation test_create(sex:Test,box:Test){
 							delete test(sex==not box or jazz and sex ,box==5+10);
 						}
-			
-			
-			
-			
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors

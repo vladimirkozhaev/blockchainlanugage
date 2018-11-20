@@ -19,13 +19,6 @@ class RellValidatorTest {
 	
 
 	@Test
-	def void testEntityExtendsItself() {
-		'''class Test extends Test{
-			
-		}'''.parse.assertError(RellPackage.eINSTANCE.classDefinition, RellValidator::HIERARCHY_CYCLE,
-			"cycle in hierarchy of entity 'Test'")
-	}
-	@Test
 	def void forwardReferencesTest() {
 		'''operation o(){
 			j:integer=i;
@@ -33,6 +26,19 @@ class RellValidatorTest {
 		}'''.parse.assertError(RellPackage.eINSTANCE.operation, RellValidator::FORWARD_REFERENCE,
 			"Forward reference i")
 	}
+	@Test
+	def void keyFieldTest() {
+		'''class test {
+						key field1:pubkey;
+						
+						fieldx:name;	
+						field2:guid;
+						field3:timestamp;
+						field4:signer;
+					}'''.parse.assertNoError("Key index is allowed")
+	}
+	
+	
 	
 	@Test
 	def void forwardReferencesTest1() {

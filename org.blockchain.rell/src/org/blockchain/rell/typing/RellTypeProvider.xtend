@@ -36,7 +36,7 @@ class RellTypeProvider {
 			Equality: RellTypeProvider.BOOL_TYPE
 			And: RellTypeProvider.BOOL_TYPE
 			Or: RellTypeProvider.BOOL_TYPE
-			default:null
+			default:e.or.typeFor
 			
 		}
 	}
