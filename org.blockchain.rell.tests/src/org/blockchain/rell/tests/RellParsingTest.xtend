@@ -20,7 +20,7 @@ class RellParsingTest {
 	@Inject
 	ParseHelper<Model> parseHelper
 	@Inject extension RellIndex
-	
+
 	@Test def void testExportedEObjectDescriptions() {
 		println("parser is:" + parseHelper)
 		val result = parseHelper.parse('''class test {
@@ -86,6 +86,34 @@ class RellParsingTest {
 			class test1{
 				xxx:test1;
 				ssss:text;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	@Test
+	def void testAttributeTypeAsAttributeName() {
+		val result = parseHelper.parse(''' 
+			class test1 {
+				id : guid;
+			}
+			
+			class test2 {
+				test1;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	@Test
+	def void testDefaultAttributeValue() {
+		val result = parseHelper.parse(''' 
+			class test {
+				testText: text = 'test_text';
 			}
 		''')
 		Assert.assertNotNull(result)
