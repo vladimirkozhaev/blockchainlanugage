@@ -169,7 +169,7 @@ class RellParsingTest {
 
 // Check that a class can apply the 'index' clause after an attribute definition
 	@Test
-	def void testApplyIndexAfterDef() {
+	def void testApplyIndexAfterAttrDef() {
 		val result = parseHelper.parse(''' 
 			class test {
 				testIndex : text;
@@ -196,7 +196,7 @@ class RellParsingTest {
 	
 // Check that a class can apply the 'index' clause with an attribute definition
 	@Test
-	def void testApplyIndexWihDef() {
+	def void testApplyIndexWihAttrDef() {
 		val result = parseHelper.parse(''' 
 			class test {
 				index testIndex : text;
