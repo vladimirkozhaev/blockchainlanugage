@@ -165,6 +165,21 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+	
+	@Test
+	def void testIndexOnAttributeWithRefType() {
+		val result = parseHelper.parse('''
+			class test1 {
+			}
+			
+			class test2 {
+				index attrTest1 : test1;
+			}	
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
 
 	@Test
 	def void testOperations() {
