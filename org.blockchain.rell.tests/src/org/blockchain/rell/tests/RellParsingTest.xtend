@@ -71,7 +71,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-	
+
 	@Test
 	def void testFieldsCommaList() {
 		val result = parseHelper.parse('''
@@ -88,6 +88,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
 	@Test
 	def void testKeyField() {
 		val result = parseHelper.parse('''
@@ -152,16 +153,14 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-	
-// Check that classes can have key and index clauses	
+
+// Check that a class can apply the 'key' clause after an attribute definition
 	@Test
-	def void testApplyKeyIndexClauses() {
+	def void testApplyKeyAfterAttrDef() {
 		val result = parseHelper.parse(''' 
 			class test {
 				testKey : text;
-				testIndex : text;
-				key testKey:text;
-				index testIndex;
+				key testKey;
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -169,6 +168,102 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+// Check that a class can apply the 'key' clause with an attribute definition	
+	@Test
+	def void testApplyKeyWithAttrDef() {
+		val result = parseHelper.parse(''' 
+			class test {
+				key testKey : text;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+// Check applying the composite "key" clause with multiple attributes in definition
+	@Test
+	def void testCompositeKeyInDefinition() {
+		val result = parseHelper.parse('''
+			class test {
+				key firstField : text, secondField : text;
+			}	
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+// Check applying the composite "key" clause with multiple attributes after their definition
+	@Test
+	def void testCompositeKeyAfterDefinition() {
+		val result = parseHelper.parse('''
+			class test {
+				firstField : text; 
+				secondField : text;
+				key firstField, secondField; 
+			}	
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+// Check that a class can apply the 'index' clause after an attribute definition
+	@Test
+	def void testApplyIndexAfterAttrDef() {
+		val result = parseHelper.parse(''' 
+			class test {
+				testIndex : text;
+				index testIndex;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+// Check that a class can apply the 'index' clause with an attribute definition
+	@Test
+	def void testApplyIndexWihAttrDef() {
+		val result = parseHelper.parse(''' 
+			class test {
+				index testIndex : text;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+// Check applying the composite "index" clause with multiple attributes in definition
+	@Test
+	def void testCompositeIndexInDefinition() {
+		val result = parseHelper.parse('''
+			class test {
+				index firstField : text, secondField : text;
+			}	
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+// Check applying the composite "index" clause with multiple attributes after their definition
+	@Test
+	def void testCompositeIndexAfterDefinition() {
+		val result = parseHelper.parse('''
+			class test {
+				firstField : text; 
+				secondField : text;
+				index firstField, secondField; 
+			}	
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
 // Check an attribute, that has reference type to a class, as index clause	
 	@Test
 	def void testIndexOnAttributeWithRefType() {
