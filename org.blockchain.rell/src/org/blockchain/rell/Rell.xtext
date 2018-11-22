@@ -9,10 +9,14 @@ Model:
 ClassDefinition:
 	'class' name=ID ('extends' superType=[ClassDefinition])? '{'
 	attributeListField+=AttributeListField*
+	specificationList+=Specification*
 	'}';
 
+Specification:
+	((key=Key | index=Index | ((key=Key index=Index)) name=[VariableDeclaration])) ';';
+
 AttributeListField:
-	prefix=Prefix? attributeList+=RelAttrubutesList ';';
+	key=Key? index=Index? attributeList+=RelAttrubutesList ';';
 
 Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
@@ -91,7 +95,7 @@ TypeReference:
 	primitive=PrimitiveType | entityType=ClassType;
 
 PrimitiveType:
-	primitiveType=(Text | Integer | Json | ByteArray | Boolean);
+	primitiveType=(Text | Tuid | Pubkey|Name | Timestamp | Integer | Json | ByteArray | Boolean);
 
 ClassType:
 	entityRef=[ClassDefinition];
@@ -101,6 +105,9 @@ Name:
 
 Pubkey:
 	'pubkey';
+
+Timestamp:
+	'timestamp';
 
 Tuid:
 	'tuid';
@@ -120,5 +127,8 @@ Text:
 ByteArray:
 	'byte_array';
 
-Prefix:
-	'key' | 'index';
+Key:
+	'key';
+
+Index:
+	'index';

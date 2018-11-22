@@ -80,8 +80,8 @@ class RellParsingTest {
 									
 									fieldx:text;	
 									field2:guid;
-									field3:timestamp;
-									field4:signer;
+									
+									
 								}
 		''')
 		Assert.assertNotNull(result)
@@ -92,12 +92,12 @@ class RellParsingTest {
 	def void testKeyField() {
 		val result = parseHelper.parse('''
 			class test {
-									key field1:pubkey;
+									key field1:text;
 									
 									fieldx:name;	
-									field2:guid;
+									field2:tuid;
 									field3:timestamp;
-									field4:signer;
+									
 								}
 		''')
 		Assert.assertNotNull(result)
