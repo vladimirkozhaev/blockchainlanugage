@@ -183,10 +183,25 @@ class RellParsingTest {
 	
 // Check applying the composite "key" clause with multiple attributes in definition
 	@Test
-	def testCompositeKeyMultipleDef() {
+	def void testCompositeKeyInDefinition() {
 		val result = parseHelper.parse('''
 			class test {
 				key firstField : text, secondField : text;
+			}	
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+// Check applying the composite "key" clause with multiple attributes after their definition
+	@Test
+	def void testCompositeKeyAfterDefinition() {
+		val result = parseHelper.parse('''
+			class test {
+				firstField : text; 
+				secondField : text;
+				key firstField, secondField; 
 			}	
 		''')
 		Assert.assertNotNull(result)
@@ -215,6 +230,19 @@ class RellParsingTest {
 			class test {
 				index testIndex : text;
 			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+// Check applying the composite "index" clause with multiple attributes in definition
+	@Test
+	def void testCompositeIndexInDefinition() {
+		val result = parseHelper.parse('''
+			class test {
+				index firstField : text, secondField : text;
+			}	
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
