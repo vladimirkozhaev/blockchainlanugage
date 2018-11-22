@@ -123,6 +123,7 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
+// Check if attribute type is not specified, it will be the same as attribute name 
 	@Test
 	def void testAttributeTypeAsAttributeName() {
 		val result = parseHelper.parse(''' 
@@ -139,6 +140,7 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
+// Check default values for attribute
 	@Test
 	def void testDefaultAttributeValue() {
 		val result = parseHelper.parse(''' 
@@ -151,6 +153,7 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+// Check that classes can have key and index clauses	
 	@Test
 	def void testApplyKeyIndexClauses() {
 		val result = parseHelper.parse(''' 
@@ -166,6 +169,7 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+// Check an attribute, that has reference type to a class, as index clause	
 	@Test
 	def void testIndexOnAttributeWithRefType() {
 		val result = parseHelper.parse('''
