@@ -153,15 +153,53 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
-// Check that classes can have key and index clauses	
+// Check that a class can apply the 'key' clause after an attribute definition
 	@Test
-	def void testApplyKeyIndexClauses() {
+	def void testApplyKeyAfterAttrDef() {
 		val result = parseHelper.parse(''' 
 			class test {
 				testKey : text;
+				key testKey;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+
+// Check that a class can apply the 'index' clause after an attribute definition
+	@Test
+	def void testApplyIndexAfterDef() {
+		val result = parseHelper.parse(''' 
+			class test {
 				testIndex : text;
-				key testKey:text;
 				index testIndex;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+// Check that a class can apply the 'key' clause with an attribute definition	
+	@Test
+	def void testApplyKeyWithAttrDef() {
+		val result = parseHelper.parse(''' 
+			class test {
+				key testKey : text;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+// Check that a class can apply the 'index' clause with an attribute definition
+	@Test
+	def void testApplyIndexWihDef() {
+		val result = parseHelper.parse(''' 
+			class test {
+				index testIndex : text;
 			}
 		''')
 		Assert.assertNotNull(result)
