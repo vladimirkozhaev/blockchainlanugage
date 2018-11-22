@@ -9,16 +9,15 @@ import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.testing.util.ParseHelper
-import org.eclipse.xtext.testing.validation.ValidationTestHelper
 import org.junit.Test
 import org.junit.runner.RunWith
+
 import static extension org.junit.Assert.*
 
 @RunWith(XtextRunner)
 @InjectWith(RellInjectorProvider)
 class RellScopeProviderTest {
 	@Inject extension ParseHelper<Model>
-	@Inject extension ValidationTestHelper
 	@Inject extension IScopeProvider
 
 	@Test def void testScopeProvider() {

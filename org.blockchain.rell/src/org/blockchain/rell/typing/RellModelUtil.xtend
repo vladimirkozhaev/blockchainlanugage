@@ -27,7 +27,7 @@ class RellModelUtil {
 
 		if (operation.parameters!==null){
 			operation.parameters.value.forEach([x|{
-				variables.add(new VariableReferenceInfo(x, true, true, false))
+				variables.add(new VariableReferenceInfo(x.declaration, true, true, false))
 			}])			
 		}
 		if (operation.statements!==null){

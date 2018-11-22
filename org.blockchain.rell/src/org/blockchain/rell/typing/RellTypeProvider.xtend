@@ -23,6 +23,8 @@ class RellTypeProvider {
 	public static val STRING_TYPE = new StringType
 	public static val INT_TYPE = new IntType
 	public static val BOOL_TYPE = new BoolType
+	public static val BYTE_ARRAY = new ByteArray
+	public static val JSON = new Json
 
 	def dispatch RellType typeFor(Expression e) {
 		switch (e) {
@@ -36,19 +38,27 @@ class RellTypeProvider {
 			Equality: RellTypeProvider.BOOL_TYPE
 			And: RellTypeProvider.BOOL_TYPE
 			Or: RellTypeProvider.BOOL_TYPE
-			default:e.or.typeFor
-			
+			default: e.or.typeFor
 		}
 	}
 
 	def dispatch RellType typeFor(VariableDeclaration declaration) {
-		val primitive = declaration.type.primitive
-		if (primitive !== null) {
+		val name=declaration.name;
+		switch (name) {
+			case 'name':RellTypeProvider.STRING_TYPE
+			case 'tuid':RellTypeProvider.BYTE_ARRAY
+			case 'pubkey':RellTypeProvider.STRING_TYPE
+			default: {
+				val primitive = declaration.type.primitive
+				if (primitive !== null) {
 
-			primitive.typeFor
+					primitive.typeFor
 
-		}else if (declaration.type.entityType!==null){
-			null;
+				} else if (declaration.type.entityType !== null) {
+					null;
+				}
+
+			}
 		}
 
 	}
@@ -63,9 +73,9 @@ class RellTypeProvider {
 	}
 
 	def dispatch RellType typeFor(TypeReference e) {
-		if (e.primitive!=null){
+		if (e.primitive != null) {
 			e.primitive.typeFor;
-		}else{
+		} else {
 			null;
 		}
 
@@ -84,7 +94,7 @@ class RellTypeProvider {
 	}
 
 	def dispatch RellType typeFor(Variable variable) {
-		variable?.expression?.typeFor
+		variable.declaration.typeFor
 	}
 
 	def dispatch RellType typeFor(VariableRef varRef) {

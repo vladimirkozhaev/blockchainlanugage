@@ -26,6 +26,12 @@ class ExpressionsTypeProviderTest {
 
 	@Test def void intConstant() { "10".assertIntType }
 
+	@Test def void name() { "name".assertVariableDeclaration(RellTypeProvider::STRING_TYPE) }
+
+	@Test def void pubkey() { "pubkey".assertVariableDeclaration(RellTypeProvider::STRING_TYPE) }
+
+	@Test def void tuid() { "tuid".assertVariableDeclaration(RellTypeProvider::BYTE_ARRAY) }
+
 	@Test def void stringConstant() { "'foo'".assertStringType }
 
 	@Test def void varIntRef1() { assertIntType("field2:integer", ga.variableDeclarationRule) }
@@ -33,10 +39,6 @@ class ExpressionsTypeProviderTest {
 	@Test def void varIntRef2() { assertIntType("field2:timestamp", ga.variableDeclarationRule) }
 
 	@Test def void varStringRef1() { assertStringType("field2:text", ga.variableDeclarationRule) }
-
-	@Test def void varStringRef2() { assertStringType("field2:tuid", ga.variableDeclarationRule) }
-
-	@Test def void varStringRef3() { assertStringType("field2:name", ga.variableDeclarationRule) }
 
 	@Test def void varBool1() { assertBoolType("true") }
 
@@ -63,6 +65,14 @@ class ExpressionsTypeProviderTest {
 		input.assertType(RellTypeProvider::STRING_TYPE, ga.expressionRule)
 	}
 
+	def assertVariableDeclaration(CharSequence input, RellType rellType) {
+		input.assertType(rellType, ga.variableDeclarationRule)
+	}
+
+	def assertByteArray(CharSequence input) {
+		input.assertType(RellTypeProvider::BYTE_ARRAY, ga.expressionRule)
+	}
+
 	def assertIntType(CharSequence input, ParserRule rule) {
 		input.assertType(RellTypeProvider::INT_TYPE, rule)
 	}
@@ -86,7 +96,7 @@ class ExpressionsTypeProviderTest {
 	def assertType(CharSequence input, RellType expectedType) {
 
 		assertType(input, expectedType, ga.expressionRule);
-	
+
 	}
 
 	def assertType(CharSequence input, RellType expectedType, ParserRule rule) {
@@ -100,7 +110,6 @@ class ExpressionsTypeProviderTest {
 		var errors = r.errors
 		assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 		var model = r.getContents.get(0)
-		println("size:"+r.getContents.size);
 		assertSame(model.typeFor, expectedType)
 	}
 

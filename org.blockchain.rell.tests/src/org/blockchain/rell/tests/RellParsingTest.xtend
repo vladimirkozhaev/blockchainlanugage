@@ -76,9 +76,9 @@ class RellParsingTest {
 	def void testFieldsCommaList() {
 		val result = parseHelper.parse('''
 			class test {
-									key field1:name,field11:pubkey;
+									key field1:text,field11:text;
 									
-									fieldx:name;	
+									fieldx:text;	
 									field2:guid;
 									field3:timestamp;
 									field4:signer;
@@ -157,7 +157,7 @@ class RellParsingTest {
 			class test {
 				testKey : text;
 				testIndex : text;
-				key testKey;
+				key testKey:text;
 				index testIndex;
 			}
 		''')

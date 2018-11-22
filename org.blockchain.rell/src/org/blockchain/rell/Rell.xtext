@@ -79,23 +79,31 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=[VariableDeclaration] ;
-
+	{VariableRef} value=[VariableDeclaration];
 
 RelAttrubutesList:
-	value+=VariableDeclaration (',' value+=VariableDeclaration)*;
+	value+=Variable (',' value+=Variable)*;
 
 VariableDeclaration:
-	name=ID ':' type=TypeReference;
+	name=Name | name=Pubkey | name=Tuid | (name=ID ':' type=TypeReference);
 
 TypeReference:
-	primitive=PrimitiveType | entityType=ClassType ;
+	primitive=PrimitiveType | entityType=ClassType;
 
 PrimitiveType:
 	primitiveType=(Text | Integer | Json | ByteArray | Boolean);
 
 ClassType:
 	entityRef=[ClassDefinition];
+
+Name:
+	'name';
+
+Pubkey:
+	'pubkey';
+
+Tuid:
+	'tuid';
 
 Boolean:
 	'bool';
@@ -104,13 +112,13 @@ Json:
 	'json';
 
 Integer:
-	'integer' | 'timestamp';
+	'integer';
 
 Text:
-	'text' | 'tuid' | 'name';
+	'text';
 
 ByteArray:
-	'byte_array' | 'signer' | 'guid' | 'pubkey';
+	'byte_array';
 
 Prefix:
 	'key' | 'index';
