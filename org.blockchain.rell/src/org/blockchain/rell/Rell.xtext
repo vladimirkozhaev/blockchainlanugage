@@ -9,11 +9,10 @@ Model:
 ClassDefinition:
 	'class' name=ID ('extends' superType=[ClassDefinition])? '{'
 	attributeListField+=AttributeListField*
-	specificationList+=Specification*
+	
 	'}';
 
-Specification:
-	((key=Key | index=Index | ((key=Key index=Index)) name=[VariableDeclaration])) ';';
+
 
 AttributeListField:
 	key=Key? index=Index? attributeList+=RelAttrubutesList ';';
