@@ -85,8 +85,13 @@ Atomic returns Expression:
 	{VariableRef} value=[VariableDeclaration];
 
 RelAttrubutesList:
-	value+=Variable (',' value+=Variable)*;
+	value+=VariableOrRef (',' value+=VariableOrRef)*;
 
+VariableOrRef:
+	{Var} value=Variable|
+	{VarDeclRef} value=[VariableDeclaration]
+	
+;
 VariableDeclaration:
 	name=Name | name=Pubkey | name=Tuid | (name=ID ':' type=TypeReference);
 
