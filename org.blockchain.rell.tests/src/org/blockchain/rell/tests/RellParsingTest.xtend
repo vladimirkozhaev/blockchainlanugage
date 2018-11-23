@@ -154,9 +154,9 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
-// Check that a class can apply the 'key' clause after an attribute definition
+// Check that a class can have the 'key' clause after an attribute definition
 	@Test
-	def void testApplyKeyAfterAttrDef() {
+	def void testKeyAfterAttributeDefinition() {
 		val result = parseHelper.parse(''' 
 			class test {
 				testKey : text;
@@ -168,9 +168,9 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
-// Check that a class can apply the 'key' clause with an attribute definition	
+// Check that a class can have the 'key' clause with an attribute definition	
 	@Test
-	def void testApplyKeyWithAttrDef() {
+	def void testKeyWithAttributeDefinition() {
 		val result = parseHelper.parse(''' 
 			class test {
 				key testKey : text;
@@ -181,9 +181,9 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
-// Check applying the composite "key" clause with multiple attributes in definition
+// Check that a class can have the composite "key" clause with multiple attributes in definition
 	@Test
-	def void testCompositeKeyInDefinition() {
+	def void testCompositeKeyWithAttributeDefinition() {
 		val result = parseHelper.parse('''
 			class test {
 				key firstField : text, secondField : text;
@@ -194,9 +194,9 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
-// Check applying the composite "key" clause with multiple attributes after their definition
+// Check that a class can have the composite "key" clause with multiple attributes after their definition
 	@Test
-	def void testCompositeKeyAfterDefinition() {
+	def void testCompositeKeyAfterAttributeDefinition() {
 		val result = parseHelper.parse('''
 			class test {
 				firstField : text; 
@@ -209,9 +209,9 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
-// Check that a class can apply the 'index' clause after an attribute definition
+// Check that a class can have the 'index' clause after an attribute definition
 	@Test
-	def void testApplyIndexAfterAttrDef() {
+	def void testIndexAfterAttributeDefinition() {
 		val result = parseHelper.parse(''' 
 			class test {
 				testIndex : text;
@@ -223,9 +223,9 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
-// Check that a class can apply the 'index' clause with an attribute definition
+// Check that a class can have the 'index' clause with an attribute definition
 	@Test
-	def void testApplyIndexWihAttrDef() {
+	def void testIndexWihAttributeDefiniton() {
 		val result = parseHelper.parse(''' 
 			class test {
 				index testIndex : text;
@@ -236,9 +236,9 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
-// Check applying the composite "index" clause with multiple attributes in definition
+// Check that a class can have the composite "index" clause with multiple attributes in definition
 	@Test
-	def void testCompositeIndexInDefinition() {
+	def void testCompositeIndexWithAttributeDefinition() {
 		val result = parseHelper.parse('''
 			class test {
 				index firstField : text, secondField : text;
@@ -249,9 +249,9 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
-// Check applying the composite "index" clause with multiple attributes after their definition
+// Check that a class can have the composite composite "index" clause with multiple attributes after their definition
 	@Test
-	def void testCompositeIndexAfterDefinition() {
+	def void testCompositeIndexAfterAttributeDefinition() {
 		val result = parseHelper.parse('''
 			class test {
 				firstField : text; 
