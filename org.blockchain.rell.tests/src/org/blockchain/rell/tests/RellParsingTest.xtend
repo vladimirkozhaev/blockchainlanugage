@@ -280,6 +280,19 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
+//Check the 'mutable' keyword to an attribute	
+	@Test
+	def void testMutableToAttribute() {
+		val result = parseHelper.parse('''
+			class test {
+				mutable firstField : text;
+			}	
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
 	@Test
 	def void testOperations() {
 		val result = parseHelper.parse('''
