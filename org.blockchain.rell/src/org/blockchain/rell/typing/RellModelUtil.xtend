@@ -16,9 +16,11 @@ import org.blockchain.rell.rell.Plus
 import org.blockchain.rell.rell.Relational
 import org.blockchain.rell.rell.Statement
 import org.blockchain.rell.rell.Update
+import org.blockchain.rell.rell.Var
 import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableInit
 import org.blockchain.rell.rell.VariableRef
+import org.blockchain.rell.rell.VarDeclRef
 
 class RellModelUtil {
 
@@ -27,7 +29,18 @@ class RellModelUtil {
 
 		if (operation.parameters!==null){
 			operation.parameters.value.forEach([x|{
-				variables.add(new VariableReferenceInfo(x.declaration, true, true, false))
+				var VariableReferenceInfo varRefInfo;
+				switch(x){
+					case Var:{
+						val Var v=x as Var;
+						varRefInfo=new VariableReferenceInfo(v.value.declaration, true, true, false)
+					}
+					case VarDeclRef:{
+						val VarDeclRef v=x as VarDeclRef;
+						varRefInfo=new VariableReferenceInfo(v.value, true, true, false)
+					}
+				}
+				variables.add(varRefInfo)
 			}])			
 		}
 		if (operation.statements!==null){
