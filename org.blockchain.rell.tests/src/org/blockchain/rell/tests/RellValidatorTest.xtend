@@ -50,14 +50,6 @@ class RellValidatorTest {
 	}
 	
 	@Test
-	def void testCompositeKeyWithAttributeDefinition(){
-		'''class test {
-		key firstField : text, secondField : text;
-		}'''.parse.assertError(RellPackage.eINSTANCE.operation, RellValidator::FORWARD_REFERENCE,
-			"Cannot to apply the composite 'key' clause with multiple attributes in definition.")
-	}
-	
-	@Test
 	def void testNotInitVariable() {
 		'''operation test(o:integer){
 			j:integer=i+1;
