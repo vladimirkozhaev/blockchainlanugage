@@ -31,16 +31,18 @@ class RellModelUtil {
 			operation.parameters.value.forEach([x|{
 				var VariableReferenceInfo varRefInfo;
 				switch(x){
-					case Var:{
+					case (x instanceof Var):{
 						val Var v=x as Var;
-						varRefInfo=new VariableReferenceInfo(v.value.declaration, true, true, false)
+						varRefInfo=new VariableReferenceInfo(v.value.declaration, true, v.value.expression!==null, false)
 					}
-					case VarDeclRef:{
+					case (x instanceof VarDeclRef):{
 						val VarDeclRef v=x as VarDeclRef;
-						varRefInfo=new VariableReferenceInfo(v.value, true, true, false)
+						varRefInfo=new VariableReferenceInfo(v.value, false, false, true)
 					}
 				}
-				variables.add(varRefInfo)
+				if (varRefInfo!==null) {
+					variables.add(varRefInfo)
+				}
 			}])			
 		}
 		if (operation.statements!==null){
