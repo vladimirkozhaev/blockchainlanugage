@@ -308,7 +308,7 @@ class RellParsingTest {
 	@Test
 	def void testCreateObjectWithinOperation() {
 		val result = parseHelper.parse('''
-			class test {a: text; mutable b: text; c : text; key a; index b; }
+			class test {a: text; b: text; c : text; key a; index b; }
 			operation createTest() {
 			    create test(a = 'akey', b = 'btext', c = 'ctext');
 			}	
