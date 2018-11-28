@@ -38,8 +38,6 @@ class RellValidatorTest {
 					}'''.parse.assertNoError("Key index is allowed")
 	}
 	
-	
-	
 	@Test
 	def void forwardReferencesTest1() {
 		'''operation test(o:integer){
