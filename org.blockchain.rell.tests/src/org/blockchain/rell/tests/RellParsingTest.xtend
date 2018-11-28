@@ -304,12 +304,13 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
-//Check creating the object of a class in operation 	
+//Check creating the object of a class within 'operation' 	
 	@Test
-	def void testObjectInsideOperation() {
+	def void testCreateObjectWithinOperation() {
 		val result = parseHelper.parse('''
-			operation createObj(id: pubkey) {
-			    create obj(id = id);
+			class test {a: text; mutable b: text; c : text; key a; index b; }
+			operation createTest() {
+			    create test(a = 'akey', b = 'btext', c = 'ctext');
 			}	
 		''')
 		Assert.assertNotNull(result)
