@@ -37,7 +37,7 @@ Delete:
 	'delete' entity=[ClassDefinition] '(' conditions=Conditions? ')';
 
 Create:
-	'create' entity=[ClassDefinition] '(' conditions=Conditions? ')';
+	'create' entity=[ClassDefinition] '(' attributeList+=RelAttrubutesList ')';
 
 Conditions:
 	elements+=ConditionElement (',' elements+=ConditionElement*)?;

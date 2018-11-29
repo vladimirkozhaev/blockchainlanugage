@@ -390,5 +390,27 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+	
+	@Test
+	def void testCreateInOperation() {
+		val result = parseHelper.parse('''
+			class user {
+			        key pubkey;
+			        index username: text;
+			        firstName: text;
+			        lastName: text;
+			        email: text;
+			
+			    }
+			    operation add_user (admin_pubkey: integer, pubkey, username: text, firstName: text, lastName: text, email: text) {
+			           create user (pubkey, username, firstName, lastName, email);
+			    }
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	
 
 }

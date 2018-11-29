@@ -102,7 +102,7 @@ class RellModelUtil {
 
 	def List<VariableReferenceInfo> usedVariables(Create update) {
 		val List<VariableReferenceInfo> variables = newArrayList
-		update.conditions.elements.stream.forEach([x|variables.addAll(x.expr.usedVariables)])
+		update.expressions.stream.forEach([x|variables.addAll(x.usedVariables)])
 		variables;
 	}
 
