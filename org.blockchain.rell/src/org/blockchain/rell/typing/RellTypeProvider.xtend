@@ -17,6 +17,7 @@ import org.blockchain.rell.rell.TypeReference
 import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableRef
+import javax.lang.model.element.VariableElement
 
 class RellTypeProvider {
 
@@ -38,6 +39,10 @@ class RellTypeProvider {
 			Equality: RellTypeProvider.BOOL_TYPE
 			And: RellTypeProvider.BOOL_TYPE
 			Or: RellTypeProvider.BOOL_TYPE
+			VariableRef:{
+				val VariableRef varRef=e as VariableRef
+				varRef.value.typeFor
+			}
 			default: e.or.typeFor
 		}
 	}

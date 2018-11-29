@@ -119,7 +119,7 @@ class RellModelUtil {
 		}else{
 			val ref = member as VarRefDecl
 			val List<VariableReferenceInfo> variables = newArrayList
-			variables.add(new VariableReferenceInfo(ref.name,false,false,true))
+			variables.add(new VariableReferenceInfo(ref.value,false,false,true))
 			variables
 		}
 		

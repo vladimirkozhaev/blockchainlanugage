@@ -426,6 +426,19 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+	@Test
+	def void testDefaultVariableNameInsideTheOperation() {
+		val result = parseHelper.parse('''
+			
+			    operation test (pubkey) {
+			           test:pubkey=pubkey
+			    }
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	
 
 }
