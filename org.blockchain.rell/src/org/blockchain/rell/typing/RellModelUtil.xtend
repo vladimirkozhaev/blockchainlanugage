@@ -5,6 +5,8 @@ import java.util.List
 import org.blockchain.rell.rell.And
 import org.blockchain.rell.rell.Comparison
 import org.blockchain.rell.rell.Create
+import org.blockchain.rell.rell.CreateAttrMember
+import org.blockchain.rell.rell.Default
 import org.blockchain.rell.rell.Delete
 import org.blockchain.rell.rell.Equality
 import org.blockchain.rell.rell.Expression
@@ -13,14 +15,17 @@ import org.blockchain.rell.rell.MulOrDiv
 import org.blockchain.rell.rell.Operation
 import org.blockchain.rell.rell.Or
 import org.blockchain.rell.rell.Plus
+import org.blockchain.rell.rell.RelAttrubutesList
 import org.blockchain.rell.rell.Relational
 import org.blockchain.rell.rell.Statement
 import org.blockchain.rell.rell.Update
 import org.blockchain.rell.rell.Var
+import org.blockchain.rell.rell.VarDeclRef
+import org.blockchain.rell.rell.VarRefDecl
 import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableInit
+import org.blockchain.rell.rell.VariableOrRef
 import org.blockchain.rell.rell.VariableRef
-import org.blockchain.rell.rell.VarDeclRef
 
 class RellModelUtil {
 
@@ -100,10 +105,45 @@ class RellModelUtil {
 		variables;
 	}
 
-	def List<VariableReferenceInfo> usedVariables(Create update) {
+	def List<VariableReferenceInfo> usedVariables(Create create) {
 		val List<VariableReferenceInfo> variables = newArrayList
-		update.expressions.stream.forEach([x|variables.addAll(x.usedVariables)])
-		variables;
+		create.attributeList.forEach([x|variables.addAll(x.usedVariables)]) //.attributeList.usedVariables
+		variables
+		
+	}
+	
+	def List<VariableReferenceInfo> usedVariables(CreateAttrMember member){
+		if (member instanceof Default){
+			val m=member as Default
+			m.expr.usedVariables
+		}else{
+			val ref = member as VarRefDecl
+			val List<VariableReferenceInfo> variables = newArrayList
+			variables.add(new VariableReferenceInfo(ref.name,false,false,true))
+			variables
+		}
+		
+	}
+
+	def usedVariables(RelAttrubutesList rellAttributesList){
+		val List<VariableReferenceInfo> variables = newArrayList
+		rellAttributesList.value.forEach([x|variables.addAll(x.usedVariables)])
+		variables
+	}
+
+	def List<VariableReferenceInfo> usedVariables(VariableOrRef varOrRef){
+		val List<VariableReferenceInfo> variables = newArrayList
+		switch(varOrRef){
+			case (varOrRef instanceof Var):{
+				val Var v=varOrRef as Var;
+				variables.addAll(v.value.usedVariables)
+			}
+			case (varOrRef instanceof VarDeclRef):{
+				val VarDeclRef v=varOrRef as VarDeclRef;
+				variables.add(new VariableReferenceInfo(v.value,false,false,true))
+			}
+		}
+		variables
 	}
 
 	def List<VariableReferenceInfo> usedVariables(Variable variable) {

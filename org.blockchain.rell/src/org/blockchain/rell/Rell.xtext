@@ -9,10 +9,7 @@ Model:
 ClassDefinition:
 	'class' name=ID ('extends' superType=[ClassDefinition])? '{'
 	attributeListField+=AttributeListField*
-	
 	'}';
-
-
 
 AttributeListField:
 	key=Key? index=Index? attributeList+=RelAttrubutesList ';';
@@ -37,7 +34,11 @@ Delete:
 	'delete' entity=[ClassDefinition] '(' conditions=Conditions? ')';
 
 Create:
-	'create' entity=[ClassDefinition] '(' attributeList+=RelAttrubutesList ')';
+	'create' entity=[ClassDefinition] '(' (attributeList+=CreateAttrMember (',' attributeList+=CreateAttrMember)*) ')';
+
+CreateAttrMember:
+	{VarRefDecl} name=[VariableDeclaration] |
+	{Default} name=ID '=' expr=Expression;
 
 Conditions:
 	elements+=ConditionElement (',' elements+=ConditionElement*)?;
@@ -88,10 +89,9 @@ RelAttrubutesList:
 	value+=VariableOrRef (',' value+=VariableOrRef)*;
 
 VariableOrRef:
-	{Var} value=Variable|
-	{VarDeclRef} value=[VariableDeclaration]
-	
-;
+	{Var} value=Variable |
+	{VarDeclRef} value=[VariableDeclaration];
+
 VariableDeclaration:
 	name=Name | name=Pubkey | name=Tuid | (name=ID ':' type=TypeReference);
 
@@ -99,7 +99,7 @@ TypeReference:
 	primitive=PrimitiveType | entityType=ClassType;
 
 PrimitiveType:
-	primitiveType=(Text | Tuid | Pubkey|Name | Timestamp | Integer | Json | ByteArray | Boolean);
+	primitiveType=(Text | Tuid | Pubkey | Name | Timestamp | Integer | Json | ByteArray | Boolean);
 
 ClassType:
 	entityRef=[ClassDefinition];

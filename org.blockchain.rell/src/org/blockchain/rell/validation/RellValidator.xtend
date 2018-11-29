@@ -76,17 +76,17 @@ class RellValidator extends AbstractRellValidator {
 
 			}
 
-			if (!isDeclared ) {
-				error("Forward reference " + element.variableDeclaration.name,
-					RellPackage::eINSTANCE.operation_Statements, FORWARD_REFERENCE)
-
-			}
-
-			if ((!isInit) && element.isUsed) {
-				error("Variable is not init " + element.variableDeclaration.name,
-					RellPackage::eINSTANCE.operation_Statements, NOT_INIT_VARIABLE)
-
-			}
+//			if (!isDeclared ) {
+//				error("Forward reference " + element.variableDeclaration.name,
+//					RellPackage::eINSTANCE.operation_Statements, FORWARD_REFERENCE)
+//
+//			}
+//
+//			if ((!isInit) && element.isUsed) {
+//				error("Variable is not init " + element.variableDeclaration.name,
+//					RellPackage::eINSTANCE.operation_Statements, NOT_INIT_VARIABLE)
+//
+//			}
 
 		}
 
@@ -143,6 +143,9 @@ class RellValidator extends AbstractRellValidator {
 	@Check def checkVariable(Variable variable) {
 		val typeDecl = variable.declaration.type;
 		val typeExpr = variable.expression;
+		if (typeDecl===null){
+			return true;
+		}
 		if (typeExpr !== null) {
 			checkExpectedSame(typeDecl.typeFor, typeExpr.typeFor);
 		}
