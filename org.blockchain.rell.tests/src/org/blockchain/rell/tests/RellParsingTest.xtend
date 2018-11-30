@@ -362,6 +362,62 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
+//Check '@'(exactly one) cardinality with Where-part '{}'
+	@Test
+	def void testExactlyOneCardinalityWherePart() {
+		val result = parseHelper.parse('''
+			class test {field: text; key field; }
+			operation o() { 
+			    val t = test @ {field = 'some_text'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+//Check '@*'(zero or more) cardinality with Where-part '{}'
+	@Test
+	def void testZeroOrMoreCardinalityWherePart() {
+		val result = parseHelper.parse('''
+			class test {field: text; key field; }
+			operation o() { 
+			    val t = test @* {field = 'some_text'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+//Check '@*'(zero or one, fails if more than one found) cardinality with Where-part '{}'
+	@Test
+	def void testZeroOrMoreFailCardinalityWherePart() {
+		val result = parseHelper.parse('''
+			class test {field: text; key field; }
+			operation o() { 
+			    val t = test @? {field = 'some_text'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+//Check '@*'(one or more) cardinality with Where-part '{}'
+	@Test
+	def void testOneOrMoreCardinalityWherePart() {
+		val result = parseHelper.parse('''
+			class test {field: text; key field; }
+			operation o() { 
+			    val t = test @+ {field = 'some_text'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+
 	@Test
 	def void testOperations() {
 		val result = parseHelper.parse('''
