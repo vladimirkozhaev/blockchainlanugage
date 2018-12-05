@@ -140,6 +140,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
 	@Test
 	def void testIndexWithAttributeDefinition() {
 		val result = parseHelper.parse(''' 
@@ -178,7 +179,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-	
+
 // Check that a class can have the 'key' clause with an attribute definition	
 	@Test
 	def void testKeyWithAttributeDefinition() {
@@ -191,7 +192,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-	
+
 // Check that a class can have the composite "key" clause with multiple attributes in definition
 	@Test
 	def void testCompositeKeyWithAttributeDefinition() {
@@ -259,7 +260,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-	
+
 // Check that a class can have the composite composite "index" clause with multiple attributes after their definition
 	@Test
 	def void testCompositeIndexAfterAttributeDefinition() {
@@ -315,9 +316,38 @@ class RellParsingTest {
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
-		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)		
-	} 
-	
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+//Check operation parameters
+	@Test
+	def void testOperationMustProvideParameters() {
+		val result = parseHelper.parse('''
+			class test {a: text; b: text; c : text; key a; index b; }
+			operation createTest(aParameter : text, bParameter : text, cParameter : text) {
+			    create test(a=aParameter, b=bParameter, c=cParameter);
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+//Check assign a value of returning 'create' statement to 'val' within 'operation'	
+	@Test
+	def void testAssignValueFromCreateStatment() {
+		val result = parseHelper.parse('''
+			class test {a: text; b: text; c : text; key a; index b; }
+			operation createTest() {
+			   val newTest =  create test(a = 'akey', b = 'btext', c = 'ctext');
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+
+	}
+
 //Check creating the object of a class with default values of attributes within 'operation' 	
 	@Test
 	def void testCreateObjectDefaultValuesWithinOperation() {
@@ -329,8 +359,64 @@ class RellParsingTest {
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
-		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)		
-	} 
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+//Check '@'(exactly one) cardinality with Where-part '{}'
+	@Test
+	def void testExactlyOneCardinalityWherePart() {
+		val result = parseHelper.parse('''
+			class test {field: text; key field; }
+			operation o() { 
+			    val t = test @ {field = 'some_text'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+//Check '@*'(zero or more) cardinality with Where-part '{}'
+	@Test
+	def void testZeroOrMoreCardinalityWherePart() {
+		val result = parseHelper.parse('''
+			class test {field: text; key field; }
+			operation o() { 
+			    val t = test @* {field = 'some_text'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+//Check '@*'(zero or one, fails if more than one found) cardinality with Where-part '{}'
+	@Test
+	def void testZeroOrMoreFailCardinalityWherePart() {
+		val result = parseHelper.parse('''
+			class test {field: text; key field; }
+			operation o() { 
+			    val t = test @? {field = 'some_text'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+//Check '@*'(one or more) cardinality with Where-part '{}'
+	@Test
+	def void testOneOrMoreCardinalityWherePart() {
+		val result = parseHelper.parse('''
+			class test {field: text; key field; }
+			operation o() { 
+			    val t = test @+ {field = 'some_text'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
 
 	@Test
 	def void testOperations() {
@@ -405,7 +491,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-	
+
 	@Test
 	def void testCreateInOperation() {
 		val result = parseHelper.parse('''
@@ -425,6 +511,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
 	@Test
 	def void testDefaultVariableName() {
 		val result = parseHelper.parse('''
@@ -452,5 +539,6 @@ class RellParsingTest {
 	}
 	
 	
+
 
 }
