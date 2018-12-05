@@ -11,13 +11,11 @@ import org.blockchain.rell.rell.MulOrDiv
 import org.blockchain.rell.rell.Not
 import org.blockchain.rell.rell.Or
 import org.blockchain.rell.rell.Plus
-import org.blockchain.rell.rell.PrimitiveType
 import org.blockchain.rell.rell.StringConstant
 import org.blockchain.rell.rell.TypeReference
 import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableRef
-import javax.lang.model.element.VariableElement
 
 class RellTypeProvider {
 
@@ -54,7 +52,7 @@ class RellTypeProvider {
 			case 'tuid':RellTypeProvider.BYTE_ARRAY
 			case 'pubkey':RellTypeProvider.STRING_TYPE
 			default: {
-				val primitive = declaration.type.primitive
+				val primitive = declaration.type
 				if (primitive !== null) {
 
 					primitive.typeFor
@@ -86,8 +84,8 @@ class RellTypeProvider {
 
 	}
 
-	def typeFor(PrimitiveType primitiveType) {
-		switch (primitiveType.primitiveType) {
+	def typeFor(String primitiveType) {
+		switch (primitiveType) {
 			case "text": RellTypeProvider.STRING_TYPE
 			case "tuid": RellTypeProvider.STRING_TYPE
 			case "name": RellTypeProvider.STRING_TYPE

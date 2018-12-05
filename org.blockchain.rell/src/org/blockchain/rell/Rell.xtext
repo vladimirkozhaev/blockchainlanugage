@@ -18,7 +18,7 @@ Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	(relation=Relational | variable=Variable | varInit=VariableInit) ';';
+	(relation=Relational | variable=Variable ) ';';
 
 Variable:
 	declaration=VariableDeclaration (('=' expression=Expression)?);
@@ -34,7 +34,7 @@ Delete:
 	'delete' entity=[ClassDefinition] '(' conditions=Conditions? ')';
 
 Create:
-	'create' entity=[ClassDefinition] '(' (attributeList+=CreateAttrMember (',' attributeList+=CreateAttrMember)*) ')';
+	'create' entity=[ClassDefinition] '(' (attributeList+=CreateAttrMember (',' attributeList+=CreateAttrMember)*)? ')';
 
 CreateAttrMember:
 	{VarRefDecl} name=[VariableDeclaration] |
@@ -83,26 +83,26 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=[VariableDeclaration];
+	{VariableRef} value=[VariableDeclaration|ValuableID];
 
 RelAttrubutesList:
-	value+=VariableOrRef (',' value+=VariableOrRef)*;
+	value+=Variable (',' value+=Variable)*;
 
-VariableOrRef:
-	{Var} value=Variable |
-	{VarDeclRef} value=[VariableDeclaration];
 
 VariableDeclaration:
-	name=Name | name=Pubkey | name=Tuid | (name=ID ':' type=TypeReference);
+	name=ValuableID ((':' type=TypeReference)?);
 
 TypeReference:
 	primitive=PrimitiveType | entityType=ClassType;
 
-PrimitiveType:
-	primitiveType=(Text | Tuid | Pubkey | Name | Timestamp | Integer | Json | ByteArray | Boolean);
 
 ClassType:
 	entityRef=[ClassDefinition];
+
+PrimitiveType:
+	Text | Tuid | Pubkey | Name | Timestamp | Integer | Json | ByteArray | Boolean;
+	
+ValuableID:PrimitiveType|ID;
 
 Name:
 	'name';
