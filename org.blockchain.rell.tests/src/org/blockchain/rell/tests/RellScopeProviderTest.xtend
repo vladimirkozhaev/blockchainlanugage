@@ -26,7 +26,7 @@ class RellScopeProviderTest {
 					j:integer=i;
 				}
 		'''.parse.operations.head => [
-			assertScope(RellPackage.eINSTANCE.variable_Declaration, "i, j, o.i, o.j")
+			assertScope(RellPackage.eINSTANCE., "i, j, o.i, o.j")
 
 		]
 	}
@@ -36,7 +36,7 @@ class RellScopeProviderTest {
 					j:integer=i;
 				}
 		'''.parse.operations.head => [
-			assertScope(RellPackage.eINSTANCE.variable_Declaration, "i, i, j, o.i, o.i, o.j")
+			assertScope(RellPackage.eINSTANCE.va, "i, i, j, o.i, o.i, o.j")
 
 		]
 	}

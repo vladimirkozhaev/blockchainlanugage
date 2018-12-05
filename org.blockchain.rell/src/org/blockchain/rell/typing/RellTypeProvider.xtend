@@ -97,7 +97,7 @@ class RellTypeProvider {
 	}
 
 	def dispatch RellType typeFor(Variable variable) {
-		variable.declaration.typeFor
+		variable.name.typeFor
 	}
 
 	def dispatch RellType typeFor(VariableRef varRef) {

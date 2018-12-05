@@ -6,7 +6,6 @@ import org.blockchain.rell.rell.And
 import org.blockchain.rell.rell.Comparison
 import org.blockchain.rell.rell.Create
 import org.blockchain.rell.rell.CreateAttrMember
-import org.blockchain.rell.rell.Default
 import org.blockchain.rell.rell.Delete
 import org.blockchain.rell.rell.Equality
 import org.blockchain.rell.rell.Expression
@@ -19,8 +18,8 @@ import org.blockchain.rell.rell.RelAttrubutesList
 import org.blockchain.rell.rell.Relational
 import org.blockchain.rell.rell.Statement
 import org.blockchain.rell.rell.Update
-import org.blockchain.rell.rell.VarRefDecl
 import org.blockchain.rell.rell.Variable
+import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableInit
 import org.blockchain.rell.rell.VariableRef
 
@@ -36,7 +35,7 @@ class RellModelUtil {
 				//var VariableReferenceInfo varRefInfo;
 				val Variable v=x as Variable;
 //				Variable v=x as Variable;
-					new VariableReferenceInfo(v.declaration, true, v.expression!==null, false)
+					new VariableReferenceInfo(v.name, true, v.expression!==null, false)
 				
 				
 			}])			
@@ -102,16 +101,30 @@ class RellModelUtil {
 	}
 	
 	def List<VariableReferenceInfo> usedVariables(CreateAttrMember member){
-		if (member instanceof Default){
-			val m=member as Default
-			m.expr.usedVariables
-		}else{
-			val ref = member as VarRefDecl
-			val List<VariableReferenceInfo> variables = newArrayList
-			variables.add(new VariableReferenceInfo(ref.name,false,false,true))
-			variables
+		
+//		if (member instanceof Default){
+//			val m=member as Default
+//			m.expr.usedVariables
+//		}else{
+//			val ref = member as VarRefDecl
+//			val List<VariableReferenceInfo> variables = newArrayList
+//			variables.add(new VariableReferenceInfo(ref.name,false,false,true))
+//			variables
+//		}
+
+		
+		val List<VariableReferenceInfo> variables = newArrayList
+		switch(member.name){
+			case (member.name instanceof VariableDeclaration):{
+				variables.add(new VariableReferenceInfo(member.name,false,member.expr!==null,true));
+			
+			}			
 		}
 		
+		if (member.expr!==null){
+			variables.addAll(member.expr.usedVariables)
+		}
+		variables
 	}
 
 	def usedVariables(RelAttrubutesList rellAttributesList){
@@ -124,7 +137,7 @@ class RellModelUtil {
 
 	def List<VariableReferenceInfo> usedVariables(Variable variable) {
 		val List<VariableReferenceInfo> array = new ArrayList
-		val varRefInfo = new VariableReferenceInfo(variable.declaration, true, false, false);
+		val varRefInfo = new VariableReferenceInfo(variable.name, true, false, false);
 		array.add(varRefInfo)
 		if (variable.expression !== null) {
 			varRefInfo.isInit = true;

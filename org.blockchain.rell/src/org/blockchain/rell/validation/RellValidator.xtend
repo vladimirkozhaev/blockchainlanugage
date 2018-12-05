@@ -141,7 +141,7 @@ class RellValidator extends AbstractRellValidator {
 	}
 
 	@Check def checkVariable(Variable variable) {
-		val typeDecl = variable.declaration.type;
+		val typeDecl = variable.name.type;
 		val typeExpr = variable.expression;
 		if (typeDecl===null){
 			return true;
