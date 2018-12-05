@@ -389,6 +389,19 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}	
+
+	@Test
+	def void testVarAndValOperation() {
+		val result = parseHelper.parse('''
+			operation o() { 
+			    val x = 1;
+			    var y = 1;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
 	
 //Check '@*'(zero or one, fails if more than one found) cardinality with Where-part '{}'
 	@Test

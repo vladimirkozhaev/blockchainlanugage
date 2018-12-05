@@ -18,8 +18,12 @@ Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	(relation=Relational | variable=Variable) ';';
+	(relation=Relational | variable=OperationVariable) ';';
 
+
+OperationVariable:
+	assessModificator=(Var|Val) variable=Variable
+;
 Variable:
 	name=VariableDeclaration (('=' expression=Expression)?);
 
@@ -136,3 +140,7 @@ Index:
 	'index';
 	
 Mutable:'mutable';
+
+Var:'var';
+
+Val:'val';

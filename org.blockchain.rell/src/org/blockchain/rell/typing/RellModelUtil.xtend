@@ -53,7 +53,7 @@ class RellModelUtil {
 
 		switch (statement) {
 			case statement.variable!==null: {
-				variables.addAll((statement.variable).usedVariables)
+				variables.addAll((statement.variable.variable).usedVariables)
 			}
 			
 			default: {
