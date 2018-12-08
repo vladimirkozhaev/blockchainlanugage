@@ -20,26 +20,6 @@ class RellScopeProviderTest {
 	@Inject extension ParseHelper<Model>
 	@Inject extension IScopeProvider
 
-	@Test def void testScopeProvider() {
-		'''operation o(i:integer){
-				
-					j:integer=i;
-				}
-		'''.parse.operations.head => [
-			assertScope(RellPackage.eINSTANCE., "i, j, o.i, o.j")
-
-		]
-	}
-	@Test def void testScopeProvider1() {
-		'''operation o(i:integer){
-					i:integer;
-					j:integer=i;
-				}
-		'''.parse.operations.head => [
-			assertScope(RellPackage.eINSTANCE.va, "i, i, j, o.i, o.i, o.j")
-
-		]
-	}
 
 	def private assertScope(EObject context, EReference reference, CharSequence expected) {
 		expected.toString.assertEquals(context.getScope(reference).allElements.map[name].join(", "))

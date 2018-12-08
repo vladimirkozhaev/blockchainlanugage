@@ -348,6 +348,21 @@ class RellParsingTest {
 
 	}
 
+//Check assign a value of returning 'create' statement to 'val' within 'operation'	
+	@Test
+	def void testTheIndex() {
+		val result = parseHelper.parse('''
+			class test {
+			x: integer;
+			index x: integer;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+
+	}
+
 //Check creating the object of a class with default values of attributes within 'operation' 	
 	@Test
 	def void testCreateObjectDefaultValuesWithinOperation() {
@@ -375,7 +390,7 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-	
+
 //Check '@*'(zero or more) cardinality with Where-part '{}'
 	@Test
 	def void testZeroOrMoreCardinalityWherePart() {
@@ -388,7 +403,7 @@ class RellParsingTest {
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
-	}	
+	}
 
 	@Test
 	def void testVarAndValOperation() {
@@ -401,8 +416,8 @@ class RellParsingTest {
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
-	}	
-	
+	}
+
 //Check '@*'(zero or one, fails if more than one found) cardinality with Where-part '{}'
 	@Test
 	def void testZeroOrMoreFailCardinalityWherePart() {
@@ -415,8 +430,8 @@ class RellParsingTest {
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
-	}	
-	
+	}
+
 //Check '@*'(one or more) cardinality with Where-part '{}'
 	@Test
 	def void testOneOrMoreCardinalityWherePart() {
@@ -429,7 +444,7 @@ class RellParsingTest {
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
-	}	
+	}
 
 	@Test
 	def void testOperations() {
@@ -496,7 +511,7 @@ class RellParsingTest {
 	def void testVariablesInsideOperations() {
 		val result = parseHelper.parse('''
 			operation test(){
-				sex:integer;
+				var sex:integer;
 				update test(id==sex){id=1};
 			}
 		''')
@@ -529,29 +544,26 @@ class RellParsingTest {
 	def void testDefaultVariableName() {
 		val result = parseHelper.parse('''
 			operation test(){
-				integer=5;
-				i:integer=integer;
+				var integer=5;
+				var i:integer=integer;
 			}
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-	
+
 	@Test
 	def void testDefaultVariableNameInsideTheOperation() {
 		val result = parseHelper.parse('''
 			
-			    operation test (pubkey) {
-			          var test:pubkey=pubkey;
-			    }
+			operation test (pubkey) {
+			      var test:pubkey=pubkey;
+			}
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
-	
-	
-
 
 }
