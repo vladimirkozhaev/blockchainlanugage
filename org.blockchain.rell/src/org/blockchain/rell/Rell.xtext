@@ -20,15 +20,17 @@ Operation:
 Statement:
 	(relation=Relational | variable=OperationVariable) ';';
 
-
 OperationVariable:
-	assessModificator=(Var|Val) variable=Variable
-;
+	assessModificator=(Var | Val) variable=Variable;
+
 Variable:
 	name=VariableDeclaration (('=' expression=Expression)?);
 
 Relational:
 	Update | Delete | Create;
+
+AtOperator:
+	class=[ClassDefinition] Ampersand '{' conditions=Conditions? '}';
 
 Update:
 	'update' entity=[ClassDefinition] '(' conditions=Conditions? ')' '{' variableList+=VariableInit
@@ -41,7 +43,7 @@ Create:
 	'create' entity=[ClassDefinition] '(' (attributeList+=CreateAttrMember (',' attributeList+=CreateAttrMember)*)? ')';
 
 CreateAttrMember:
-	 name=[VariableDeclaration|ValuableID] ('=' expr=Expression)?;
+	name=[VariableDeclaration|ValuableID] ('=' expr=Expression)?;
 
 Conditions:
 	elements+=ConditionElement (',' elements+=ConditionElement*)?;
@@ -86,7 +88,8 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=[VariableDeclaration|ValuableID];
+	{VariableRef} value=[VariableDeclaration|ValuableID]|
+	{SelectOp} value=AtOperator;
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
@@ -132,15 +135,23 @@ Text:
 
 ByteArray:
 	'byte_array';
+	
+List:'list';
 
 Key:
 	'key';
 
 Index:
 	'index';
-	
-Mutable:'mutable';
 
-Var:'var';
+Mutable:
+	'mutable';
 
-Val:'val';
+Var:
+	'var';
+
+Val:
+	'val';
+
+Ampersand:
+	'@';

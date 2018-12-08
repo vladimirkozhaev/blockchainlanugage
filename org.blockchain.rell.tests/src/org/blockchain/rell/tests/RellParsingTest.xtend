@@ -543,7 +543,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			
 			    operation test (pubkey) {
-			           test:pubkey=pubkey;
+			          var test:pubkey=pubkey;
 			    }
 		''')
 		Assert.assertNotNull(result)
