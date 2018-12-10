@@ -446,6 +446,126 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
+// check create new object with explicit attributes initialization in 'create' statement
+	@Test
+	def void testCreateStatementWithExplicitAttributeInit() {
+		val result = parseHelper.parse('''
+			class foo {
+				id : integer;
+				name : text;
+			}
+			
+			operation op() {
+				create foo(id = 1, name = 'test');
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	// check create new object with implicit attributes initialization in 'create' statement
+	@Test
+	def void testCreateStatementWithImplicitAttributeInit() {
+		val result = parseHelper.parse('''
+			class foo {
+				id : integer;
+				name : text;
+			}
+			
+			operation op() {
+				create foo(1,'test');
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	// check nested 'create' statement with explicit attributes initialization
+	@Test
+	def void testNestedCreateStatementWithExplicitAttributeInit() {
+		val result = parseHelper.parse('''
+			class foo {
+				id : integer;
+				name : text;
+			}
+			
+			class bar {
+				id : integer;
+				name : text;
+				f : foo;
+			}
+			operation op() {
+				create bar (id = 1, name = 'test', create foo(id = 1, name = 'test'));
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	// check nested 'create' statement with implicit attributes initialization
+	@Test
+	def void testNestedCreateStatementWithImlicitAttributeInit() {
+		val result = parseHelper.parse('''
+			class foo {
+				id : integer;
+				name : text;
+			}
+			
+			class bar {
+				id : integer;
+				name : text;
+				f : foo;
+			}
+			operation op() {
+				create bar (1, 'test', create foo(1, 'test'));
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	// check arbitrary order of 'create' statement parameters with explicit attributes initialization
+	@Test
+	def void testExplicitArbitraryOrderOfParameters() {
+		val result = parseHelper.parse('''
+			class foo {
+				id : integer;
+				name : text;
+			}
+			
+			operation op() {
+				create foo(id = 1, name = 'test');
+				create foo(name = 'test', id = 1);
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check arbitrary order of 'create' statement parameters with implicit attributes initialization
+	@Test
+	def void testImplicitArbitraryOrderOfParameters() {
+		val result = parseHelper.parse('''
+			class foo {
+				id : integer;
+				name : text;
+			}
+			
+			operation op() {
+				create foo(1, 'test');
+				create foo('test', 1);
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	@Test
 	def void testOperations() {
 		val result = parseHelper.parse('''
