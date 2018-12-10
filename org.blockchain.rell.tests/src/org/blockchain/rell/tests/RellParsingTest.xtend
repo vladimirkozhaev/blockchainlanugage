@@ -566,6 +566,29 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+	// check at-operator within 'create' statement as parameter
+	@Test
+	def void testAtOperatorAsParameterInCreate() {
+		val result = parseHelper.parse('''
+			class foo {
+				id : integer;
+				name : text;
+			}
+			
+			class bar {
+				id : integer;
+				name : text;
+				f : foo;
+			}
+			operation op() {
+				create bar (1, 'test', foo @ {name = 'foo'});
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	@Test
 	def void testOperations() {
 		val result = parseHelper.parse('''
