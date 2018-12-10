@@ -30,7 +30,7 @@ Relational:
 	Update | Delete | Create;
 
 AtOperator:
-	class=[ClassDefinition] Ampersand '{' conditions=Conditions? '}';
+	class=[ClassDefinition] Ampersand ampersandModificator=AmpersandModificator? '{' variable+=Variable* '}';
 
 Update:
 	'update' entity=[ClassDefinition] '(' conditions=Conditions? ')' '{' variableList+=VariableInit
@@ -72,13 +72,14 @@ Comparison returns Expression:
 	right=PlusOrMinus)*;
 
 PlusOrMinus returns Expression:
-	MulOrDiv (({Plus.left=current} '+' | {Minus.left=current} '-')
+	MulOrDiv (({Plus.left=current} PlusChar | {Minus.left=current} MinusChar)
 	right=MulOrDiv)*;
 
-MulOrDiv returns Expression:
-	Primary ({MulOrDiv.left=current} op=('*' | '/')
-	right=Primary)*;
 
+MulOrDiv returns Expression:
+	Primary ({MulOrDiv.left=current} op=(MulChar | DivChar)
+	right=Primary)*;
+	
 Primary returns Expression:
 	'(' Expression ')' |
 	{Not} "not" expression=Primary |
@@ -108,6 +109,10 @@ PrimitiveType:
 
 ValuableID:
 	PrimitiveType | ID;
+
+AmpersandModificator:
+	PlusChar|MulChar|QuestionChar
+;
 
 Name:
 	'name';
@@ -155,3 +160,13 @@ Val:
 
 Ampersand:
 	'@';
+	
+
+QuestionChar:
+	'?'
+;
+
+PlusChar:'+';
+MinusChar:'-';
+MulChar:'*';
+DivChar:'/';
