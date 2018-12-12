@@ -27,17 +27,21 @@ Variable:
 	name=VariableDeclaration (('=' expression=Expression)?);
 
 Relational:
-	Update | Delete | Create;
+	Update | Delete | Create | AtOperator;
 
 AtOperator:
-	class=[ClassDefinition] Ampersand ampersandModificator=AmpersandModificator? '{' variable+=Variable* '}';
+	class+=[ClassDefinition] (',' class+=[ClassDefinition])* Ampersand ampersandModificator=AmpersandModificator? '{'
+	conditions+=Expression* '}';
+
+ClassMemberDefinition:
+	classDefinition=[ClassDefinition] "." variableDeclarationRef=VariableDeclarationRef;
 
 Update:
-	'update' entity=[ClassDefinition] '(' conditions=Conditions? ')' '{' variableList+=VariableInit
+	'update' entity=[ClassDefinition] '(' conditions+=Expression* ')' '{' variableList+=VariableInit
 	(',' variableList+=VariableInit*)? '}';
 
 Delete:
-	'delete' entity=[ClassDefinition] '(' conditions=Conditions? ')';
+	'delete' entity=[ClassDefinition] '(' conditions+=Expression* ')';
 
 Create:
 	'create' entity=[ClassDefinition] '(' (attributeList+=CreateAttrMember (',' attributeList+=CreateAttrMember)*)? ')';
@@ -45,11 +49,8 @@ Create:
 CreateAttrMember:
 	name=[VariableDeclaration|ValuableID] ('=' expr=Expression)?;
 
-Conditions:
-	elements+=ConditionElement (',' elements+=ConditionElement*)?;
-
-ConditionElement:
-	name=ID ('==' | '!=' | '>' | '<' | '>=' | '<=') expr=Expression;
+VariableDeclarationRef:
+	decl=[VariableDeclaration];
 
 VariableInit:
 	name=[VariableDeclaration] '=' expression=Expression;
@@ -75,11 +76,10 @@ PlusOrMinus returns Expression:
 	MulOrDiv (({Plus.left=current} PlusChar | {Minus.left=current} MinusChar)
 	right=MulOrDiv)*;
 
-
 MulOrDiv returns Expression:
 	Primary ({MulOrDiv.left=current} op=(MulChar | DivChar)
 	right=Primary)*;
-	
+
 Primary returns Expression:
 	'(' Expression ')' |
 	{Not} "not" expression=Primary |
@@ -89,8 +89,9 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=[VariableDeclaration|ValuableID]|
-	{SelectOp} value=AtOperator;
+	{VariableRef} value=[VariableDeclaration|ValuableID] |
+	{SelectOp} value=AtOperator |
+	{MemberDefinition} value=ClassMemberDefinition;
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
@@ -102,7 +103,7 @@ TypeReference:
 	primitive=PrimitiveType | entityType=ClassType;
 
 ClassType:
-	entityRef=[ClassDefinition];
+	type=[ClassDefinition];
 
 PrimitiveType:
 	Text | Tuid | Pubkey | Name | Timestamp | Integer | Json | ByteArray | Boolean;
@@ -111,8 +112,7 @@ ValuableID:
 	PrimitiveType | ID;
 
 AmpersandModificator:
-	PlusChar|MulChar|QuestionChar
-;
+	PlusChar | MulChar | QuestionChar;
 
 Name:
 	'name';
@@ -140,8 +140,9 @@ Text:
 
 ByteArray:
 	'byte_array';
-	
-List:'list';
+
+List:
+	'list';
 
 Key:
 	'key';
@@ -160,13 +161,18 @@ Val:
 
 Ampersand:
 	'@';
-	
 
 QuestionChar:
-	'?'
-;
+	'?';
 
-PlusChar:'+';
-MinusChar:'-';
-MulChar:'*';
-DivChar:'/';
+PlusChar:
+	'+';
+
+MinusChar:
+	'-';
+
+MulChar:
+	'*';
+
+DivChar:
+	'/';

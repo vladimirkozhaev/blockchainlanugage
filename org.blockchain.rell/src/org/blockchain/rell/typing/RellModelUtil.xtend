@@ -74,8 +74,12 @@ class RellModelUtil {
 				(relation as Delete).usedVariables
 
 			}
+			case (relation instanceof Create): {
+				(relation as Delete).usedVariables
+
+			}
 			default: {
-				(relation as Create).usedVariables
+				newArrayList
 			}
 		}
 	}

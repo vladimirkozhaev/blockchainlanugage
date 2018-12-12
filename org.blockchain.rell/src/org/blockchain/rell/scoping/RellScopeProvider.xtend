@@ -3,11 +3,14 @@
  */
 package org.blockchain.rell.scoping
 
-import org.blockchain.rell.rell.ClassDefinition
-import org.blockchain.rell.rell.RellPackage
+import java.util.List
+import org.blockchain.rell.rell.ClassMemberDefinition
+import org.blockchain.rell.rell.ClassType
+import org.blockchain.rell.rell.VariableDeclaration
+import org.blockchain.rell.rell.VariableDeclarationRef
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
-import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
 
@@ -19,20 +22,36 @@ import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
  */
 class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
-	override getScope(EObject context, EReference reference) {
-		// We want to define the Scope for the Element's superElement cross-reference
-		if (context instanceof ClassDefinition && reference == RellPackage.Literals.CLASS_DEFINITION__SUPER_TYPE) {
-			// Collect a list of candidates by going through the model
-			// EcoreUtil2 provides useful functionality to do that
-			// For example searching for all elements within the root Object's tree
-			val EObject rootElement = EcoreUtil2.getRootContainer(context)
-			var candidates = EcoreUtil2.getAllContentsOfType(rootElement, context.class)
-			// Create IEObjectDescriptions and puts them into an IScope instance
-			candidates.remove(context)
-			return Scopes.scopeFor(candidates)
-		}
-		return super.getScope(context, reference);
+	def IScope getVariableDeclarationRefScope(VariableDeclarationRef classType, EReference ref) {
+		
+		val container=classType.eContainer;
+		switch(container){
+			case (container instanceof ClassMemberDefinition):{
+				val classMemberDefinition=container as ClassMemberDefinition;
+				val attrubuteListField=classMemberDefinition.classDefinition.attributeListField;
+				val List<VariableDeclaration> variableDeclarationList=newArrayList;
+				attrubuteListField.forEach[x|x.attributeList.forEach[attrList|attrList.value.forEach[variable|variableDeclarationList.add(variable.name)]]];
+				
+				
+				val scope= Scopes::scopeFor(variableDeclarationList)
+				return scope
+			}
+		}	
+		return IScope::NULLSCOPE
+		
 	}
+
+
+	
+	override IScope getScope(EObject context, EReference reference) {
+		
+		if (context instanceof VariableDeclarationRef){
+			return getVariableDeclarationRefScope(context as VariableDeclarationRef,reference);
+		}
+		return super.getScope(context,reference);	
+
+	}
+
 
 	
 }
