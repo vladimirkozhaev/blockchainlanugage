@@ -84,18 +84,18 @@ class RellModelUtil {
 		}
 	}
 
-	def List<VariableReferenceInfo> usedVariables(Update update) {
-		val List<VariableReferenceInfo> variables = newArrayList
-		update.conditions.elements.stream.forEach([x|variables.addAll(x.expr.usedVariables)])
-		update.variableList.stream.forEach([x|variables.addAll(x.usedVariables)])
-		variables;
-	}
-
-	def List<VariableReferenceInfo> usedVariables(Delete update) {
-		val List<VariableReferenceInfo> variables = newArrayList
-		update.conditions.elements.stream.forEach([x|variables.addAll(x.expr.usedVariables)])
-		variables;
-	}
+//	def List<VariableReferenceInfo> usedVariables(Update update) {
+//		val List<VariableReferenceInfo> variables = newArrayList
+//		update.conditions.elements.stream.forEach([x|variables.addAll(x.expr.usedVariables)])
+//		update.variableList.stream.forEach([x|variables.addAll(x.usedVariables)])
+//		variables;
+//	}
+//
+//	def List<VariableReferenceInfo> usedVariables(Delete update) {
+//		val List<VariableReferenceInfo> variables = newArrayList
+//		update.conditions.elements.stream.forEach([x|variables.addAll(x.expr.usedVariables)])
+//		variables;
+//	}
 
 	def List<VariableReferenceInfo> usedVariables(Create create) {
 		val List<VariableReferenceInfo> variables = newArrayList

@@ -4,8 +4,11 @@
 package org.blockchain.rell.scoping
 
 import java.util.List
+import org.blockchain.rell.rell.AtOperator
+import org.blockchain.rell.rell.ClassDefinition
 import org.blockchain.rell.rell.ClassMemberDefinition
-import org.blockchain.rell.rell.ClassType
+import org.blockchain.rell.rell.ClassRef
+import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableDeclarationRef
 import org.eclipse.emf.ecore.EObject
@@ -28,11 +31,11 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		switch(container){
 			case (container instanceof ClassMemberDefinition):{
 				val classMemberDefinition=container as ClassMemberDefinition;
-				val attrubuteListField=classMemberDefinition.classDefinition.attributeListField;
+				val classDefinition=classMemberDefinition.classRef.value;
+				val attrubuteListField=classDefinition.attributeListField;
 				val List<VariableDeclaration> variableDeclarationList=newArrayList;
 				attrubuteListField.forEach[x|x.attributeList.forEach[attrList|attrList.value.forEach[variable|variableDeclarationList.add(variable.name)]]];
-				
-				
+							
 				val scope= Scopes::scopeFor(variableDeclarationList)
 				return scope
 			}
@@ -40,13 +43,42 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		return IScope::NULLSCOPE
 		
 	}
-
-
+	
+	def IScope getClassRefScope(ClassRef classRef, EReference ref) {
+		
+		val container=classRef.eContainer.notExressionContainer;
+		if (container instanceof ClassMemberDefinition){
+			
+			val notExprCont=container.eContainer.notExressionContainer
+			
+			 if (notExprCont instanceof AtOperator){
+			 	val atOperator=notExprCont as AtOperator
+				val List<ClassDefinition> classDefList=newArrayList
+				atOperator.tableNameWithAlias.forEach[x|classDefList.add(x.classDef)]
+				return Scopes::scopeFor(classDefList);
+			 }
+		}	
+		return super.getScope(classRef,ref);
+		
+	}
+	
+	def notExressionContainer(EObject context){
+		var privateContainer=context
+		while (privateContainer instanceof Expression){
+			privateContainer=privateContainer.eContainer
+		}
+		return privateContainer;
+	}
+	
 	
 	override IScope getScope(EObject context, EReference reference) {
-		
-		if (context instanceof VariableDeclarationRef){
-			return getVariableDeclarationRefScope(context as VariableDeclarationRef,reference);
+		switch(context){
+			case (context instanceof VariableDeclarationRef):{
+				return getVariableDeclarationRefScope(context as VariableDeclarationRef,reference);
+			}
+			case(context instanceof ClassRef):{
+				return getClassRefScope(context as ClassRef,reference);
+			}
 		}
 		return super.getScope(context,reference);	
 
