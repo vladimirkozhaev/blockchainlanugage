@@ -424,7 +424,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {field: text; key field; }
 			operation o() { 
-			    val t = test @? {field = 'some_text'};
+			    val t = test @? {field == 'some_text'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -438,7 +438,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {field: text; key field; }
 			operation o() { 
-			    val t = test @+ {field = 'some_text'};
+			    val t = test @+ {field == 'some_text'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -497,7 +497,7 @@ class RellParsingTest {
 				f : foo;
 			}
 			operation op() {
-				create bar (id = 1, name = 'test', create foo(id = 1, name = 'test'));
+				create bar (id == 1, name == 'test', create foo(id == 1, name == 'test'));
 			}
 		''')
 		Assert.assertNotNull(result)
