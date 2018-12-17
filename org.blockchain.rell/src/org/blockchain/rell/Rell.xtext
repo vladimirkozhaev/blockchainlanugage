@@ -38,10 +38,11 @@ ClassMemberDefinition:
 	classRef=ClassRef "." variableDeclarationRef=VariableDeclarationRef;
 
 ClassRef:
-	value=[ClassDefinition];
+	value=[TableNameWithAlias];
 
 TableNameWithAlias:
-	(className=ID ':')? classDef=[ClassDefinition];
+	{ClassRefDecl} (name=ID ':' classDef=[ClassDefinition]) |
+	{JustNameDecl} name=[ClassDefinition];
 
 Update:
 	'update' entity=[ClassDefinition] '(' conditions+=Expression* ')' '{' variableList+=VariableInit

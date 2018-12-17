@@ -5,17 +5,22 @@ package org.blockchain.rell.scoping
 
 import java.util.List
 import org.blockchain.rell.rell.AtOperator
+import org.blockchain.rell.rell.AttributeListField
 import org.blockchain.rell.rell.ClassDefinition
 import org.blockchain.rell.rell.ClassMemberDefinition
 import org.blockchain.rell.rell.ClassRef
+import org.blockchain.rell.rell.ClassRefDecl
 import org.blockchain.rell.rell.Expression
+import org.blockchain.rell.rell.JustNameDecl
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableDeclarationRef
+import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
+import org.blockchain.rell.rell.TableNameWithAlias
 
 /**
  * This class contains custom scoping description.
@@ -26,15 +31,38 @@ import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
 class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 	def IScope getVariableDeclarationRefScope(VariableDeclarationRef classType, EReference ref) {
-		
+		 
 		val container=classType.eContainer;
 		switch(container){
 			case (container instanceof ClassMemberDefinition):{
 				val classMemberDefinition=container as ClassMemberDefinition;
 				val classDefinition=classMemberDefinition.classRef.value;
-				val attrubuteListField=classDefinition.attributeListField;
+				var EList<AttributeListField> attrubuteListField;
+				switch (classDefinition){
+					case (classDefinition instanceof ClassRefDecl):{
+						val classRefDecl=classDefinition as ClassRefDecl
+						attrubuteListField=classRefDecl.classDef.attributeListField;
+					}case (classDefinition instanceof JustNameDecl):{
+						val justNameDecl=classDefinition as JustNameDecl
+						attrubuteListField=justNameDecl.name.attributeListField;
+					}
+				}
 				val List<VariableDeclaration> variableDeclarationList=newArrayList;
-				attrubuteListField.forEach[x|x.attributeList.forEach[attrList|attrList.value.forEach[variable|variableDeclarationList.add(variable.name)]]];
+				if (attrubuteListField===null){
+					return IScope.NULLSCOPE;
+				}
+				attrubuteListField.forEach[x|if (x.attributeList!==null) 
+					{
+						x.attributeList.forEach[attrList|
+							if (attrList!==null&&attrList.value!==null){
+								attrList.value.forEach[variable|{
+									if (variable!==null) {
+										variableDeclarationList.add(variable.name)
+									}
+								}]
+							}
+					]}
+				];
 							
 				val scope= Scopes::scopeFor(variableDeclarationList)
 				return scope
@@ -53,8 +81,8 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			
 			 if (notExprCont instanceof AtOperator){
 			 	val atOperator=notExprCont as AtOperator
-				val List<ClassDefinition> classDefList=newArrayList
-				atOperator.tableNameWithAlias.forEach[x|classDefList.add(x.classDef)]
+				val List<TableNameWithAlias> classDefList=newArrayList
+				atOperator.tableNameWithAlias.forEach[x|classDefList.add(x)]
 				return Scopes::scopeFor(classDefList);
 			 }
 		}	
@@ -73,6 +101,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	
 	override IScope getScope(EObject context, EReference reference) {
 		switch(context){
+			case (context===null): return IScope.NULLSCOPE
 			case (context instanceof VariableDeclarationRef):{
 				return getVariableDeclarationRefScope(context as VariableDeclarationRef,reference);
 			}
