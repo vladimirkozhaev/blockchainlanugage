@@ -29,10 +29,25 @@ Variable:
 Relational:
 	Update | Delete | Create | AtOperator;
 
+Update:
+	'update' entity=[ClassDefinition] '(' conditions+=Expression* ')' '{' variableList+=VariableInit
+	(',' variableList+=VariableInit*)? '}';
+
+Delete:
+	'delete' entity=[ClassDefinition] '(' conditions+=Expression (',' conditions+=Expression)* ')';
+
+Create:
+	'create' entity=[ClassDefinition] '(' (createWhatPart+=CreateWhatPart  (','
+	createWhatPart+=CreateWhatPart)*)? ')';
+
+CreateWhatPart:
+	(varDeclRef=VariableDeclarationRef '=')?
+	condition+=Expression;
+
 AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand ampersandModificator=AmpersandModificator? '{'
-	conditions+=Expression* '}';
+	conditions+=Expression (',' conditions+=Expression)* '}';
 
 ClassMemberDefinition:
 	classRef=ClassRef "." variableDeclarationRef=VariableDeclarationRef;
@@ -44,21 +59,8 @@ TableNameWithAlias:
 	{ClassRefDecl} (name=ID ':' classDef=[ClassDefinition]) |
 	{JustNameDecl} name=[ClassDefinition];
 
-Update:
-	'update' entity=[ClassDefinition] '(' conditions+=Expression* ')' '{' variableList+=VariableInit
-	(',' variableList+=VariableInit*)? '}';
-
-Delete:
-	'delete' entity=[ClassDefinition] '(' conditions+=Expression* ')';
-
-Create:
-	'create' entity=[ClassDefinition] '(' (attributeList+=CreateAttrMember (',' attributeList+=CreateAttrMember)*)? ')';
-
-CreateAttrMember:
-	name=[VariableDeclaration|ValuableID] ('=' expr=Expression)?;
-
 VariableDeclarationRef:
-	decl=[VariableDeclaration];
+	decl=[VariableDeclaration|ValuableID];
 
 VariableInit:
 	name=[VariableDeclaration] '=' expression=Expression;
@@ -99,7 +101,8 @@ Atomic returns Expression:
 	{BoolConstant} value=('true' | 'false') |
 	{VariableRef} value=[VariableDeclaration|ValuableID] |
 	{SelectOp} value=AtOperator |
-	{MemberDefinition} value=ClassMemberDefinition;
+	{MemberDefinition} value=ClassMemberDefinition|
+	{CreateAtom} value=Create;
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
