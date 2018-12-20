@@ -165,6 +165,78 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+	
+// Check set default attribute value via at-operator 
+	@Test
+	def void testDefaultAttributeValueWithAtOperator() {
+		val result = parseHelper.parse(''' 
+			class version { 
+				id : pubkey;
+				value: integer;
+			}
+			class model { 
+				name: text; 
+				version: version = version@{};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+// Check set default attribute value via at-operator with 'where' part
+	@Test
+	def void testDefaultAttributeValueWithAtOperatorWherePart() {
+		val result = parseHelper.parse(''' 
+			class version { 
+				id : pubkey;
+				value: integer;
+			}
+			class model { 
+				name: text; 
+				version: version = version@{id = x'0123abcd'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+// Check set default attribute value via at-operator that return value from 'what' part
+	@Test
+	def void testDefAttribValWithAtOperatorReturnWhatPart() {
+		val result = parseHelper.parse(''' 
+			class version { 
+				id : pubkey;
+				value: integer;
+			}
+			class model { 
+				name: text; 
+				version: integer = version@{id = x'0123abcd'}(version.value);
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+// Check default attribute value via at-operator that return value by member access
+	@Test
+	def void testDefAttribValWithAtOperatorReturnMemberAccess() {
+		val result = parseHelper.parse(''' 
+			class version { 
+				id : pubkey;
+				value: integer;
+			}
+			class model { 
+				name: text; 
+				version: integer = version@{id = x'0123abcd'}.value;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
 
 // Check that a class can have the 'key' clause after an attribute definition
 	@Test
@@ -582,6 +654,42 @@ class RellParsingTest {
 			}
 			operation op() {
 				create bar (1, 'test', foo @ {name = 'foo'});
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check alias in 'where' part of at-operator within operation
+	@Test
+	def void testAliasWherePartWithinOperation() {
+		val result = parseHelper.parse('''
+			class foo { 
+				pubkey;
+				name;
+			}
+			
+			operation op() {
+			    val foo_obj = (f: foo) @{f.pubkey = x'0123abcd'};    
+			}
+			
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check simple create statement
+	@Test
+	def void testCreateWithinOperation() {
+		val result = parseHelper.parse('''
+			class foo {
+				id : integer;
+				name : text;
+			}
+			operation op() {
+				create foo (1, 'test');
 			}
 		''')
 		Assert.assertNotNull(result)
