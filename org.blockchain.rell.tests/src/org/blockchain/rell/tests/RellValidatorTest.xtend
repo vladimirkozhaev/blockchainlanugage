@@ -63,5 +63,13 @@ class RellValidatorTest {
 		}'''.parse.assertNoError("Need be compilled")
 
 	}
+	
+	def void testAssignAnotherTypeToDefaultValue(){
+		'''
+			class foo { 
+				i : integer = "text";
+			}
+		'''.parse.assertError(RellPackage.eINSTANCE.variableDeclaration, "Default value type missmatch for 'i': text instead of integer")
+	}
 
 }
