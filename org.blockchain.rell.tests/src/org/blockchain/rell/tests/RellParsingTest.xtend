@@ -680,6 +680,24 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+	// check alias in 'where' and 'what' part of at-operator within operation 
+	@Test
+	def void testAliasWhatPartWithinOperation() {
+		val result = parseHelper.parse('''
+			class foo { 
+				pubkey;
+				name;
+			}
+			
+			operation op() {
+			    val foo_name = (f: foo) @{f.pubkey = x'0123abcd'}(f.name);    
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	// check simple create statement
 	@Test
 	def void testCreateWithinOperation() {
