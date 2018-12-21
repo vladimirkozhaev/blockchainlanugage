@@ -456,7 +456,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-				create foo(id = 1, name = 'test');
+				create foo(id == 1, name == 'test');
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -470,7 +470,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class foo {
 				id : integer;
-				name : text;
+				name1 : text;
 			}
 			
 			operation op() {
@@ -534,6 +534,23 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class foo {
 				id : integer;
+				name1 : text;
+			}
+			
+			operation op() {
+				create foo(id == 1, name1 == 'test');
+				create foo(name1 == 'test', id == 1);
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	@Test
+	def void testKeywordsAsFieldNameInTheCreate() {
+		val result = parseHelper.parse('''
+			class foo {
+				id : integer;
 				name : text;
 			}
 			
@@ -577,11 +594,11 @@ class RellParsingTest {
 			
 			class bar {
 				id : integer;
-				name : text;
+				name1 : text;
 				f : foo;
 			}
 			operation op() {
-				create bar (1, 'test', foo @ {name = 'foo'});
+				create bar (1, 'test', foo @ {name1 == 'foo'});
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -704,6 +721,45 @@ class RellParsingTest {
 			      var test:pubkey=pubkey;
 			}
 		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	@Test
+	def void testAliases() {
+		val result = parseHelper.parse('''class Test{
+			t:text;
+		}
+		class Test1{
+			t1:text;
+		}
+		class Test2{
+			t2:text;
+		}
+		
+		operation o(){
+			val op=(a:Test,b:Test)@{a.t=="rrrr"};
+		}		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	@Test
+	def void testWrongAliases() {
+		val result = parseHelper.parse('''class Test{
+			t:text;
+		}
+		class Test1{
+			t1:text;
+		}
+		class Test2{
+			t2:text;
+		}
+		
+		operation o(){
+			val op=(a:Test,b:Test)@{a1.t=="rrrr"};
+		}		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
