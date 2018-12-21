@@ -99,7 +99,7 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=[VariableDeclaration|ValuableID] |
+	{VariableRef} value=VariableDeclarationRef |
 	{SelectOp} value=AtOperator |
 	{MemberDefinition} value=ClassMemberDefinition|
 	{CreateAtom} value=Create;

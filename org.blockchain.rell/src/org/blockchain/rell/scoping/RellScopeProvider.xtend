@@ -23,6 +23,7 @@ import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
+import org.blockchain.rell.rell.VariableRef
 
 /**
  * This class contains custom scoping description.
@@ -60,16 +61,37 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			}case (container instanceof CreateWhatPart):{
 				val create=container.eContainer as Create
 				val ClassDefinition en=create.entity;
-				val VariableDeclaration variableDeclaration=variableDeclarationRef.decl
+				
 				val scope=Scopes::scopeFor(en.attributeListField.makeVariableDeclarationList)
-				println(variableDeclaration.name +" "+scope)
+				
 				return scope
+			} case (container instanceof VariableRef):{
+				val notExprContainer=container.notExressionContainer;
+				switch (notExprContainer){
+					case (notExprContainer instanceof AtOperator):{
+						val atOperator=notExprContainer as AtOperator
+						val List<VariableDeclaration> variableDeclarationList=newArrayList
+						atOperator.tableNameWithAlias.forEach[tableNameWithAlias|{
+							switch(tableNameWithAlias){
+								case (tableNameWithAlias instanceof JustNameDecl):{
+									val nameDecl=tableNameWithAlias as JustNameDecl
+									val classDefinition=nameDecl.name
+									variableDeclarationList.addAll(classDefinition.attributeListField.makeVariableDeclarationList)
+								}
+							}
+						}]
+						return Scopes::scopeFor(variableDeclarationList)
+					}
+				}
+				return IScope::NULLSCOPE;
 			}
 			
 		}	
 		return IScope::NULLSCOPE
 		
 	}
+	
+	
 	
 	protected def List<VariableDeclaration> makeVariableDeclarationList(EList<AttributeListField> attrubuteListField) {
 		val List<VariableDeclaration> variableDeclarationList=newArrayList;

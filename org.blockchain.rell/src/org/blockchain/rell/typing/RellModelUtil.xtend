@@ -194,7 +194,7 @@ class RellModelUtil {
 				variables.addAll(usedVariables((expression as MulOrDiv).right))
 			}
 			case (expression instanceof VariableRef): {
-				variables.add(new VariableReferenceInfo((expression as VariableRef).value,false,false,true))
+				variables.add(new VariableReferenceInfo((expression as VariableRef).value.decl,false,false,true))
 			}
 			
 			default:
