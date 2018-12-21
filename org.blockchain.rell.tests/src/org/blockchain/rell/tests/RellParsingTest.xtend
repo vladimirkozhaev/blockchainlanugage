@@ -773,7 +773,6 @@ class RellParsingTest {
 			
 			operation op() {
 			    val foo = foo @{k == 122}(name);    
->>>>>>> 6b015ab0dd18e1e9b8b9f59a2346925d0a438100
 			}
 		''')
 		Assert.assertNotNull(result)
