@@ -724,16 +724,35 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
-	// check simple create statement
+	// check explicit reference to a class variable in 'where' part within operation
 	@Test
-	def void testCreateWithinOperation() {
+	def void testExplicitRefWherePart() {
 		val result = parseHelper.parse('''
-			class foo {
-				id : integer;
-				name : text;
+			class foo { 
+				key k: integer;
+				name;
 			}
+			
 			operation op() {
-				create foo (1, 'test');
+			    val foo = foo @{k == 122};    
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check explicit reference to a class variable in 'what' part within operation
+	@Test
+	def void testExplicitRefWhatPart() {
+		val result = parseHelper.parse('''
+			class foo { 
+				key k: integer;
+				name;
+			}
+			
+			operation op() {
+			    val foo = foo @{k == 122}(name);    
 			}
 		''')
 		Assert.assertNotNull(result)
