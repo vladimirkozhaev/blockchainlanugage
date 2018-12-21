@@ -123,6 +123,32 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+	
+//	Check initialization byte_array
+    @Test
+	def void testInitValueToByteArray() {
+		val result = parseHelper.parse('''
+			class foo {
+			    ba : byte_array = x"0373599a61cc6b3bc02a78c34313e1737ae9cfd56b9bb24360b437d469efdf3b15";
+			}		
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+//	Check initialization pubkey
+    @Test
+	def void testInitValueToPubkey() {
+		val result = parseHelper.parse('''
+			class foo {
+			    pb : pubkey = x"0373599a61cc6b3bc02a78c34313e1737ae9cfd56b9bb24360b437d469efdf3b15";
+			}		
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
 
 // Check if attribute type is not specified, it will be the same as attribute name 
 	@Test
