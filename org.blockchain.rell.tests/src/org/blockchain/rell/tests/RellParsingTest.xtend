@@ -194,7 +194,7 @@ class RellParsingTest {
 			}
 			class model { 
 				name: text; 
-				version: version = version@{id = x'0123abcd'};
+				version: version = version@{id == x'0123abcd'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -212,7 +212,7 @@ class RellParsingTest {
 			}
 			class model { 
 				name: text; 
-				version: integer = version@{id = x'0123abcd'}(version.value);
+				version: integer = version@{id == x'0123abcd'}(version.value);
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -230,7 +230,7 @@ class RellParsingTest {
 			}
 			class model { 
 				name: text; 
-				version: integer = version@{id = x'0123abcd'}.value;
+				version: integer = version@{id == x'0123abcd'}.value;
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -569,7 +569,7 @@ class RellParsingTest {
 				f : foo;
 			}
 			operation op() {
-				create bar (id == 1, name == 'test', create foo(id == 1, name == 'test'));
+				create bar (id = 1, name = 'test', create foo(id = 1, name = 'test'));
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -653,7 +653,7 @@ class RellParsingTest {
 				f : foo;
 			}
 			operation op() {
-				create bar (1, 'test', foo @ {name = 'foo'});
+				create bar (1, 'test', foo @ {name == 'foo'});
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -671,7 +671,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-			    val foo_obj = (f: foo) @{f.pubkey = x'0123abcd'};    
+			    val foo_obj = (f: foo) @{f.pubkey == x'0123abcd'};    
 			}
 			
 		''')
@@ -690,7 +690,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-			    val foo_name = (f: foo) @{f.pubkey = x'0123abcd'}(f.name);    
+			    val foo_name = (f: foo) @{f.pubkey == x'0123abcd'}(f.name);    
 			}
 		''')
 		Assert.assertNotNull(result)
