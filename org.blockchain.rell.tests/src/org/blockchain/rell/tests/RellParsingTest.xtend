@@ -220,7 +220,7 @@ class RellParsingTest {
 			}
 			class model { 
 				name: text; 
-				version: version = version@{id == x'0123abcd'};
+				version: version = version@{.id == x'0123abcd'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -238,7 +238,7 @@ class RellParsingTest {
 			}
 			class model { 
 				name: text; 
-				version: integer = version@{id == x'0123abcd'}(version.value);
+				version: integer = version@{.id == x'0123abcd'}(version.value);
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -256,7 +256,7 @@ class RellParsingTest {
 			}
 			class model { 
 				name: text; 
-				version: integer = version@{id == x'0123abcd'}.value;
+				version: integer = version@{.id == x'0123abcd'}.value;
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -437,7 +437,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {a: text; b: text; c : text; key a; index b; }
 			operation createTest() {
-			   val newTest =  create test(a == 'akey', b == 'btext', c == 'ctext');
+			   val newTest =  create test(a = 'akey', b = 'btext', c = 'ctext');
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -481,7 +481,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {field: text; key field; }
 			operation o() { 
-			    val t = test @ {field == 'some_text'};
+			    val t = test @ {.field == 'some_text'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -495,7 +495,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {field: text; key field; }
 			operation o() { 
-			    val t = test @* {field == 'some_text'};
+			    val t = test @* {.field == 'some_text'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -522,7 +522,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {field: text; key field; }
 			operation o() { 
-			    val t = test @? {field == 'some_text'};
+			    val t = test @? {.field == 'some_text'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -536,7 +536,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {field: text; key field; }
 			operation o() { 
-			    val t = test @+ {field == 'some_text'};
+			    val t = test @+ {.field == 'some_text'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -554,7 +554,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-				create foo(id == 1, name == 'test');
+				create foo(id = 1, name = 'test');
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -636,25 +636,8 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-				create foo(id == 1, name1 == 'test');
-				create foo(name1 == 'test', id == 1);
-			}
-		''')
-		Assert.assertNotNull(result)
-		val errors = result.eResource.errors
-		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
-	}
-	@Test
-	def void testKeywordsAsFieldNameInTheCreate() {
-		val result = parseHelper.parse('''
-			class foo {
-				id : integer;
-				name : text;
-			}
-			
-			operation op() {
-				create foo(id = 1, name = 'test');
-				create foo(name = 'test', id = 1);
+				create foo(id = 1, name1 = 'test');
+				create foo(name1 = 'test', id = 1);
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -696,10 +679,7 @@ class RellParsingTest {
 				f : foo;
 			}
 			operation op() {
-<<<<<<< HEAD
-				create bar (1, 'test', foo @ {name1 == 'foo'});
-=======
-				create bar (1, 'test', foo @ {name == 'foo'});
+				create bar (1, 'test', foo @ {.name == 'foo'});
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -754,7 +734,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-			    val foo = foo @{k == 122};    
+			    val foo = foo @{.k == 122};    
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -772,7 +752,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-			    val foo = foo @{k == 122}(name);    
+			    val foo = foo @{.k == 122}(.name);    
 			}
 		''')
 		Assert.assertNotNull(result)
