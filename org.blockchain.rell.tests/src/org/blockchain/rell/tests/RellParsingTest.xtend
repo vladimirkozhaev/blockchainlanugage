@@ -149,6 +149,22 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+	
+// Check record declaration 
+	@Test	
+	def void testRecordDeclaration() {
+		val result = parseHelper.parse('''
+			record foo {
+			    k : pubkey;
+			    i : integer;
+			    name: text;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
 
 // Check if attribute type is not specified, it will be the same as attribute name 
 	@Test
@@ -220,7 +236,7 @@ class RellParsingTest {
 			}
 			class model { 
 				name: text; 
-				version: version = version@{id == x'0123abcd'};
+				version: version = version@{.id == x'0123abcd'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -256,7 +272,7 @@ class RellParsingTest {
 			}
 			class model { 
 				name: text; 
-				version: integer = version@{id == x'0123abcd'}.value;
+				version: integer = version@{.id == x'0123abcd'}.value;
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -437,7 +453,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {a: text; b: text; c : text; key a; index b; }
 			operation createTest() {
-			   val newTest =  create test(a == 'akey', b == 'btext', c == 'ctext');
+			   val newTest =  create test(a = 'akey', b = 'btext', c = 'ctext');
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -481,7 +497,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {field: text; key field; }
 			operation o() { 
-			    val t = test @ {field == 'some_text'};
+			    val t = test @ {.field == 'some_text'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -495,7 +511,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {field: text; key field; }
 			operation o() { 
-			    val t = test @* {field == 'some_text'};
+			    val t = test @* {.field == 'some_text'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -522,7 +538,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {field: text; key field; }
 			operation o() { 
-			    val t = test @? {field == 'some_text'};
+			    val t = test @? {.field == 'some_text'};
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -554,7 +570,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-				create foo(id == 1, name == 'test');
+				create foo(id = 1, name = 'test');
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -636,6 +652,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
+<<<<<<< HEAD
 				create foo(.id == 1, .name1 == 'test');
 				create foo(.name1 == 'test', .id == 1);
 			}
@@ -653,8 +670,9 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-				create foo(id = 1, name = 'test');
-				create foo(name = 'test', id = 1);
+			
+				create foo(id = 1, name1 = 'test');
+				create foo(name1 = 'test', id = 1);
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -697,7 +715,6 @@ class RellParsingTest {
 			}
 			operation op() {
 
-				create bar (1, 'test', foo @ {.name == 'foo'});
 				create bar (1, 'test', foo @ {.name == 'foo'});
 			}
 		''')
@@ -753,7 +770,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-			    val foo = foo @{k == 122};    
+			    val foo = foo @{.k == 122};    
 			}
 		''')
 		Assert.assertNotNull(result)
@@ -771,7 +788,62 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-			    val foo = foo @{k == 122}(name);    
+			    val foo = foo @{.k == 122}(.name);    
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check simple update operation (short expression to access to class members)
+	@Test
+	def void testUpdateOperationShortAccess() {
+		val result = parseHelper.parse('''
+			class foo { 
+				key k: integer;
+				mutable name;
+			}
+			
+			operation op() {
+			    update foo @{.k == 122}(name = "new_name");    
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check simple update operation (full expression to access to class members)
+	@Test
+	def void testUpdateOperationFullAccess() {
+		val result = parseHelper.parse('''
+			class foo { 
+				key k: integer;
+				mutable name;
+			}
+			
+			operation op() {
+			    update foo @{foo.k == 122}(name = "new_name");    
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	// check pass val variable to where part of at expression 
+	@Test
+	def void testUpdateOperationValInWherePart() {
+		val result = parseHelper.parse('''
+			class foo { 
+			    key k: integer;
+			    mutable name;
+			}
+			
+			operation op() {
+			  val k = 122;
+			  update foo @{.k == k}(name = "new_name");    
 			}
 		''')
 		Assert.assertNotNull(result)
