@@ -37,7 +37,7 @@ Delete:
 	'delete' entity=[ClassDefinition] '(' conditions+=Expression (',' conditions+=Expression)* ')';
 
 Create:
-	'create' entity=[ClassDefinition] '(' (createWhatPart+=CreateWhatPart  (','
+	'create' (entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart  (','
 	createWhatPart+=CreateWhatPart)*)? ')';
 
 CreateWhatPart:
@@ -58,6 +58,7 @@ ClassRef:
 TableNameWithAlias:
 	{ClassRefDecl} (name=ID ':' classDef=[ClassDefinition]) |
 	{JustNameDecl} name=[ClassDefinition];
+
 
 VariableDeclarationRef:
 	decl=[VariableDeclaration|ValuableID];
@@ -99,7 +100,7 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=VariableDeclarationRef |
+	{VariableRef} "." value=VariableDeclarationRef |
 	{SelectOp} value=AtOperator |
 	{MemberDefinition} value=ClassMemberDefinition|
 	{CreateAtom} value=Create;

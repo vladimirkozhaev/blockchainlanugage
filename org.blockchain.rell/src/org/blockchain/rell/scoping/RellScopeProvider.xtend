@@ -12,18 +12,20 @@ import org.blockchain.rell.rell.ClassRef
 import org.blockchain.rell.rell.ClassRefDecl
 import org.blockchain.rell.rell.Create
 import org.blockchain.rell.rell.CreateWhatPart
+import org.blockchain.rell.rell.Delete
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.JustNameDecl
 import org.blockchain.rell.rell.TableNameWithAlias
+import org.blockchain.rell.rell.Update
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableDeclarationRef
+import org.blockchain.rell.rell.VariableRef
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
-import org.blockchain.rell.rell.VariableRef
 
 /**
  * This class contains custom scoping description.
@@ -82,6 +84,19 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 						}]
 						return Scopes::scopeFor(variableDeclarationList)
 					}
+					case (notExprContainer instanceof Update):{
+						val update = notExprContainer as Update
+						return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
+					}
+					case (notExprContainer instanceof Delete):{
+						val delete=notExprContainer as Delete
+						val List<VariableDeclaration> variableDeclarationList=delete.entity.attributeListField.makeVariableDeclarationList
+						return Scopes::scopeFor(variableDeclarationList)
+					}
+					case (notExprContainer instanceof Create):{
+						val update=notExprContainer as Create
+						return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
+					}
 				}
 				return IScope::NULLSCOPE;
 			}
@@ -91,7 +106,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		
 	}
 	
-	
+
 	
 	protected def List<VariableDeclaration> makeVariableDeclarationList(EList<AttributeListField> attrubuteListField) {
 		val List<VariableDeclaration> variableDeclarationList=newArrayList;

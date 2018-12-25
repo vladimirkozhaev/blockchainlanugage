@@ -64,14 +64,14 @@ class RellModelUtil {
 
 	def List<VariableReferenceInfo> usedVariables(Relational relation) {
 		switch (relation) {
-			case (relation instanceof Update): {
-				(relation as Update).usedVariables
-
-			}
-			case (relation instanceof Delete): {
-				(relation as Delete).usedVariables
-
-			}
+//			case (relation instanceof Update): {
+//				(relation as Update).usedVariables
+//
+//			}
+//			case (relation instanceof Delete): {
+//				(relation as Delete).usedVariables
+//
+//			}
 			case (relation instanceof Create): {
 				(relation as Create).usedVariables
 
