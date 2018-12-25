@@ -243,6 +243,22 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+	@Test
+	def void testDefaultAttributeValueWithAtOperatorWherePartAndPubkey() {
+		val result = parseHelper.parse(''' 
+			class version { 
+				id : pubkey;
+				value: integer;
+			}
+			class model { 
+				name: text; 
+				version: version = version@{.id == x'0123abcd'};
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
 
 // Check set default attribute value via at-operator that return value from 'what' part
 	@Test
@@ -571,6 +587,7 @@ class RellParsingTest {
 			
 			operation op() {
 				create foo(id = 1, name = 'test');
+				create foo(name = 'test', id = 1);
 			}
 		''')
 		Assert.assertNotNull(result)
