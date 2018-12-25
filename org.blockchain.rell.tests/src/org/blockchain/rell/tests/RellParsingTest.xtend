@@ -149,6 +149,22 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+	
+// Check record declaration 
+	@Test	
+	def void testRecordDeclaration() {
+		val result = parseHelper.parse('''
+			record foo {
+			    k : pubkey;
+			    i : integer;
+			    name: text;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
 
 // Check if attribute type is not specified, it will be the same as attribute name 
 	@Test
