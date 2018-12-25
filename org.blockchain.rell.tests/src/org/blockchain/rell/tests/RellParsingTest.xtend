@@ -760,6 +760,61 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+	// check simple update operation (short expression to access to class members)
+	@Test
+	def void testUpdateOperationShortAccess() {
+		val result = parseHelper.parse('''
+			class foo { 
+				key k: integer;
+				mutable name;
+			}
+			
+			operation op() {
+			    update foo @{.k == 122}(name = "new_name");    
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check simple update operation (full expression to access to class members)
+	@Test
+	def void testUpdateOperationFullAccess() {
+		val result = parseHelper.parse('''
+			class foo { 
+				key k: integer;
+				mutable name;
+			}
+			
+			operation op() {
+			    update foo @{foo.k == 122}(name = "new_name");    
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+
+	// check pass val variable to where part of at expression 
+	@Test
+	def void testUpdateOperationValInWherePart() {
+		val result = parseHelper.parse('''
+			class foo { 
+			    key k: integer;
+			    mutable name;
+			}
+			
+			operation op() {
+			  val k = 122;
+			  update foo @{.k == k}(name = "new_name");    
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	@Test
 	def void testOperations() {
 		val result = parseHelper.parse('''
