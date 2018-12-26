@@ -652,7 +652,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-<<<<<<< HEAD
+
 				create foo(.id == 1, .name1 == 'test');
 				create foo(.name1 == 'test', .id == 1);
 			}
