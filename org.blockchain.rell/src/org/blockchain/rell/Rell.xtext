@@ -30,14 +30,15 @@ Relational:
 	Update | Delete | Create | AtOperator;
 
 Update:
-	'update' entity=[ClassDefinition] '(' conditions+=Expression* ')' '{' variableList+=VariableInit
-	(',' variableList+=VariableInit*)? '}';
+	'update' entity=[ClassDefinition] '(' createWhatPart+=CreateWhatPart (','
+	createWhatPart+=CreateWhatPart)* ')' '{' conditions+=Expression (',' conditions+=Expression)*
+	 '}';
 
 Delete:
 	'delete' entity=[ClassDefinition] '(' conditions+=Expression (',' conditions+=Expression)* ')';
 
 Create:
-	'create' (entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart  (','
+	'create' (entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*)? ')';
 
 CreateWhatPart:
@@ -50,7 +51,7 @@ AtOperator:
 	conditions+=Expression (',' conditions+=Expression)* '}';
 
 ClassMemberDefinition:
-	classRef=ClassRef "." variableDeclarationRef=VariableDeclarationRef;
+	(classRef=ClassRef)? "." variableDeclarationRef=VariableDeclarationRef;
 
 ClassRef:
 	value=[TableNameWithAlias];
@@ -58,7 +59,6 @@ ClassRef:
 TableNameWithAlias:
 	{ClassRefDecl} (name=ID ':' classDef=[ClassDefinition]) |
 	{JustNameDecl} name=[ClassDefinition];
-
 
 VariableDeclarationRef:
 	decl=[VariableDeclaration|ValuableID];
@@ -100,9 +100,10 @@ Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} "." value=VariableDeclarationRef |
+	{VariableRef} value=VariableDeclarationRef | //Error because of this string
 	{SelectOp} value=AtOperator |
-	{MemberDefinition} value=ClassMemberDefinition|
+	{MemberDefinition} value=ClassMemberDefinition
+	|
 	{CreateAtom} value=Create;
 
 RelAttrubutesList:
