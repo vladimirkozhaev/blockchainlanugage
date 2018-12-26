@@ -439,7 +439,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class test {a: text; b: text; c : text; key a; index b; }
 			operation createTest(aParameter : text, bParameter : text, cParameter : text) {
-			    create test(a==aParameter, b==bParameter, c==cParameter);
+			    create test(a=aParameter, b=bParameter, c=cParameter);
 			}
 		''')
 		Assert.assertNotNull(result)
