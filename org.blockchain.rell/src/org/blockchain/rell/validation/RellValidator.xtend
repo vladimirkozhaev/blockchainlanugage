@@ -25,6 +25,7 @@ import org.blockchain.rell.typing.RellTypeProvider
 import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.validation.Check
+import org.blockchain.rell.rell.Model
 
 /**
  * Custom validation rules. 
@@ -49,6 +50,8 @@ class RellValidator extends AbstractRellValidator {
 	public static val MORE_TNAN_ONE_VARIABLE = ISSUE_CODE_PREFIX + "Copy"
 
 	public static val TYPE_MISMATCH = ISSUE_CODE_PREFIX + "TypeMismatch"
+
+	public static val NOT_UNIQUE_NANE = "Name should be unique"
 
 	@Check
 	def void checkOperation(Operation operation) {
@@ -175,6 +178,17 @@ class RellValidator extends AbstractRellValidator {
 		if (leftType.isInt || rightType.isInt || (!leftType.isString && !rightType.isString)) {
 			checkNotBoolean(leftType, RellPackage.Literals.PLUS__LEFT)
 			checkNotBoolean(rightType, RellPackage.Literals.PLUS__RIGHT)
+		}
+	}
+	
+	@Check def checkUniqueClassName(Model model) {
+		val classNames = <String>newHashSet()
+		for(classDefinition : model.getEntities()) {
+			if(classNames.contains(classDefinition.getName())) {
+				error("Class names should be unique. Class with name " + classDefinition.getName() + " already exists",
+					RellPackage.Literals.CLASS_DEFINITION.getEIDAttribute(), NOT_UNIQUE_NANE)
+			}
+			classNames.add(classDefinition.getName());
 		}
 	}
 
