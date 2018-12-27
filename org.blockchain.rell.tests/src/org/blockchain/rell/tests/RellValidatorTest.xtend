@@ -10,6 +10,7 @@ import org.eclipse.xtext.testing.util.ParseHelper
 import org.eclipse.xtext.testing.validation.ValidationTestHelper
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.Assert
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(RellInjectorProvider))
@@ -70,6 +71,14 @@ class RellValidatorTest {
 				i : integer = "text";
 			}
 		'''.parse.assertError(RellPackage.eINSTANCE.variableDeclaration, "Default value type missmatch for 'i': text instead of integer")
+	}
+	
+	@Test
+	def void testUniqueName(){
+		val validated = '''	class Test {}
+			class Test {}
+		'''.parse.validate()
+		Assert.assertTrue(validated.get(0).getCode() == RellValidator::NOT_UNIQUE_NANE)
 	}
 
 }
