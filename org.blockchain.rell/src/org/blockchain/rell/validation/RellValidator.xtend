@@ -233,7 +233,6 @@ class RellValidator extends AbstractRellValidator {
 	
 	@Check def checkUniqueAttributeName(ClassDefinition classDefinition) {
 		val attributesName = <String>newHashSet
-
 		for (var i = 0; i < classDefinition.attributeListField.size; i++) {
 			val values = classDefinition.attributeListField.get(i).attributeList.get(0).value
 			if (values.size > 1) {
