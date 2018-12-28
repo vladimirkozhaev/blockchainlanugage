@@ -28,6 +28,7 @@ import org.eclipse.xtext.validation.Check
 import org.blockchain.rell.rell.Model
 import org.blockchain.rell.rell.VariableInitialization
 import org.blockchain.rell.rell.Statement
+import org.blockchain.rell.rell.AttributeListField
 
 /**
  * Custom validation rules. 
@@ -55,6 +56,8 @@ class RellValidator extends AbstractRellValidator {
 
 	public static val NOT_UNIQUE_NANE = "Name should be unique"
 	public static val NOT_DECLARED_YET = "Variable is not declared yet"
+	
+	public static val DUPLICATE_ATTRIBUTE_NAME = "Attribute with the same name already is defined"
 
 	@Check
 	def void checkOperation(Operation operation) {
@@ -227,7 +230,36 @@ class RellValidator extends AbstractRellValidator {
 			}			
 		}
 	}
+	
+	@Check def checkUniqueAttributeName(ClassDefinition classDefinition) {
+		val attributesName = <String>newHashSet
 
+		for (var i = 0; i < classDefinition.attributeListField.size; i++) {
+			val values = classDefinition.attributeListField.get(i).attributeList.get(0).value
+			if (values.size > 1) {
+				for (var j = 0; j < values.size; j++) {
+					if (attributesName.contains(values.get(j).name.name)) {
+						error(
+							"Attribute with the " + values.get(j).name.name + "name already is defined",
+							RellPackage.Literals.VARIABLE_DECLARATION.EIDAttribute,
+							DUPLICATE_ATTRIBUTE_NAME
+						)
+					}
+					attributesName.add(values.get(j).name.name)
+				}
+			} else {
+				if (attributesName.contains(values.get(0).name.name)) {
+					error(
+						"Attribute with the " + values.get(0).name.name  + " name already is defined",
+						RellPackage.Literals.VARIABLE_DECLARATION.EIDAttribute,
+						DUPLICATE_ATTRIBUTE_NAME
+					)
+				}
+				attributesName.add(values.get(0).name.name)
+			}
+		}
+	}
+	
 	def private checkExpectedSame(RellType left, RellType right) {
 		if (right !== null && left !== null && right != left) {
 			error("expected the same type, but was " + left + ", " + right,
