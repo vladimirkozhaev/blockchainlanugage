@@ -75,28 +75,6 @@ class RellValidatorTest {
 	}
 	
 	@Test
-	def void testUniqueVariableName(){
-		val validated = '''
-			operation test() {
-				val j=1;
-				val j=1;
-			}
-		'''.parse.validate()
-		Assert.assertTrue(validated.get(0).getCode() == RellValidator::NOT_UNIQUE_NANE)
-	}
-	
-	@Test
-	def void testVariableAssignmentBeforeDeclaration(){
-		val validated = '''
-			operation test() {
-				j = 1;
-				val j;
-			}
-		'''.parse.validate()
-		Assert.assertTrue(validated.get(0).getCode() == RellValidator::NOT_DECLARED_YET)
-	}
-	
-	@Test
 	def void testDublicateAttributeNameDeclaration() {
 		val validated = '''
 			class test {

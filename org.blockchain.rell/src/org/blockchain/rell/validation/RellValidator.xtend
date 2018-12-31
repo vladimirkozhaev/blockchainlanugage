@@ -55,8 +55,7 @@ class RellValidator extends AbstractRellValidator {
 	public static val TYPE_MISMATCH = ISSUE_CODE_PREFIX + "TypeMismatch"
 
 	public static val NOT_UNIQUE_NANE = "Name should be unique"
-	public static val NOT_DECLARED_YET = "Variable is not declared yet"
-	
+
 	public static val DUPLICATE_ATTRIBUTE_NAME = "Attribute with the same name already is defined"
 
 	@Check
@@ -195,39 +194,6 @@ class RellValidator extends AbstractRellValidator {
 					RellPackage.Literals.CLASS_DEFINITION.getEIDAttribute(), NOT_UNIQUE_NANE)
 			}
 			classNames.add(classDefinition.getName());
-		}
-	}
-	
-	@Check def checkUniqueVariableName(Operation operation) {
-		val variableNames = <String>newHashSet()
-		for(statement : operation.getStatements()) {
-			if(statement.getVariable() !== null &&
-				statement.getVariable().getVariable() !== null &&
-				statement.getVariable().getVariable().getName() !== null) {
-					val variableName = statement.getVariable().getVariable().getName().getName()
-					if(variableNames.contains(variableName)) {
-						error("Variable names should be unique. Variable with name " + variableName + " already exists",
-					RellPackage.Literals.OPERATION_VARIABLE.getEIDAttribute(), NOT_UNIQUE_NANE)
-					}
-					variableNames.add(variableName);
-			}			
-		}
-	}
-	
-	@Check def checkVariableInitialization(Operation operation) {
-		val variableNames = <String>newHashSet()
-		for(statement : operation.getStatements()) {
-			if(statement.getVariable() !== null &&
-				statement.getVariable().getVariable() !== null &&
-				statement.getVariable().getVariable().getName() !== null) {
-					val variableName = statement.getVariable().getVariable().getName().getName()
-					variableNames.add(variableName);
-			} else if(statement.getInitialization() !== null) {
-				if(!variableNames.contains(statement.getInitialization().getName())) {
-					error("Variable " + statement.getInitialization().getName() + " is not declared yet.",
-					RellPackage.Literals.VARIABLE_INITIALIZATION.getEIDAttribute(), NOT_DECLARED_YET)
-				}
-			}			
 		}
 	}
 	
