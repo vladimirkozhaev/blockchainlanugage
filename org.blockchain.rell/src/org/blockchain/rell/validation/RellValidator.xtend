@@ -44,6 +44,8 @@ class RellValidator extends AbstractRellValidator {
 
 	public static val FORWARD_REFERENCE = ISSUE_CODE_PREFIX + "ForwardReference";
 
+	public static val NOT_UNIQUE_NAME = ISSUE_CODE_PREFIX + "NotUniqueName";
+	
 	public static val NOT_INIT_VARIABLE = ISSUE_CODE_PREFIX + "NotInitVariable";
 
 	public static val WRONG_TYPE = ISSUE_CODE_PREFIX + "WrongType";
@@ -254,6 +256,38 @@ class RellValidator extends AbstractRellValidator {
 				reference,
 				TYPE_MISMATCH
 			)
+	}
+	
+	@Check
+	def void checkVariableDeclarationConflict(Operation operation) {
+		val List<VariableReferenceInfo> variableDeclarations = operation.usedVariables;
+		variableDeclarations.reverse;
+		for (var i = 0; i < variableDeclarations.length - 1; i++) {
+			val element = variableDeclarations.get(i);
+			val sublistToCheck = new ArrayList(variableDeclarations.subList(i + 1, variableDeclarations.length));
+			for (var j = 0; j < sublistToCheck.length; j++) {
+				if (sublistToCheck.get(j).variableDeclaration.name == element.variableDeclaration.name) {
+					error("The variable with the same name is already defined: " + element.variableDeclaration.name,
+					RellPackage::eINSTANCE.operation_Statements, NOT_UNIQUE_NAME)
+				}
+			}
+		}
+	}
+	
+	@Check
+	def void checkVariableDeclarationInitialized(Operation operation) {
+		val List<VariableReferenceInfo> variableDeclarations = operation.usedVariables;
+		variableDeclarations.reverse;
+		for (var i = 0; i < variableDeclarations.length - 1; i++) {
+			val element = variableDeclarations.get(i);
+			val sublistToCheck = new ArrayList(variableDeclarations.subList(i + 1, variableDeclarations.length));
+			for (var j = 0; j < sublistToCheck.length; j++) {
+				if (sublistToCheck.get(j).variableDeclaration.name == element.variableDeclaration.name) {
+					error("The variable with the same name is already defined: " + element.variableDeclaration.name,
+					RellPackage::eINSTANCE.operation_Statements, NOT_UNIQUE_NAME)
+				}
+			}
+		}
 	}
 
 	def private RellType getTypeAndCheckNotNull(Expression exp, EReference reference) {
