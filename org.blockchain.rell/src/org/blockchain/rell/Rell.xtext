@@ -18,7 +18,7 @@ Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Statement:
-	(relation=Relational | variable=OperationVariable | initialization=VariableInitialization) ';';
+	(relation=Relational | variable=OperationVariable) ';';
 
 OperationVariable:
 	assessModificator=(Var | Val) variable=Variable;
@@ -123,10 +123,6 @@ PrimitiveType:
 
 ValuableID:
 	PrimitiveType | ID;
-	
-VariableInitialization:
-	name=ID '=' expression=Expression
-;
 
 AmpersandModificator:
 	PlusChar | MulChar | QuestionChar;

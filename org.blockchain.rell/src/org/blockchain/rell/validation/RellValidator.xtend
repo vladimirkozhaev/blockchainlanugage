@@ -44,6 +44,8 @@ class RellValidator extends AbstractRellValidator {
 
 	public static val FORWARD_REFERENCE = ISSUE_CODE_PREFIX + "ForwardReference";
 
+	public static val NOT_UNIQUE_NAME = ISSUE_CODE_PREFIX + "NotUniqueName";
+	
 	public static val NOT_INIT_VARIABLE = ISSUE_CODE_PREFIX + "NotInitVariable";
 
 	public static val WRONG_TYPE = ISSUE_CODE_PREFIX + "WrongType";
@@ -55,8 +57,7 @@ class RellValidator extends AbstractRellValidator {
 	public static val TYPE_MISMATCH = ISSUE_CODE_PREFIX + "TypeMismatch"
 
 	public static val NOT_UNIQUE_NANE = "Name should be unique"
-	public static val NOT_DECLARED_YET = "Variable is not declared yet"
-	
+
 	public static val DUPLICATE_ATTRIBUTE_NAME = "Attribute with the same name already is defined"
 //
 //	@Check
@@ -199,6 +200,7 @@ class RellValidator extends AbstractRellValidator {
 		addIssue("Test error", model, 10,  100,null);
 	}
 	
+
 //	@Check def checkUniqueVariableName(Operation operation) {
 //		val variableNames = <String>newHashSet()
 //		for(statement : operation.getStatements()) {
@@ -298,4 +300,103 @@ class RellValidator extends AbstractRellValidator {
 //			error("null type", reference, TYPE_MISMATCH)
 //		return type;
 //	}
+
+	@Check def checkUniqueAttributeName(ClassDefinition classDefinition) {
+		val attributesName = <String>newHashSet
+		for (var i = 0; i < classDefinition.attributeListField.size; i++) {
+			val values = classDefinition.attributeListField.get(i).attributeList.get(0).value
+			if (values.size > 1) {
+				for (var j = 0; j < values.size; j++) {
+					if (attributesName.contains(values.get(j).name.name)) {
+						error(
+							"Attribute with the " + values.get(j).name.name + "name already is defined",
+							RellPackage.Literals.VARIABLE_DECLARATION.EIDAttribute,
+							DUPLICATE_ATTRIBUTE_NAME
+						)
+					}
+					attributesName.add(values.get(j).name.name)
+				}
+			} else {
+				if (attributesName.contains(values.get(0).name.name)) {
+					error(
+						"Attribute with the " + values.get(0).name.name  + " name already is defined",
+						RellPackage.Literals.VARIABLE_DECLARATION.EIDAttribute,
+						DUPLICATE_ATTRIBUTE_NAME
+					)
+				}
+				attributesName.add(values.get(0).name.name)
+			}
+		}
+	}
+	
+	def private checkExpectedSame(RellType left, RellType right) {
+		if (right !== null && left !== null && right != left) {
+			error("expected the same type, but was " + left + ", " + right,
+				RellPackage.Literals.EQUALITY.getEIDAttribute(), TYPE_MISMATCH)
+		}
+	}
+
+	def private checkNotBoolean(RellType type, EReference reference) {
+		if (type.isBoolean) {
+			error("cannot be boolean", reference, TYPE_MISMATCH)
+		}
+	}
+
+	def private checkExpectedBoolean(Expression exp, EReference reference) {
+		checkExpectedType(exp, RellTypeProvider.BOOL_TYPE, reference)
+	}
+
+	def private checkExpectedInt(Expression exp, EReference reference) {
+		checkExpectedType(exp, RellTypeProvider.INT_TYPE, reference)
+	}
+
+	def private checkExpectedType(Expression exp, RellType expectedType, EReference reference) {
+		val actualType = getTypeAndCheckNotNull(exp, reference)
+		if (actualType != expectedType)
+			error(
+				"expected " + expectedType + " type, but was " + actualType,
+				reference,
+				TYPE_MISMATCH
+			)
+	}
+	
+	@Check
+	def void checkVariableDeclarationConflict(Operation operation) {
+		val List<VariableReferenceInfo> variableDeclarations = operation.usedVariables;
+		variableDeclarations.reverse;
+		for (var i = 0; i < variableDeclarations.length - 1; i++) {
+			val element = variableDeclarations.get(i);
+			val sublistToCheck = new ArrayList(variableDeclarations.subList(i + 1, variableDeclarations.length));
+			for (var j = 0; j < sublistToCheck.length; j++) {
+				if (sublistToCheck.get(j).variableDeclaration.name == element.variableDeclaration.name) {
+					error("The variable with the same name is already defined: " + element.variableDeclaration.name,
+					RellPackage::eINSTANCE.operation_Statements, NOT_UNIQUE_NAME)
+				}
+			}
+		}
+	}
+	
+	@Check
+	def void checkVariableDeclarationInitialized(Operation operation) {
+		val List<VariableReferenceInfo> variableDeclarations = operation.usedVariables;
+		variableDeclarations.reverse;
+		for (var i = 0; i < variableDeclarations.length - 1; i++) {
+			val element = variableDeclarations.get(i);
+			val sublistToCheck = new ArrayList(variableDeclarations.subList(i + 1, variableDeclarations.length));
+			for (var j = 0; j < sublistToCheck.length; j++) {
+				if (sublistToCheck.get(j).variableDeclaration.name == element.variableDeclaration.name) {
+					error("The variable with the same name is already defined: " + element.variableDeclaration.name,
+					RellPackage::eINSTANCE.operation_Statements, NOT_UNIQUE_NAME)
+				}
+			}
+		}
+	}
+
+	def private RellType getTypeAndCheckNotNull(Expression exp, EReference reference) {
+		val type = exp?.typeFor
+		if (type === null)
+			error("null type", reference, TYPE_MISMATCH)
+		return type;
+	}
+
 }

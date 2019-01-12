@@ -64,15 +64,7 @@ class RellValidatorTest {
 		}'''.parse.assertNoError("Need be compilled")
 
 	}
-	
-	def void testAssignAnotherTypeToDefaultValue(){
-		'''
-			class foo { 
-				i : integer = "text";
-			}
-		'''.parse.assertError(RellPackage.eINSTANCE.variableDeclaration, "Default value type missmatch for 'i': text instead of integer")
-	}
-	
+		
 	@Test
 	def void testUniqueClassName(){
 		val validated = '''	
@@ -83,25 +75,37 @@ class RellValidatorTest {
 	}
 	
 	@Test
-	def void testUniqueVariableName(){
+	def void testDublicateAttributeNameDeclaration() {
 		val validated = '''
-			operation test() {
-				val j=1;
-				val j=1;
+			class test {
+				i : integer;
+				i : integer;
 			}
 		'''.parse.validate()
-		Assert.assertTrue(validated.get(0).getCode() == RellValidator::NOT_UNIQUE_NANE)
+		Assert.assertTrue(validated.get(0).getCode() == RellValidator::DUPLICATE_ATTRIBUTE_NAME)
 	}
 	
 	@Test
-	def void testVariableAssignmentBeforeDeclaration(){
+	def void testDublicateAttributeNameDeclarationInOneLine() {
 		val validated = '''
-			operation test() {
-				j = 1;
-				val j;
+			class test {
+				i : integer, i : integer;
+				t : text;
 			}
 		'''.parse.validate()
-		Assert.assertTrue(validated.get(0).getCode() == RellValidator::NOT_DECLARED_YET)
+		Assert.assertTrue(validated.get(0).getCode() == RellValidator::DUPLICATE_ATTRIBUTE_NAME)
+	}
+	
+	@Test
+	def void testVariableDeclarationConflict() {
+		val validated = '''
+			operation test() {
+							val x=1;
+							val j=1;
+							val j=1;
+			}
+		'''.parse.validate()
+		Assert.assertTrue(validated.get(0).getCode() == RellValidator::DUPLICATE_ATTRIBUTE_NAME)
 	}
 
 }
