@@ -48,7 +48,7 @@ CreateWhatPart:
 AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand ampersandModificator=AmpersandModificator? '{'
-	conditions+=Expression (',' conditions+=Expression)* '}';
+	(conditions+=Expression (',' conditions+=Expression)*)? '}';
 
 ClassMemberDefinition:
 	(classRef=ClassRef)? "." variableDeclarationRef=VariableDeclarationRef;
