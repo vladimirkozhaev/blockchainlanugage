@@ -109,6 +109,7 @@ Primary returns Expression:
 Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
+	{ByteArrayConstant} value=ByteArrayValue|
 	{BoolConstant} value=('true' | 'false') |
 	{VariableRef} value=VariableDeclarationRef | //Error because of this string
 	{SelectOp} value=AtOperator |
@@ -202,3 +203,11 @@ MulChar:
 
 DivChar:
 	'/';
+	
+
+terminal ByteArrayChar:'0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'a'|'b'|'c'|'d'|'e'|'f'|'a'|'b'|'A'|'B'|'C'|'D'|'E'|'F';
+
+terminal ByteArayPair: ByteArrayChar ByteArrayChar;
+
+terminal ByteArrayValue:'x' (('\'' ByteArayPair* '\'')|('"' ByteArayPair* '"')) ;
+
