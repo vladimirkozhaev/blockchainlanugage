@@ -14,11 +14,12 @@ import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static extension org.junit.Assert.*
+
 @RunWith(XtextRunner)
 @InjectWith(RellInjectorProvider)
 class RellIndexTest {
-	@Inject
-	ParseHelper<Model> parseHelper
+	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension RellIndex
 	
 	@Test def void testExportedEObjectDescriptions() {
@@ -32,17 +33,62 @@ class RellIndexTest {
 		''')
 		Assert.assertNotNull(result)
 		result.assertExportedEObjectDescriptions("test, test.field1, test.field2, test.field3, test.field4")
-	// before SmallJavaResourceDescriptionsStrategy the output was
-	// "C, C.f, C.m, C.m.p, C.m.v, A"
 	}
-
+	
+	@Test def void tesClassesDescriptions() {
+		val result = parseHelper.parse(
+			'''
+				class test1 {}
+				class test2 {}
+			'''			
+		)
+		assertNotNull(result)
+		
+		result.assertExportedEObjectDescriptions("test1, test2")		
+	}
+	
+	@Test def void testClassesIndex() {
+		val result = 
+		'''
+			class test1 {}
+		'''.parse	
+		assertNotNull(result)
+		
+		'''
+			class test2 {}
+		'''.parse(result.eResource.resourceSet).
+			entities.head.assertClassesIndex("test1, test2")
+	}
+	
+	@Test def void testOperationsIndex() {
+		val result = 
+		'''
+			operation op1() {}
+		'''.parse
+		assertNotNull(result)
+		
+		'''
+			operation op2() {}
+		'''.parse(result.eResource.resourceSet).
+		operations.head.assertOperationsIndex("op1, op2")
+	}
+	
 	def private assertExportedEObjectDescriptions(EObject o, CharSequence expected) {
 		Assert.assertEquals(
 			expected.toString,
 			o.getExportedEObjectDescriptions.map[qualifiedName].join(", ")
 		)
 	}
-
 	
-
+	def private assertClassesIndex(EObject o, String expected) {
+		val visibleClassesDescriptions = o.getVisibleClassesDescriptions
+		expected.assertEquals(visibleClassesDescriptions.
+			map[it.qualifiedName].join(", "))
+	}
+	
+	def private assertOperationsIndex(EObject o, String expected) {
+		val visibleOperationsDescriptions = o.visibleOperationsDescriptions
+		expected.assertEquals(visibleOperationsDescriptions.
+			map[it.qualifiedName].join(", "))  
+	}
 }
