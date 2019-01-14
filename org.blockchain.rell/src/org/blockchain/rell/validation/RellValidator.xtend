@@ -7,28 +7,17 @@ import com.google.inject.Inject
 import java.util.ArrayList
 import java.util.List
 import org.blockchain.rell.rell.ClassDefinition
-import org.blockchain.rell.rell.Comparison
-import org.blockchain.rell.rell.Equality
 import org.blockchain.rell.rell.Expression
-import org.blockchain.rell.rell.Minus
-import org.blockchain.rell.rell.MulOrDiv
+import org.blockchain.rell.rell.Model
 import org.blockchain.rell.rell.Operation
-import org.blockchain.rell.rell.Or
-import org.blockchain.rell.rell.Plus
 import org.blockchain.rell.rell.RellPackage
-import org.blockchain.rell.rell.TypeReference
-import org.blockchain.rell.rell.Variable
-import org.blockchain.rell.rell.VariableInit
 import org.blockchain.rell.typing.RellModelUtil
 import org.blockchain.rell.typing.RellType
 import org.blockchain.rell.typing.RellTypeProvider
 import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.validation.Check
-import org.blockchain.rell.rell.Model
-import org.blockchain.rell.rell.VariableInitialization
-import org.blockchain.rell.rell.Statement
-import org.blockchain.rell.rell.AttributeListField
+import org.blockchain.rell.rell.Record
 
 /**
  * Custom validation rules. 
@@ -190,14 +179,23 @@ class RellValidator extends AbstractRellValidator {
 	
 	@Check def checkUniqueClassName(Model model) {
 		val classNames = <String>newHashSet()
-		for(classDefinition : model.getEntities()) {
-			if(classNames.contains(classDefinition.getName())) {
-				error("Class names should be unique. Class with name " + classDefinition.getName() + " already exists",
+		for(classDefinition : model.entities) {
+			val name=switch(classDefinition){
+				
+				case (classDefinition instanceof ClassDefinition):{
+					(classDefinition as ClassDefinition).name;
+				}
+				case (classDefinition instanceof Record):{
+					(classDefinition as Record).name;
+				}
+			}
+			if(classNames.contains(name)) {
+				error("Class names should be unique. Class with name " + name + " already exists",
 					RellPackage.Literals.CLASS_DEFINITION.getEIDAttribute(), NOT_UNIQUE_NANE)
 			}
-			classNames.add(classDefinition.getName());
+			classNames.add(name);
 		}
-		addIssue("Test error", model, 10,  100,null);
+		
 	}
 	
 

@@ -3,7 +3,7 @@ grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
 generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
-	entities+=ClassDefinition*
+	entities+=(ClassDefinition|Record)*
 	operations+=Operation*;
 
 ClassDefinition:
@@ -11,11 +11,17 @@ ClassDefinition:
 	attributeListField+=AttributeListField*
 	'}';
 
+Record:
+	'record' name=ID ('extends' superType=[ClassDefinition])? '{'
+	attributeListField+=AttributeListField*
+	'}';
+	
 AttributeListField:
 	mutable=Mutable? key=Key? index=Index? attributeList+=RelAttrubutesList ';';
 
 Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
+
 
 Statement:
 	(relation=Relational | variable=OperationVariable) ';';
@@ -30,15 +36,19 @@ Relational:
 	Update | Delete | Create | AtOperator;
 
 Update:
-	'update' entity=[ClassDefinition] '(' createWhatPart+=CreateWhatPart (','
-	createWhatPart+=CreateWhatPart)* ')' '{' conditions+=Expression (',' conditions+=Expression)*
-	 '}';
+	'update' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}' '('  createWhatPart+=CreateWhatPart (','
+	createWhatPart+=CreateWhatPart)*  
+	 ')';
 
 Delete:
-	'delete' entity=[ClassDefinition] '(' conditions+=Expression (',' conditions+=Expression)* ')';
+	'delete' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}';
 
 Create:
 	'create' (entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart (','
+	createWhatPart+=CreateWhatPart)*)? ')';
+	
+CreateRecord:
+	 (	entity=[Record]) '(' (createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*)? ')';
 
 CreateWhatPart:
@@ -104,7 +114,10 @@ Atomic returns Expression:
 	{SelectOp} value=AtOperator |
 	{MemberDefinition} value=ClassMemberDefinition
 	|
-	{CreateAtom} value=Create;
+	{CreateAtom} value=Create|
+	{CreateRecordAtom} value=CreateRecord;
+
+
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
