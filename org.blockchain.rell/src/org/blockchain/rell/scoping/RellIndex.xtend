@@ -27,6 +27,10 @@ class RellIndex {
 	def getVisibleClassesDescriptions(EObject o) {
 		o.getVisibleEObjectDescriptions(RellPackage::eINSTANCE.classDefinition)
 	}
+	
+	def getVisibleOperationsDescriptions(EObject o) {
+		o.getVisibleEObjectDescriptions(RellPackage::eINSTANCE.operation)
+	}
 
 	def getVisibleContainers(EObject o) {
 		val index = rdp.getResourceDescriptions(o.eResource)
