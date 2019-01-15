@@ -875,6 +875,43 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+	
+	// check query short form
+	@Test
+	def void testQueryShortForm() {
+		val result = parseHelper.parse('''
+			query q(x: integer): integer = x * x;
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)		
+	} 
+	
+	//check query full from
+	@Test
+	def void testQueryFullForm() {
+		val result = parseHelper.parse('''
+			query q(x: integer): integer {
+			    return x * x;
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)		
+	} 
+	
+	// check returning record from query
+	@Test
+	def void testReturnRecordWithinQuery() {
+		val result = parseHelper.parse('''
+			record foo { i: integer; s: text; q: text = 'test'; }
+			query q() { val s = 'Hello'; val q = 'Bye'; return foo(i = 123, q, s); }
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	@Test
 	def void testOperations() {
 		val result = parseHelper.parse('''
