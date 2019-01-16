@@ -109,14 +109,17 @@ Primary returns Expression:
 Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
-	{ByteArrayConstant} value=ByteArrayValue|
+	{ByteArrayConstant} value=BYTE_ARRAY_VALUE|
 	{BoolConstant} value=('true' | 'false') |
 	{VariableRef} value=VariableDeclarationRef | //Error because of this string
 	{SelectOp} value=AtOperator |
-	{MemberDefinition} value=ClassMemberDefinition
-	|
+	{MemberDefinition} value=ClassMemberDefinition|
 	{CreateAtom} value=Create|
 	{CreateRecordAtom} value=CreateRecord;
+
+
+
+
 
 
 
@@ -127,7 +130,9 @@ VariableDeclaration:
 	name=ValuableID ((':' type=TypeReference)?);
 
 TypeReference:
-	primitive=PrimitiveType | entityType=ClassType;
+	primitive=PrimitiveType | entityType=ClassType|tuple=TupleType;
+	
+TupleType:'(' varDecl=VariableDeclaration ')';
 
 ClassType:
 	type=[ClassDefinition];
@@ -205,9 +210,9 @@ DivChar:
 	'/';
 	
 
-terminal ByteArrayChar:'0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'a'|'b'|'c'|'d'|'e'|'f'|'a'|'b'|'A'|'B'|'C'|'D'|'E'|'F';
+terminal BYTE_ARRAY_CHAR:'0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'a'|'b'|'c'|'d'|'e'|'f'|'A'|'B'|'C'|'D'|'E'|'F';
 
-terminal ByteArayPair: ByteArrayChar ByteArrayChar;
+terminal BYTE_ARRAY_PAIR: BYTE_ARRAY_CHAR BYTE_ARRAY_CHAR;
 
-terminal ByteArrayValue:'x' (('\'' ByteArayPair* '\'')|('"' ByteArayPair* '"')) ;
+terminal BYTE_ARRAY_VALUE:'x' (('\'' BYTE_ARRAY_PAIR* '\'')|('"' BYTE_ARRAY_PAIR* '"')) ;
 
