@@ -3,8 +3,8 @@ grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
 generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
-	entities+=(ClassDefinition|Record)*
-	operations+=Operation*;
+	entities+=(ClassDefinition | Record)*
+	operations+=(Operation | Query)*;
 
 ClassDefinition:
 	'class' name=ID ('extends' superType=[ClassDefinition])? '{'
@@ -15,13 +15,27 @@ Record:
 	'record' name=ID ('extends' superType=[ClassDefinition])? '{'
 	attributeListField+=AttributeListField*
 	'}';
-	
+
 AttributeListField:
 	mutable=Mutable? key=Key? index=Index? attributeList+=RelAttrubutesList ';';
 
 Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
+Query:
+	"query" name=ID '(' parameters=RelAttrubutesList? ')' 
+	
+		( ':' type=TypeReference)? 
+		(
+			('=' returnExr=Expression ';' ) | 
+			(
+		  		'{'
+	         		statements+=Statement* 
+	         		'return' returnExr=Expression ';' 
+	         	'}'
+	    	)
+	    )
+	;
 
 Statement:
 	(relation=Relational | variable=OperationVariable) ';';
@@ -36,9 +50,10 @@ Relational:
 	Update | Delete | Create | AtOperator;
 
 Update:
-	'update' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}' '('  createWhatPart+=CreateWhatPart (','
-	createWhatPart+=CreateWhatPart)*  
-	 ')';
+	'update' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}' '('
+	createWhatPart+=CreateWhatPart (','
+	createWhatPart+=CreateWhatPart)*
+	')';
 
 Delete:
 	'delete' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}';
@@ -46,19 +61,27 @@ Delete:
 Create:
 	'create' (entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*)? ')';
-	
+
 CreateRecord:
-	 (	entity=[Record]) '(' (createWhatPart+=CreateWhatPart (','
-	createWhatPart+=CreateWhatPart)*)? ')';
+	(entity=[Record]) '(' (createWhatPart+=CreateWhatPartNoVariable (','
+	createWhatPart+=CreateWhatPartNoVariable)*)? ')';
 
 CreateWhatPart:
 	(varDeclRef=VariableDeclarationRef '=')?
+	condition+=Expression;
+	
+CreateWhatPartNoVariable:
+	(varDeclRef=ID '=')?
 	condition+=Expression;
 
 AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand ampersandModificator=AmpersandModificator? '{'
-	(conditions+=Expression (',' conditions+=Expression)*)? '}';
+	(conditions+=Expression (',' conditions+=Expression)*)? '}' ((tupleValue=TupleValue?) | ('.'
+	variableDeclarationRef=VariableDeclarationRef));
+
+TupleValue:
+	'(' tuplePart+=Expression (',' tuplePart+=Expression)* ')';
 
 ClassMemberDefinition:
 	(classRef=ClassRef)? "." variableDeclarationRef=VariableDeclarationRef;
@@ -109,19 +132,13 @@ Primary returns Expression:
 Atomic returns Expression:
 	{IntConstant} value=INT |
 	{StringConstant} value=STRING |
-	{ByteArrayConstant} value=BYTE_ARRAY_VALUE|
+	{ByteArrayConstant} value=BYTE_ARRAY_VALUE |
 	{BoolConstant} value=('true' | 'false') |
 	{VariableRef} value=VariableDeclarationRef | //Error because of this string
 	{SelectOp} value=AtOperator |
-	{MemberDefinition} value=ClassMemberDefinition|
-	{CreateAtom} value=Create|
+	{MemberDefinition} value=ClassMemberDefinition |
+	{CreateAtom} value=Create |
 	{CreateRecordAtom} value=CreateRecord;
-
-
-
-
-
-
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
@@ -130,9 +147,10 @@ VariableDeclaration:
 	name=ValuableID ((':' type=TypeReference)?);
 
 TypeReference:
-	primitive=PrimitiveType | entityType=ClassType|tuple=TupleType;
-	
-TupleType:'(' varDecl=VariableDeclaration ')';
+	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType;
+
+TupleType:
+	'(' varDecl=VariableDeclaration ')';
 
 ClassType:
 	type=[ClassDefinition];
@@ -159,7 +177,7 @@ Tuid:
 	'tuid';
 
 Boolean:
-	'bool';
+	'boolean';
 
 Json:
 	'json';
@@ -208,11 +226,14 @@ MulChar:
 
 DivChar:
 	'/';
-	
 
-terminal BYTE_ARRAY_CHAR:'0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'a'|'b'|'c'|'d'|'e'|'f'|'A'|'B'|'C'|'D'|'E'|'F';
+terminal BYTE_ARRAY_CHAR:
+	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D'
+	| 'E' | 'F';
 
-terminal BYTE_ARRAY_PAIR: BYTE_ARRAY_CHAR BYTE_ARRAY_CHAR;
+terminal BYTE_ARRAY_PAIR:
+	BYTE_ARRAY_CHAR BYTE_ARRAY_CHAR;
 
-terminal BYTE_ARRAY_VALUE:'x' (('\'' BYTE_ARRAY_PAIR* '\'')|('"' BYTE_ARRAY_PAIR* '"')) ;
+terminal BYTE_ARRAY_VALUE:
+	'x' (('\'' BYTE_ARRAY_PAIR* '\'') | ('"' BYTE_ARRAY_PAIR* '"'));
 
