@@ -150,9 +150,51 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
-// Check tuple of two types 
+//  Check create tuple with named fields and two values 
 	@Test
-	def void testTupleTwoTypes() {
+	def void testCreateSimpleTupleTwoValues() {
+		val result = parseHelper.parse('''
+			operation op() {
+				 val test_tuple: (text, integer)  = ("Bill", 38);
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+//  Check create tuple with named fields and two values 
+	@Test
+	def void testCreateSimpleNamedTupleTwoValues() {
+		val result = parseHelper.parse('''
+			operation op() {
+				 val test_tuple: (name:text, age:integer)  = (name="John", age=18);
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+//  Check create nested tuple 
+	@Test
+	def void testCreateNestedTuple() {
+		val result = parseHelper.parse('''
+			operation op() {
+					 val test_tuple: (text, (integer, boolean))  = ("Bill", (38, true));
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+// Check tuple of two values from at expression
+	@Test
+	def void testTupleTwoValues() {
 		val result = parseHelper.parse('''
 			class company {
 			    name;
@@ -175,9 +217,9 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}	
 	
-// Check tuple of three types 
+// Check tuple of three values from at expression 
 	@Test
-	def void testTupleThreeTypes() {
+	def void testTupleThreeValues() {
 		val result = parseHelper.parse('''
 			class company {
 			    name;
@@ -200,7 +242,7 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}	
 	
-	// Check nested tuple
+// Check tuple of three values from at expression
 	@Test
 	def void testNestedTupleTwoTypes() {
 		val result = parseHelper.parse('''
@@ -991,8 +1033,9 @@ class RellParsingTest {
 	@Test
 	def void testReturnTupleFromQuery(){
 		val result = parseHelper.parse('''
-			record foo { i: integer; s: text; q: text = 'test'; }
-			query q() { val s = 'Hello'; val q = 'Bye'; return foo(i = 123, q, s); }
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
+			query q() {  return user @ { .firstName == 'Bill' } (=.lastName, '' + (123,'Hello')); }
 		''')
 		Assert.assertNull(result)
 		val errors = result.eResource.errors
