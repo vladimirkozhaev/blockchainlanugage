@@ -897,6 +897,29 @@ class RellParsingTest {
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
+		println(errors.join(", "))
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)		
+	} 
+	
+	//check query full from
+	@Test
+	def void testQuery1() {
+		val result = parseHelper.parse('''
+			class company { name: text; }
+			class user { name: text; company; }
+			class optest {
+			                    b1: boolean; b2: boolean;
+			                    i1: integer; i2: integer;
+			                    t1: text; t2: text;
+			                    ba1: byte_array; ba2: byte_array;
+			                    j1: json; j2: json;
+			                    user1: user; user2: user;
+			                    company1: company; company2: company;
+			            }
+			query q() = optest @* { .b1 and .b2 };
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)		
 	} 
 	
@@ -907,8 +930,9 @@ class RellParsingTest {
 			record foo { i: integer; s: text; q: text = 'test'; }
 			query q() { val s = 'Hello'; val q = 'Bye'; return foo(i = 123, q, s); }
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
+		println(errors.join(", "))
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
@@ -936,17 +960,7 @@ class RellParsingTest {
 
 
 
-	@Test
-	def void testNotAndBrackets() {
-		val result = parseHelper.parse('''
-			operation sex (test:integer){
-				update sex(test==1,sex == not (sex or box)){sex=1};
-			}
-		''')
-		Assert.assertNotNull(result)
-		val errors = result.eResource.errors
-		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
-	}
+	
 
 	@Test
 	def void testVariablesInsideOperations() {
