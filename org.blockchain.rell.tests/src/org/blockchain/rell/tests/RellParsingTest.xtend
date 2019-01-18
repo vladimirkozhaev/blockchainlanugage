@@ -150,6 +150,123 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+//  Check create tuple with named fields and two values 
+	@Test
+	def void testCreateSimpleTupleTwoValues() {
+		val result = parseHelper.parse('''
+			operation op() {
+				 val test_tuple: (text, integer)  = ("Bill", 38);
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+//  Check create tuple with named fields and two values 
+	@Test
+	def void testCreateSimpleNamedTupleTwoValues() {
+		val result = parseHelper.parse('''
+			operation op() {
+				 val test_tuple: (name:text, age:integer)  = (name="John", age=18);
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+//  Check create nested tuple 
+	@Test
+	def void testCreateNestedTuple() {
+		val result = parseHelper.parse('''
+			operation op() {
+					 val test_tuple: (text, (integer, boolean))  = ("Bill", (38, true));
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+// Check tuple of two values from at expression
+	@Test
+	def void testTupleTwoValues() {
+		val result = parseHelper.parse('''
+			class company {
+			    name;
+			    address : name;
+			    
+			}
+			
+			class user {
+			    name;
+			    company;
+			}
+			
+			operation op() {
+			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address );
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+// Check tuple of three values from at expression 
+	@Test
+	def void testTupleThreeValues() {
+		val result = parseHelper.parse('''
+			class company {
+			    name;
+			    address : name;
+			    type : integer;    
+			}
+			
+			class user {
+			    name;
+			    company;
+			}
+			
+			operation op() {
+			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address, .company.type );
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+// Check tuple of three values from at expression
+	@Test
+	def void testNestedTupleTwoTypes() {
+		val result = parseHelper.parse('''
+			class company {
+			    name;
+			    address : name;
+			    type : integer;    
+			}
+			
+			class user {
+			    name;
+			    company;
+			}
+			
+			operation op() {
+			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address, ("Microsoft", "Silicon Valley") );
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
 // Check record declaration 
 	@Test	
 	def void testRecordDeclaration() {
@@ -934,6 +1051,20 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		println(errors.join(", "))
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check tuple return from query
+	@Test
+	def void testReturnTupleFromQuery(){
+		val result = parseHelper.parse('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
+			query q() {  return user @ { .firstName == 'Bill' } (=.lastName, '' + (123,'Hello')); }
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
 	}
 	
 	@Test
