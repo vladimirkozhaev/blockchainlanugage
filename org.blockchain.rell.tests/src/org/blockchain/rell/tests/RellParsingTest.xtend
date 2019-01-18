@@ -217,6 +217,20 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}	
 	
+	// Check tuple of two values from at expression
+	@Test
+	def void testSimpleTuple() {
+		val result = parseHelper.parse('''
+				operation op() {
+			    val u: (integer,boolean, (boolean,boolean))=(100,true, (true,false));
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
 // Check tuple of three values from at expression 
 	@Test
 	def void testTupleThreeValues() {

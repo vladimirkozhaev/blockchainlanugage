@@ -77,11 +77,14 @@ CreateWhatPartNoVariable:
 AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand ampersandModificator=AmpersandModificator? '{'
-	(conditions+=Expression (',' conditions+=Expression)*)? '}' ((tupleValue=TupleValue?) | ('.'
+	(conditions+=Expression (',' conditions+=Expression)*)? '}' ((tupleValue=TupleValue?) | (	
 	variableDeclarationRef=VariableDeclarationRef));
 
 TupleValue:
-	'(' tuplePart+=Expression (',' tuplePart+=Expression)* ')';
+	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
+
+
+TupleValueMember:name=[VariableDeclaration]? value=Expression;
 
 ClassMemberDefinition:
 	(classRef=ClassRef)? "." variableDeclarationRef=VariableDeclarationRef;
@@ -96,8 +99,6 @@ TableNameWithAlias:
 VariableDeclarationRef:
 	decl=[VariableDeclaration|ValuableID];
 
-VariableInit:
-	name=[VariableDeclaration] '=' expression=Expression;
 
 Expression:
 	or=Or;
@@ -134,11 +135,14 @@ Atomic returns Expression:
 	{StringConstant} value=STRING |
 	{ByteArrayConstant} value=BYTE_ARRAY_VALUE |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=VariableDeclarationRef | //Error because of this string
+	{VariableRef} value=VariableDeclarationRef | 
 	{SelectOp} value=AtOperator |
 	{MemberDefinition} value=ClassMemberDefinition |
 	{CreateAtom} value=Create |
-	{CreateRecordAtom} value=CreateRecord;
+	{CreateRecordAtom} value=CreateRecord
+	|
+	{TupleRes}value=TupleValue
+	;
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
@@ -146,11 +150,17 @@ RelAttrubutesList:
 VariableDeclaration:
 	name=ValuableID ((':' type=TypeReference)?);
 
+TupleVarDeclaration:
+	(name=ValuableID ':')? type=TypeReference;
+
+
 TypeReference:
 	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType;
 
 TupleType:
-	'(' varDecl=VariableDeclaration ')';
+	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
+
+
 
 ClassType:
 	type=[ClassDefinition];

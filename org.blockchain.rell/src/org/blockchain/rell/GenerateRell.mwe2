@@ -6,7 +6,7 @@ import org.eclipse.xtext.xtext.generator.model.project.*
 var rootPath = ".."
 
 Workflow {
-	
+
 	component = XtextGenerator {
 		configuration = {
 			project = StandardProjectConfig {
@@ -32,13 +32,21 @@ Workflow {
 		language = StandardLanguage {
 			name = "org.blockchain.rell.Rell"
 			fileExtensions = "rell"
-
 			serializer = {
 				generateStub = false
 			}
-//			validator = {
-//				 composedCheck = "org.eclipse.xtext.validation.NamesAreUniqueValidator"
-//			}
+
+			//			validator = {
+			//				 composedCheck = "org.eclipse.xtext.validation.NamesAreUniqueValidator"
+			//			}
+			parserGenerator = {
+				debugGrammar=true
+				options = {
+    backtrack = true
+  }
+			}
+			
+			
 		}
 	}
 }
