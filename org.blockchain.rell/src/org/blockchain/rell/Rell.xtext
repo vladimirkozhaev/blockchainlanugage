@@ -78,7 +78,10 @@ TupleValue:
 	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
 
 ListCreation:
-	 '[' listValue+=Expression (',' listValue+=Expression)* ']';
+	'[' listValue+=Expression (',' listValue+=Expression)* ']';
+
+NewListCreation:
+	List '(' ListCreation ')';
 
 TupleValueMember:
 	(name=ValuableID '=')? value=Expression;
@@ -109,7 +112,6 @@ Equality returns Expression:
 	Comparison ({Equality.left=current} op=(EQUALS | NOT_EQUALS)
 	right=Comparison)*;
 
-
 Comparison returns Expression:
 	PlusOrMinus ({Comparison.left=current} op=(MORE_EQUAL | LESS_EQUAL | MORE | LESS)
 	right=PlusOrMinus)*;
@@ -138,7 +140,8 @@ Atomic returns Expression:
 	{CreateAtom} value=Create |
 	{CreateRecordAtom} value=CreateRecord
 	| {TupleRes} value=TupleValue
-	| {ListCreation} value=ListCreation;
+	| {ListCreation} value=ListCreation
+	| {NewListCreation} value=NewListCreation;
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
@@ -153,7 +156,7 @@ TypeReference:
 	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType | list=ListType;
 
 ListType:
-	"list" LESS listType=TypeReference ("?"?) MORE;
+	List LESS listType=TypeReference ("?"?) MORE;
 
 TupleType:
 	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
@@ -233,13 +236,26 @@ MulChar:
 DivChar:
 	'/';
 
+terminal EQUALS:
+	'==';
 
-terminal EQUALS:'==';
-terminal NOT_EQUALS:'!=';
-terminal MORE_EQUAL:'>=';
-terminal LESS_EQUAL:'<=';
-terminal MORE:'>';
-terminal LESS:'<';
+terminal NOT_EQUALS:
+	'!=';
+
+terminal MORE_EQUAL:
+	'>=';
+
+terminal LESS_EQUAL:
+	'<=';
+
+terminal MORE:
+	'>';
+
+terminal LESS:
+	'<';
+
+terminal NULL:
+	'null';
 
 terminal BYTE_ARRAY_CHAR:
 	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D'
