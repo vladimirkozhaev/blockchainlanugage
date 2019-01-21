@@ -192,23 +192,28 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}	
 	
-// Check tuple of two values from at expression
+//  Check create named nested tuple 
 	@Test
-	def void testTupleTwoValues() {
+	def void testCreateNamedNestedTuple() {
 		val result = parseHelper.parse('''
-			class company {
-			    name;
-			    address : name;
-			    
-			}
-			
-			class user {
-			    name;
-			    company;
-			}
-			
 			operation op() {
-			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address );
+					 val test_tuple: (name: text, (age : integer, active : boolean))  = (name = "Bill", (age = 38, active = true));
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+// Check return tuple of reference types of values
+	@Test
+	def void testAssignTupleWithExplicitValues() {
+		val result = parseHelper.parse('''
+			class city { name: text;}
+			class person { name: text; age : integer; homeCity: city; workCity: city;}
+			operation o() { 
+			    val test_tuple : (homeCity : city, workCity : city) = person @ {.name == "Bob"} (.homeCity, .workCity);
 			}
 		'''
 		)
@@ -272,7 +277,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address, ("Microsoft", "Silicon Valley") );
+			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address );
 			}
 		'''
 		)
@@ -1000,6 +1005,27 @@ class RellParsingTest {
 			  val k = 122;
 			  update foo @{.k == k}(name = "new_name");    
 			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check update operation with alias
+	@Test
+	def void testUpdateOperationWithAlias() {
+		val result = parseHelper.parse('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { 
+			            update p: person (c1: city, c2: city) @ {
+			                p.homeCity.name == c1.name,
+			                p.workCity.name == c2.name,
+			                c1.country.name == 'Germany',
+			                c2.country.name == 'USA'
+			            } ( score = 999 );
+			         }
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
