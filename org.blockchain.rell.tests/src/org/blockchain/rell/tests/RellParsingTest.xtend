@@ -5,8 +5,6 @@ package org.blockchain.rell.tests
 
 import com.google.inject.Inject
 import org.blockchain.rell.rell.Model
-import org.blockchain.rell.scoping.RellIndex
-import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.testing.util.ParseHelper
@@ -19,26 +17,6 @@ import org.junit.runner.RunWith
 class RellParsingTest {
 	@Inject
 	ParseHelper<Model> parseHelper
-	@Inject extension RellIndex
-
-	@Test def void testExportedEObjectDescriptions() {
-		val result = parseHelper.parse('''class test {
-						field1:text;
-						field2:integer;
-						field3:byte_array;
-						field4:json;
-					}
-		''')
-		Assert.assertNotNull(result)
-		result.assertExportedEObjectDescriptions("test, test.field1, test.field2, test.field3, test.field4")
-	}
-
-	def private assertExportedEObjectDescriptions(EObject o, CharSequence expected) {
-		Assert.assertEquals(
-			expected.toString,
-			o.getExportedEObjectDescriptions.map[qualifiedName].join(", ")
-		)
-	}
 
 	@Test
 	def void testSimpleClassWithPrimitiveTypes() {
@@ -192,23 +170,28 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}	
 	
-// Check tuple of two values from at expression
+//  Check create named nested tuple 
 	@Test
-	def void testTupleTwoValues() {
+	def void testCreateNamedNestedTuple() {
 		val result = parseHelper.parse('''
-			class company {
-			    name;
-			    address : name;
-			    
-			}
-			
-			class user {
-			    name;
-			    company;
-			}
-			
 			operation op() {
-			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address );
+					 val test_tuple: (name: text, (age : integer, active : boolean))  = (name = "Bill", (age = 38, active = true));
+			}
+		'''
+		)
+        Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}	
+	
+// Check return tuple of reference types of values
+	@Test
+	def void testAssignTupleWithExplicitValues() {
+		val result = parseHelper.parse('''
+			class city { name: text;}
+			class person { name: text; age : integer; homeCity: city; workCity: city;}
+			operation o() { 
+			    val test_tuple : (homeCity : city, workCity : city) = person @ {.name == "Bob"} (.homeCity, .workCity);
 			}
 		'''
 		)
@@ -272,7 +255,7 @@ class RellParsingTest {
 			}
 			
 			operation op() {
-			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address, ("Microsoft", "Silicon Valley") );
+			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address );
 			}
 		'''
 		)
@@ -1006,6 +989,27 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+	// check update operation with alias
+	@Test
+	def void testUpdateOperationWithAlias() {
+		val result = parseHelper.parse('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { 
+			            update p: person (c1: city, c2: city) @ {
+			                p.homeCity.name == c1.name,
+			                p.workCity.name == c2.name,
+			                c1.country.name == 'Germany',
+			                c2.country.name == 'USA'
+			            } ( score = 999 );
+			         }
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	
 	// check query short form
 	@Test
@@ -1054,7 +1058,7 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)		
 	} 
 	
-	// check returning record from query
+	// check return record from query
 	@Test
 	def void testReturnRecordWithinQuery() {
 		val result = parseHelper.parse('''
@@ -1074,6 +1078,18 @@ class RellParsingTest {
 			class company { name: text; }
 			class user { firstName: text; lastName: text; company; }
 			query q() {  return user @ { .firstName == 'Bill' } (=.lastName, '' + (123,'Hello')); }
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
+	
+	// check simple declaration of function 
+	@Test
+	def void testsimpleFunctionDeclaration(){
+		val result = parseHelper.parse('''
+			function f(x: integer): integer = x * x;
 		''')
 		Assert.assertNull(result)
 		val errors = result.eResource.errors
