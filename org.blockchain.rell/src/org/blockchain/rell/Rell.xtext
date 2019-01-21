@@ -23,19 +23,13 @@ Operation:
 	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
 
 Query:
-	"query" name=ID '(' parameters=RelAttrubutesList? ')' 
-	
-		( ':' type=TypeReference)? 
-		(
-			('=' returnExr=Expression ';' ) | 
-			(
-		  		'{'
-	         		statements+=Statement* 
-	         		'return' returnExr=Expression ';' 
-	         	'}'
-	    	)
-	    )
-	;
+	"query" name=ID '(' parameters=RelAttrubutesList? ')'
+	(':' type=TypeReference)?
+	(('=' returnExr=Expression ';') |
+	('{'
+	statements+=Statement*
+	'return' returnExr=Expression ';'
+	'}'));
 
 Statement:
 	(relation=Relational | variable=OperationVariable) ';';
@@ -69,7 +63,7 @@ CreateRecord:
 CreateWhatPart:
 	(varDeclRef=VariableDeclarationRef '=')?
 	condition+=Expression;
-	
+
 CreateWhatPartNoVariable:
 	(varDeclRef=ID '=')?
 	condition+=Expression;
@@ -77,14 +71,17 @@ CreateWhatPartNoVariable:
 AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand ampersandModificator=AmpersandModificator? '{'
-	(conditions+=Expression (',' conditions+=Expression)*)? '}' ((tupleValue=TupleValue?) | (	
-	'.' variableDeclarationRef=VariableDeclarationRef));
+	(conditions+=Expression (',' conditions+=Expression)*)? '}' ((tupleValue=TupleValue?) | ('.'
+	variableDeclarationRef=VariableDeclarationRef));
 
 TupleValue:
 	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
 
+ListCreation:
+	 '[' listValue+=Expression (',' listValue+=Expression)* ']';
 
-TupleValueMember:(name=ValuableID '=')? value=Expression;
+TupleValueMember:
+	(name=ValuableID '=')? value=Expression;
 
 ClassMemberDefinition:
 	(classRef=ClassRef)? "." variableDeclarationRef=VariableDeclarationRef;
@@ -99,7 +96,6 @@ TableNameWithAlias:
 VariableDeclarationRef:
 	decl=[VariableDeclaration|ValuableID] ('.' part=[VariableDeclaration|ValuableID])*;
 
-
 Expression:
 	or=Or;
 
@@ -110,11 +106,12 @@ And returns Expression:
 	Equality ({And.left=current} "and" right=Equality)*;
 
 Equality returns Expression:
-	Comparison ({Equality.left=current} op=("==" | "!=")
+	Comparison ({Equality.left=current} op=(EQUALS | NOT_EQUALS)
 	right=Comparison)*;
 
+
 Comparison returns Expression:
-	PlusOrMinus ({Comparison.left=current} op=(">=" | "<=" | ">" | "<")
+	PlusOrMinus ({Comparison.left=current} op=(MORE_EQUAL | LESS_EQUAL | MORE | LESS)
 	right=PlusOrMinus)*;
 
 PlusOrMinus returns Expression:
@@ -135,14 +132,13 @@ Atomic returns Expression:
 	{StringConstant} value=STRING |
 	{ByteArrayConstant} value=BYTE_ARRAY_VALUE |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=VariableDeclarationRef | 
+	{VariableRef} value=VariableDeclarationRef |
 	{SelectOp} value=AtOperator |
 	{MemberDefinition} value=ClassMemberDefinition |
 	{CreateAtom} value=Create |
 	{CreateRecordAtom} value=CreateRecord
-	|
-	{TupleRes}value=TupleValue
-	;
+	| {TupleRes} value=TupleValue
+	| {ListCreation} value=ListCreation;
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
@@ -153,18 +149,14 @@ VariableDeclaration:
 TupleVarDeclaration:
 	(name=ValuableID ':')? type=TypeReference;
 
-
 TypeReference:
-	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType|list=ListType;
+	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType | list=ListType;
 
 ListType:
-	"list" "<" listType=TypeReference ("?"?) ">"
-;
+	"list" LESS listType=TypeReference ("?"?) MORE;
 
 TupleType:
 	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
-
-
 
 ClassType:
 	type=[ClassDefinition];
@@ -240,6 +232,14 @@ MulChar:
 
 DivChar:
 	'/';
+
+
+terminal EQUALS:'==';
+terminal NOT_EQUALS:'!=';
+terminal MORE_EQUAL:'>=';
+terminal LESS_EQUAL:'<=';
+terminal MORE:'>';
+terminal LESS:'<';
 
 terminal BYTE_ARRAY_CHAR:
 	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D'

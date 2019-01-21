@@ -1090,12 +1090,31 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class TestClass{
 				test:integer;
-			}
+			}	
 			
 			operation t1(){
 				val t:list<integer>;
 				val t1:list<integer?>;
 				val t2:list<TestClass>;
+				
+			}
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
+	
+	@Test
+	def void testListCreation(){
+		val result = parseHelper.parse('''
+			class TestClass{
+				test:integer;
+			}
+			
+			operation t1(){
+				val t:list<integer> = [1,2,3];
+				val t1:list<integer?> =[1,2,3];
 			}
 		''')
 		Assert.assertNotNull(result)
