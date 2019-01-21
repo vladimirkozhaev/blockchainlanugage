@@ -35,6 +35,27 @@ class RellIndexTest {
 		result.assertExportedEObjectDescriptions("test, test.field1, test.field2, test.field3, test.field4")
 	}
 	
+	@Test def void testClassesWithAttributesDescription() {
+		
+		val result = parseHelper.parse('''
+		class test1 {
+						field1:text;
+						field2:integer;
+						field3:byte_array;
+						field4:json;
+					}
+		class test2 {
+						field1:text;
+						field2:integer;
+						field3:byte_array;
+						field4:json;
+					}
+		''')
+		Assert.assertNotNull(result)
+		result.assertExportedEObjectDescriptions("test1, test1.field1, test1.field2, test1.field3, test1.field4, "
+											   + "test2, test2.field1, test2.field2, test2.field3, test2.field4")
+	}
+	
 	@Test def void tesClassesDescriptions() {
 		val result = parseHelper.parse(
 			'''
