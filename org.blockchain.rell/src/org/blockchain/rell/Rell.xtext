@@ -84,7 +84,7 @@ TupleValue:
 	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
 
 
-TupleValueMember:name=[VariableDeclaration]? value=Expression;
+TupleValueMember:(name=[TupleVarDeclaration] '=')? value=Expression;
 
 ClassMemberDefinition:
 	(classRef=ClassRef)? "." variableDeclarationRef=VariableDeclarationRef;
@@ -97,7 +97,7 @@ TableNameWithAlias:
 	{JustNameDecl} name=[ClassDefinition];
 
 VariableDeclarationRef:
-	decl=[VariableDeclaration|ValuableID];
+	decl=[VariableDeclaration|ValuableID] ('.' part=[VariableDeclaration|ValuableID])*;
 
 
 Expression:

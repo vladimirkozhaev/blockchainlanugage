@@ -5,7 +5,6 @@ import java.util.List
 import org.blockchain.rell.rell.And
 import org.blockchain.rell.rell.Comparison
 import org.blockchain.rell.rell.Create
-import org.blockchain.rell.rell.Delete
 import org.blockchain.rell.rell.Equality
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.Minus
@@ -16,9 +15,7 @@ import org.blockchain.rell.rell.Plus
 import org.blockchain.rell.rell.RelAttrubutesList
 import org.blockchain.rell.rell.Relational
 import org.blockchain.rell.rell.Statement
-import org.blockchain.rell.rell.Update
 import org.blockchain.rell.rell.Variable
-import org.blockchain.rell.rell.VariableInit
 import org.blockchain.rell.rell.VariableRef
 
 class RellModelUtil {
@@ -149,13 +146,13 @@ class RellModelUtil {
 		array
 	}
 
-	def List<VariableReferenceInfo> usedVariables(VariableInit variableInit) {
-		var List<VariableReferenceInfo> variables = newArrayList
-		variables.add(new VariableReferenceInfo(variableInit.name))
-		variables.addAll(usedVariables(variableInit.expression))
-
-		variables
-	}
+//	def List<VariableReferenceInfo> usedVariables(VariableInit variableInit) {
+//		var List<VariableReferenceInfo> variables = newArrayList
+//		variables.add(new VariableReferenceInfo(variableInit.name))
+//		variables.addAll(usedVariables(variableInit.expression))
+//
+//		variables
+//	}
 
 
 	def List<VariableReferenceInfo> processExpression(Expression expression){
