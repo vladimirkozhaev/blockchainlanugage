@@ -5,8 +5,6 @@ package org.blockchain.rell.tests
 
 import com.google.inject.Inject
 import org.blockchain.rell.rell.Model
-import org.blockchain.rell.scoping.RellIndex
-import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.testing.util.ParseHelper
@@ -19,26 +17,6 @@ import org.junit.runner.RunWith
 class RellParsingTest {
 	@Inject
 	ParseHelper<Model> parseHelper
-	@Inject extension RellIndex
-
-	@Test def void testExportedEObjectDescriptions() {
-		val result = parseHelper.parse('''class test {
-						field1:text;
-						field2:integer;
-						field3:byte_array;
-						field4:json;
-					}
-		''')
-		Assert.assertNotNull(result)
-		result.assertExportedEObjectDescriptions("test, test.field1, test.field2, test.field3, test.field4")
-	}
-
-	def private assertExportedEObjectDescriptions(EObject o, CharSequence expected) {
-		Assert.assertEquals(
-			expected.toString,
-			o.getExportedEObjectDescriptions.map[qualifiedName].join(", ")
-		)
-	}
 
 	@Test
 	def void testSimpleClassWithPrimitiveTypes() {
@@ -1080,7 +1058,7 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)		
 	} 
 	
-	// check returning record from query
+	// check return record from query
 	@Test
 	def void testReturnRecordWithinQuery() {
 		val result = parseHelper.parse('''
@@ -1100,6 +1078,18 @@ class RellParsingTest {
 			class company { name: text; }
 			class user { firstName: text; lastName: text; company; }
 			query q() {  return user @ { .firstName == 'Bill' } (=.lastName, '' + (123,'Hello')); }
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
+	
+	// check simple declaration of function 
+	@Test
+	def void testsimpleFunctionDeclaration(){
+		val result = parseHelper.parse('''
+			function f(x: integer): integer = x * x;
 		''')
 		Assert.assertNull(result)
 		val errors = result.eResource.errors
