@@ -78,13 +78,13 @@ AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand ampersandModificator=AmpersandModificator? '{'
 	(conditions+=Expression (',' conditions+=Expression)*)? '}' ((tupleValue=TupleValue?) | (	
-	variableDeclarationRef=VariableDeclarationRef));
+	'.' variableDeclarationRef=VariableDeclarationRef));
 
 TupleValue:
 	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
 
 
-TupleValueMember:(name=[TupleVarDeclaration] '=')? value=Expression;
+TupleValueMember:(name=ValuableID '=')? value=Expression;
 
 ClassMemberDefinition:
 	(classRef=ClassRef)? "." variableDeclarationRef=VariableDeclarationRef;
@@ -155,7 +155,11 @@ TupleVarDeclaration:
 
 
 TypeReference:
-	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType;
+	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType|list=ListType;
+
+ListType:
+	"list" "<" listType=TypeReference ("?"?) ">"
+;
 
 TupleType:
 	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';

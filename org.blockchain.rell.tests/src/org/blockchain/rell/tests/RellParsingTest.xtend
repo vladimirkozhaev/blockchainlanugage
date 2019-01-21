@@ -1077,9 +1077,28 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class company { name: text; }
 			class user { firstName: text; lastName: text; company; }
-			query q() {  return user @ { .firstName == 'Bill' } (=.lastName, '' + (123,'Hello')); }
+			query q() {  return user @ { .firstName == 'Bill' } (.lastName, '' + (123,'Hello')); }
 		''')
 		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
+	
+	@Test
+	def void testSimpleDefList(){
+		val result = parseHelper.parse('''
+			class TestClass{
+				test:integer;
+			}
+			
+			operation t1(){
+				val t:list<integer>;
+				val t1:list<integer?>;
+				val t2:list<TestClass>;
+			}
+		''')
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 		
