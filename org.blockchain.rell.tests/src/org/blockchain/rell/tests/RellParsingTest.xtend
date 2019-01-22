@@ -1097,6 +1097,19 @@ class RellParsingTest {
 		
 	}
 	
+	// check simple declaration of function 
+	@Test
+	def void testUpdateStatementInFunction(){
+		val result = parseHelper.parse('''
+			class user { name: text; mutable score: integer; }
+			function f(name: text, s: integer): integer { update user @ { name } ( score += s ); return s; } query q() = f('Bob', 500) ;
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
+	
 	@Test
 	def void testOperations() {
 		val result = parseHelper.parse('''
