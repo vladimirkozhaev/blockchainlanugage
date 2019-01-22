@@ -1009,6 +1009,19 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
+	// check assign value from at-expression in update statement
+	@Test
+	def void testUpdateOperationWithAssignFromAt() {
+		val result = parseHelper.parse('''
+			class default_score { name : text; value: integer; }
+			class person { name: text; mutable score: integer = default_score@{}.value; }
+			operation o() { update person @ {} (.score = default_score @{.name == "super_score"}.value); }
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
 	
 	
 	// check query short form
