@@ -1010,6 +1010,20 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
+	// check alias in at-expression in update statement
+	@Test
+	def void testUpdateOperationAliasWithAssignFromAt() {
+		val result = parseHelper.parse('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { update p1: person (p2: person) @ { p1.homeCity == p2.workCity } ( score = p1.score * 3 + p2.score ); }
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	// check assign value from at-expression in update statement
 	@Test
 	def void testUpdateOperationWithAssignFromAt() {
