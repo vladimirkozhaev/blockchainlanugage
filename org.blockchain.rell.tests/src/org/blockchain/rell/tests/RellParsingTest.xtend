@@ -1163,7 +1163,28 @@ class RellParsingTest {
 			query q() { val x = list<integer?>(); x.add(123); return ''+x; }
 			query q() { val x = list<integer>([123]); x[0] = 456; return ''+x; }
 			query q() { val x = list<integer?>([123,456,null]); x.removeAll(list<integer>([123])); return ''+x; }
-			query q() { val x = list<integer>([123,456]); return x.containsAll(list<integer>([123])); }
+			query q() { val x = list<integer>([123,456]); return x.containsAll(list<integer>([123])); }		
+			
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
+	
+	@Test
+	def void testSetMethods(){
+		val result = parseHelper.parse('''
+			query q() = set<integer>().str() ;
+			query q() = set<integer>([1]).str() ;
+			query q() = set<integer>([1, 2, 3, 4, 5]).str() ;
+			
+			
+			query q() { val x = set<integer?>(); x.add(null); return ''+x; }
+			query q() { val x = set<integer?>(); x.add(123); return ''+x; }
+			query q() { val x = set<integer>([123]); x[0] = 456; return ''+x; }
+			query q() { val x = set<integer?>([123,456,null]); x.removeAll(set<integer>([123])); return ''+x; }
+			query q() { val x = set<integer>([123,456]); return x.containsAll(set<integer>([123])); }		
 			
 		''')
 		Assert.assertNotNull(result)

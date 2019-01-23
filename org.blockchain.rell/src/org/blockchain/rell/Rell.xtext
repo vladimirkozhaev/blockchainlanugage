@@ -87,6 +87,10 @@ ListCreation:
 NewListCreation:
 	List specification=ListSpecification? '(' (creation=ListCreation?) ')' ('.' LIST_METHOD '(' (expr+=Expression (',' expr+=Expression)*)? ')')*;
 
+NewSetCreation:
+	Set specification=ListSpecification? '(' (creation=ListCreation?) ')' ('.' LIST_METHOD '(' (expr+=Expression (',' expr+=Expression)*)? ')')*;
+
+
 TupleValueMember:
 	(name=ValuableID '=')? value=Expression;
 
@@ -156,6 +160,7 @@ Atomic returns Expression:
 	| {TupleRes} value=TupleValue
 	| {ListCreation} value=ListCreation
 	| {NewListCreation} value=NewListCreation
+	| {NewSetCreation} value=NewSetCreation
 	| {TheNull} value=NULL;
 
 RelAttrubutesList:
@@ -168,10 +173,12 @@ TupleVarDeclaration:
 	(name=ValuableID ':')? type=TypeReference;
 
 TypeReference:
-	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType | list=ListType;
+	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType | list=ListType|set=SetType;
 
 ListType:
 	List ListSpecification;
+SetType:
+	Set ListSpecification;
 
 ListSpecification:
 	LESS listType=TypeReference ("?"?) MORE;
@@ -221,6 +228,9 @@ ByteArray:
 List:
 	'list';
 
+Set:
+	'set';
+
 Key:
 	'key';
 
@@ -255,9 +265,10 @@ DivChar:
 	'/';
 	
 terminal LIST_METHOD:
-	"add"|"addAll"|"contains"|"containsAll"|"removeAll"|"calculate"|"sub"|"len"|"str"
+	"add"|"addAll"|"contains"|"containsAll"|"removeAll"|"calculate"|"sub"|"len"|"str"|"remove"|"removeAt"|"clear"
 	;
-
+//terminal SET_METHOD:LIST_METHOD;
+	
 terminal EQUALS:
 	'==';
 
