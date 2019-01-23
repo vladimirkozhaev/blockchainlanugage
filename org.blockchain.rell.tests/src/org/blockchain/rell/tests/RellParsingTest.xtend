@@ -1136,6 +1136,17 @@ class RellParsingTest {
 	}
 	
 	@Test
+	def void testAceesToList(){
+		val result = parseHelper.parse('''
+			query q() { val x = list<integer?>([123]); x[0] = null; return ''+x; }
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	
+	@Test
 	def void testOperations() {
 		val result = parseHelper.parse('''
 			class Test{
