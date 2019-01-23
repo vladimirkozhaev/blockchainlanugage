@@ -1009,6 +1009,33 @@ class RellParsingTest {
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
+
+	// check alias in at-expression in update statement
+	@Test
+	def void testUpdateOperationAliasWithAssignFromAt() {
+		val result = parseHelper.parse('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { update p1: person (p2: person) @ { p1.homeCity == p2.workCity } ( score = p1.score * 3 + p2.score ); }
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check assign value from at-expression in update statement
+	@Test
+	def void testUpdateOperationWithAssignFromAt() {
+		val result = parseHelper.parse('''
+			class default_score { name : text; value: integer; }
+			class person { name: text; mutable score: integer = default_score@{}.value; }
+			operation o() { update person @ {} (.score = default_score @{.name == "super_score"}.value); }
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
 	
 	
 	// check query short form
@@ -1128,6 +1155,19 @@ class RellParsingTest {
 	def void testsimpleFunctionDeclaration(){
 		val result = parseHelper.parse('''
 			function f(x: integer): integer = x * x;
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
+	
+	// check simple declaration of function 
+	@Test
+	def void testUpdateStatementInFunction(){
+		val result = parseHelper.parse('''
+			class user { name: text; mutable score: integer; }
+			function f(name: text, s: integer): integer { update user @ { name } ( score += s ); return s; } query q() = f('Bob', 500) ;
 		''')
 		Assert.assertNull(result)
 		val errors = result.eResource.errors
