@@ -32,7 +32,11 @@ Query:
 	'}'));
 
 Statement:
-	(relation=Relational | variable=OperationVariable) ';';
+	(relation=Relational | variable=OperationVariable|varInitiation=VarInitiation) ';';
+
+VarInitiation:
+	VariableDeclarationRef ('=' expression=Expression)?
+;
 
 OperationVariable:
 	assessModificator=(Var | Val) variable=Variable;
@@ -45,7 +49,7 @@ Relational:
 
 Update:
 	'update' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}' '('
-	createWhatPart+=CreateWhatPart (','
+	createWhatPart+=CreateWhatPart (','		
 	createWhatPart+=CreateWhatPart)*
 	')';
 
@@ -81,7 +85,7 @@ ListCreation:
 	'[' listValue+=Expression (',' listValue+=Expression)* ']';
 
 NewListCreation:
-	List '(' ListCreation ')';
+	List specification=ListSpecification? '(' (creation=ListCreation?) ')' ('.' LIST_METHOD '(' (expr+=Expression (',' expr+=Expression)*)? ')')*;
 
 TupleValueMember:
 	(name=ValuableID '=')? value=Expression;
@@ -97,7 +101,17 @@ TableNameWithAlias:
 	{JustNameDecl} name=[ClassDefinition];
 
 VariableDeclarationRef:
-	decl=[VariableDeclaration|ValuableID] ('.' part=[VariableDeclaration|ValuableID])*;
+	decl=[VariableDeclaration|ValuableID] (accesToList=AccessToList?) ('.' (part=[VariableDeclaration|ValuableID]|call=MethodCall))*;
+
+MethodCall:name=MethodName '(' (argList+=Expression (','  argList+=Expression)*)? ')';
+
+MethodName:
+	LIST_METHOD
+;
+	
+
+AccessToList:
+	'[' expr=Expression ']';
 
 Expression:
 	or=Or;
@@ -141,7 +155,8 @@ Atomic returns Expression:
 	{CreateRecordAtom} value=CreateRecord
 	| {TupleRes} value=TupleValue
 	| {ListCreation} value=ListCreation
-	| {NewListCreation} value=NewListCreation;
+	| {NewListCreation} value=NewListCreation
+	| {TheNull} value=NULL;
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
@@ -156,7 +171,10 @@ TypeReference:
 	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType | list=ListType;
 
 ListType:
-	List LESS listType=TypeReference ("?"?) MORE;
+	List ListSpecification;
+
+ListSpecification:
+	LESS listType=TypeReference ("?"?) MORE;
 
 TupleType:
 	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
@@ -235,6 +253,10 @@ MulChar:
 
 DivChar:
 	'/';
+	
+terminal LIST_METHOD:
+	"add"|"addAll"|"contains"|"containsAll"|"removeAll"|"calculate"|"sub"|"len"|"str"
+	;
 
 terminal EQUALS:
 	'==';
