@@ -1185,7 +1185,23 @@ class RellParsingTest {
 			query q() { val x = set<integer>([123]); x[0] = 456; return ''+x; }
 			query q() { val x = set<integer?>([123,456,null]); x.removeAll(set<integer>([123])); return ''+x; }
 			query q() { val x = set<integer>([123,456]); return x.containsAll(set<integer>([123])); }		
+				
 			
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
+	
+	@Test
+	def void testMapMethods(){
+		val result = parseHelper.parse('''
+			query q() { val x = map<integer,text?>(); x[123]=null; return ''+x;}
+			query q() = map<text,foo>() ;
+			query q (x: integer): map<integer, text> = [x:'Bob',x*2:'Alice'];	
+			query q() = map<text,integer>().calculate('Bob') ;
+			query q() = ['Bob':123,'Alice':456].calculate('Bob') ;
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
