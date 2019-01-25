@@ -1112,6 +1112,145 @@ class RellParsingTest {
 		
 	}
 	
+	// list ''+ from at expression
+	@Test
+	def void testListFromAtExpression() {
+		val result = parseHelper.parse('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
+			query q() {  return user @ { .firstName == 'Bill' } (=.lastName, '' + list([1,2,3])); }
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		
+	}
+	
+	// check list equal operators ===, !==, ==, !=
+	@Test
+	def void testListReturnFromQueryOne() {
+		val result = parseHelper.parse('''
+			query q1() { var x: list<list<text>>; x = [['Hello', 'World']]; return x; }
+			query q2() { val a: list<integer>? = [1,2,3]; return a === null; }
+			query q3() { val a: list<integer>? = [1,2,3]; return a !== null; }
+			query q4() { val a: list<integer>? = [1,2,3]; return a === [1,2,3]; }
+			query q5() { val a: list<integer>? = [1,2,3]; return a !== [1,2,3]; }
+			query q6() { val a: list<integer>? = [1,2,3]; val b = a; return a === b; }
+			query q7() { val a: list<integer>? = [1,2,3]; val b = a; return a !== b; }
+			query q8() { val a: list<integer>? = null; return a === null; }
+			query q9() { val a: list<integer>? = null; return a !== null; }
+			query q10() { val a: list<integer>? = null; return a === [1,2,3]; }
+			query q11() { val a: list<integer>? = null; return a !== [1,2,3]; }
+			query q12() { val a = [1, 2, 3]; val b = [1, 2, 3]; return a == b; }
+			query q13() { val a = [1, 2, 3]; val b = [1, 2, 3]; return a != b; }
+			query q14() { val a = [1, 2, 3]; val b = [1, 2, 3]; return a === b; }
+			query q15() { val a = [1, 2, 3]; val b = [1, 2, 3]; return a !== b; }
+			query q16() { val a = [1, 2, 3]; val b = a; return a === b; }
+			query q17() { val a = [1, 2, 3]; val b = a; return a !== b; }
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check list addAll, removeAll, containsAll
+	@Test
+	def void testListaddAllremoveAllcontainsAll() {
+		val result = parseHelper.parse('''
+			query q1() { val x = list<integer?>(); x.addAll(list<integer>([123])); return ''+x; }
+			query q2() { val x = list<integer?>(); x.addAll(list<integer?>([123,null])); return ''+x; }
+			query q3() { val x = list<integer>([123,456]); x.removeAll(list<integer>([123])); return ''+x; }
+			query q4() { val x = list<integer?>([123,456,null]); x.removeAll(list<integer>([123])); return ''+x; }
+			query q5() { val x = list<integer?>([123,456,null]); x.removeAll(list<integer?>([123,null])); return ''+x; }
+			query q6() { val x = list<integer>([123,456]); return x.containsAll(list<integer>([123])); }
+			query q7() { val x = list<integer?>([123,456,null]); return x.containsAll(list<integer>([123])); }
+			query q8() { val x = list<integer?>([123,456,null]); return x.containsAll(list<integer?>([123,null])); }
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check list calculate
+	@Test
+	def void testListCalculate() {
+		val result = parseHelper.parse('''
+			query q1() = list([1, 2, 3, 4, 5]).calculate(0) ;
+			query q2() = list([1, 2, 3, 4, 5]).calculate(4) ;
+			query q3() = list([1, 2, 3, 4, 5]).calculate(-1) ;
+			query q4() = list([1, 2, 3, 4, 5]).calculate(5) ;
+			query q5() = [1, 2, 3, 4, 5].calculate(0) ;
+			query q6() = [1, 2, 3, 4, 5].calculate(4) ;
+			query q7() = [1, 2, 3, 4, 5].calculate(-1) ;
+			query q8() = [1, 2, 3, 4, 5].calculate(5) ;
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	
+	// check list clear, empty
+	@Test
+	def void testListClearEmpty() {
+		val result = parseHelper.parse('''
+			query q1() { val x = [1, 2, 3]; x.clear(); return x; }
+			query q2() = list<integer>().empty() ;
+			query q3() = list<integer>([1]).empty() ;
+			query q4() = list<integer>([1, 2, 3, 4, 5]).empty() ;
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check list size, len
+	@Test
+	def void testListSizeLen() {
+		val result = parseHelper.parse('''
+			query q1() = list<integer>().size() ;
+			query q2() = list([1]).size() ;
+			query q3() = list([1, 2, 3, 4, 5]).size() ;
+			query q4() = list<integer>().len() ;
+			query q5() = list([1]).len() ;
+			query q6() = list([1, 2, 3, 4, 5]).len() ;
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check list from set
+	@Test
+	def void testListFromSet() {
+		val result = parseHelper.parse('''
+			query q1() = list<integer>(list<integer>()) ;
+			query q2() = list<integer>(set<integer>()) ;
+			query q3() = list<integer?>(list<integer>()) ;
+			query q4() = list<integer?>(list<integer?>()) ;
+			query q5() = list<integer?>(set<integer>()) ;
+			query q6() = list<integer?>(set<integer?>()) ;
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
+	// check list with records
+	@Test
+	def void testListWithRecords() {
+		val result = parseHelper.parse('''
+			record foo { x: integer; b: list<bar>; } record bar { s: list<text>; q: boolean; }
+			query q1() { val f = foo(123, [bar(['Hello'], true)]); return f == foo(123, [bar(['Hello'], true)]); }
+			query q2() { val l = ['Hello']; val f = foo(123, [bar(l, true)]);
+			                l.add('Bye');
+			                return f == foo(123, [bar(['Hello'], true)]); }
+		''')
+		Assert.assertNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	@Test
 	def void testSimpleDefList(){
 		val result = parseHelper.parse('''
