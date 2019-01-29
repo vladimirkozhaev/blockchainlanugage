@@ -8,6 +8,7 @@ import org.blockchain.rell.rell.Model
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.testing.util.ParseHelper
+import org.eclipse.xtext.testing.validation.ValidationTestHelper
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,8 +17,9 @@ import org.junit.runner.RunWith
 @InjectWith(RellInjectorProvider)
 class RellParsingTest {
 	@Inject
-	ParseHelper<Model> parseHelper
-
+	extension ParseHelper<Model> parseHelper
+	@Inject extension ValidationTestHelper
+	
 	// Check initialization byte_array
 	@Test
 	def void testInitValueToByteArray() {
@@ -1030,15 +1032,8 @@ class RellParsingTest {
 
 	@Test // This test will need to fail, but it's passed
 	def void testDefaultVariableName() {
-		assertParsingTrue('''
-			operation test(){ var integer1=5; var i:integer=integer; }
-		''')
-	}
-
-	@Test // This test will need to fail, but it's passed
-	def void testDefaultVariableNameInsideTheOperation() {
 		val result = parseHelper.parse('''
-			operation test (p : pubkey) { var test:pubkey=i; }
+			operation test(){ var integer=5; var i:integer=integer; }
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
@@ -1046,29 +1041,31 @@ class RellParsingTest {
 	}
 
 	@Test
-	def void testAliases() {
-		val result = parseHelper.parse('''
-			class Test{	t:text; }
-			class Test1{ t1:text; }
-			class Test2{ t2:text; }
-			operation o(){
-				val op=(a:Test,b:Test)@{a.t=="rrrr"};
-			}		
+	def void testDefaultVariableNameInsideTheOperation() {
+		assertParsingTrue('''	
+			operation test (pubkey) { var test:pubkey = i; }
+		''')
+	}
+	
+	@Test // This test will need to fail, but it's passed
+	def void testDefaultVariableNameInsideTheOperation1() {
+		val result = parseHelper.parse('''	
+			operation test (pubkey) { var test:pubkey = i; }
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
+		println("errors list print: "+ errors.toString)// empty
+		println("errors list size print: "+ errors.size)// 0
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 
 	@Test // This test will need to fail, but it's passed
-	def void testWrongAliases() {
+	def void testAliases() {
 		val result = parseHelper.parse('''
 			class Test{ t:text; }
-			class Test2{ t1:text; }
-			class Test2{ t2:text; } //error
-			operation o(){
-				val op=(a:Test,b:Test3)@{a111.t=="rrrr"}; //error
-			}		
+			class Test1{ t1:text; }
+			class Test3{ t2:text; }
+			operation o(){ val op=(a:Test,b:Test7)@{a.t=="rrrr"};}
 		''')
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
@@ -1078,7 +1075,6 @@ class RellParsingTest {
 	private def void assertParsingTrue(String codeSnippet) {
 		val result = parseHelper.parse(codeSnippet)
 		Assert.assertNotNull(result)
-		val errors = result.eResource.errors
-		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+		result.assertNoErrors
 	}
 }
