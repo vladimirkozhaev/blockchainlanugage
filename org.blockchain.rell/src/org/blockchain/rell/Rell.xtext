@@ -24,12 +24,13 @@ Operation:
 
 Query:
 	"query" name=ID '(' parameters=RelAttrubutesList? ')'
-	(':' type=TypeReference)?
+	(DOUBLE_QUOTE type=TypeReference)?
 	(('=' returnExr=Expression ';') |
 	('{'
 	statements+=Statement*
 	'return' returnExr=Expression ';'
 	'}'));
+
 
 Statement:
 	(relation=Relational | variable=OperationVariable|varInitiation=VarInitiation) ';';
@@ -56,6 +57,7 @@ Update:
 Delete:
 	'delete' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}';
 
+
 Create:
 	'create' (entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*)? ')';
@@ -74,7 +76,7 @@ CreateWhatPartNoVariable:
 
 AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
-	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand ampersandModificator=AmpersandModificator? '{'
+	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand (ampersandModificator=AmpersandModificator?) '{'
 	(conditions+=Expression (',' conditions+=Expression)*)? '}' ((tupleValue=TupleValue?) | ('.'
 	variableDeclarationRef=VariableDeclarationRef));
 
@@ -82,13 +84,35 @@ TupleValue:
 	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
 
 ListCreation:
-	'[' listValue+=Expression (',' listValue+=Expression)* ']';
+	'[' arguments=Arguments ']' ('.' LIST_METHOD listMethodArguments+=ArgumentsInBrackets)*;
+
+MapCreation:
+	'[' mapPart+=MapCreationPart (',' mapPart+=MapCreationPart)* ']' ('.' MAP_METHOD listMethodArguments+=ArgumentsInBrackets)*
+;
 
 NewListCreation:
-	List specification=ListSpecification? '(' (creation=ListCreation?) ')' ('.' LIST_METHOD '(' (expr+=Expression (',' expr+=Expression)*)? ')')*;
+	List {NewListCreation} (specification=ListSpecification?) 
+	'(' 
+		(
+			(
+				listCreation=ListCreation|
+				newListCreation=NewListCreation|
+				newSetCreation=NewSetCreation
+			)?
+		) 
+		')' ('.' LIST_METHOD arguments+=ArgumentsInBrackets)*;
+
+NewMapCreation:
+	Map {NewMapCreation	}specification=MapSpecification? '(' (creation=ListCreation?) ')' ('.' MAP_METHOD arguments+=Arguments )*;
 
 NewSetCreation:
-	Set specification=ListSpecification? '(' (creation=ListCreation?) ')' ('.' LIST_METHOD '(' (expr+=Expression (',' expr+=Expression)*)? ')')*;
+	Set {NewSetCreation} (specification=ListSpecification?) 
+	'(' 
+		(
+			(listCreation=ListCreation|newListCreation=NewListCreation|newSetCreation=NewSetCreation)?
+		) 
+	')' 
+	('.' LIST_METHOD arguments+=ArgumentsInBrackets )*;
 
 
 TupleValueMember:
@@ -101,13 +125,17 @@ ClassRef:
 	value=[TableNameWithAlias];
 
 TableNameWithAlias:
-	{ClassRefDecl} (name=ID ':' classDef=[ClassDefinition]) |
+	{ClassRefDecl} (name=ID DOUBLE_QUOTE classDef=[ClassDefinition]) |
 	{JustNameDecl} name=[ClassDefinition];
 
 VariableDeclarationRef:
-	decl=[VariableDeclaration|ValuableID] (accesToList=AccessToList?) ('.' (part=[VariableDeclaration|ValuableID]|call=MethodCall))*;
+	decl=[VariableDeclaration|ValuableID] (accesToList=AccessToList?)  ('.' (part=[VariableDeclaration|ValuableID]|call=MethodCall))*;
 
-MethodCall:name=MethodName '(' (argList+=Expression (','  argList+=Expression)*)? ')';
+MethodCall:name=MethodName arguments=ArgumentsInBrackets;
+
+Arguments:listPart+=Expression (','  listPart+=Expression)*;
+
+ArgumentsInBrackets: '(' arguments=Arguments? ')';
 
 MethodName:
 	LIST_METHOD
@@ -116,6 +144,7 @@ MethodName:
 
 AccessToList:
 	'[' expr=Expression ']';
+
 
 Expression:
 	or=Or;
@@ -127,7 +156,7 @@ And returns Expression:
 	Equality ({And.left=current} "and" right=Equality)*;
 
 Equality returns Expression:
-	Comparison ({Equality.left=current} op=(EQUALS | NOT_EQUALS)
+	Comparison ({Equality.left=current} op=(EQUALS | NOT_EQUALS|EQUALSS|NOT_EQUALSS)
 	right=Comparison)*;
 
 Comparison returns Expression:
@@ -148,40 +177,50 @@ Primary returns Expression:
 	Atomic;
 
 Atomic returns Expression:
-	{IntConstant} value=INT |
+	{IntConstant} value=IntWithMinus |
 	{StringConstant} value=STRING |
 	{ByteArrayConstant} value=BYTE_ARRAY_VALUE |
 	{BoolConstant} value=('true' | 'false') |
-	{VariableRef} value=VariableDeclarationRef |
 	{SelectOp} value=AtOperator |
 	{MemberDefinition} value=ClassMemberDefinition |
 	{CreateAtom} value=Create |
 	{CreateRecordAtom} value=CreateRecord
 	| {TupleRes} value=TupleValue
 	| {ListCreation} value=ListCreation
-	| {NewListCreation} value=NewListCreation
-	| {NewSetCreation} value=NewSetCreation
-	| {TheNull} value=NULL;
+	| {MapCreation} value=MapCreation
+	| {NewLCreation} value=NewListCreation
+	| {NewSCreation} value=NewSetCreation
+	| {NewMCreation} value=NewMapCreation
+	| {TheNull} value=NULL
+	|{VariableRef} value=VariableDeclarationRef;
+
+
+MapCreationPart:exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
 
 VariableDeclaration:
-	name=ValuableID ((':' type=TypeReference)?);
-
+	name=ValuableID ((DOUBLE_QUOTE type=TypeReference)?);
+	
 TupleVarDeclaration:
-	(name=ValuableID ':')? type=TypeReference;
+	(name=ValuableID DOUBLE_QUOTE)? type=TypeReference;
 
 TypeReference:
-	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType | list=ListType|set=SetType;
+	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType | list=ListType|set=SetType|map=MapType;
 
 ListType:
 	List ListSpecification;
 SetType:
 	Set ListSpecification;
 
+MapType:
+	Map MapSpecification;
 ListSpecification:
-	LESS listType=TypeReference ("?"?) MORE;
+	LESS listType=TypeReference (QuestionChar?) MORE;
+	
+MapSpecification:
+	LESS keySpec=TypeReference (QuestionChar?) ',' valSpec=TypeReference (QuestionChar?) MORE;
 
 TupleType:
 	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
@@ -198,6 +237,8 @@ ValuableID:
 AmpersandModificator:
 	PlusChar | MulChar | QuestionChar;
 
+IntWithMinus:MinusChar? INT;
+
 Name:
 	'name';
 
@@ -207,7 +248,7 @@ Pubkey:
 Timestamp:
 	'timestamp';
 
-Tuid:
+ Tuid:
 	'tuid';
 
 Boolean:
@@ -227,6 +268,8 @@ ByteArray:
 
 List:
 	'list';
+
+Map:'map';
 
 Set:
 	'set';
@@ -264,16 +307,23 @@ MulChar:
 DivChar:
 	'/';
 	
-terminal LIST_METHOD:
-	"add"|"addAll"|"contains"|"containsAll"|"removeAll"|"calculate"|"sub"|"len"|"str"|"remove"|"removeAt"|"clear"
+LIST_METHOD:
+	"add"|"addAll"|"contains"|"containsAll"|"removeAll"|"calculate"|"sub"|"size"|"str"|"remove"|"removeAt"|"clear"|"empty"
 	;
+	
+MAP_METHOD:"empty"|"size"|"contains"|"get"|"str"|"clear"|"put"|"putAll"|"remove"|"keys"|"values";	
 //terminal SET_METHOD:LIST_METHOD;
 	
 terminal EQUALS:
 	'==';
+terminal EQUALSS:
+	'===';
 
 terminal NOT_EQUALS:
 	'!=';
+	
+terminal NOT_EQUALSS:
+	'!==';
 
 terminal MORE_EQUAL:
 	'>=';
@@ -286,6 +336,11 @@ terminal MORE:
 
 terminal LESS:
 	'<';
+
+terminal DOUBLE_QUOTE:
+	':'
+;
+
 
 terminal NULL:
 	'null';

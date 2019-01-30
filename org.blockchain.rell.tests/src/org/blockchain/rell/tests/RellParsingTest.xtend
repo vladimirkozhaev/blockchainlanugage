@@ -1037,6 +1037,19 @@ class RellParsingTest {
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
+	// check assign value from at-expression in update statement
+	@Test
+	def void testAssesToVariableFromSelect() {
+		val result = parseHelper.parse('''
+			class default_score { name : text; value: integer; }
+			class person { name: text; mutable score: integer = default_score@{}.value; }
+			
+		''')
+		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
+	}
+	
 	
 	// check query short form
 	@Test
@@ -1118,9 +1131,9 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			class company { name: text; }
 			class user { firstName: text; lastName: text; company; }
-			query q() {  return user @ { .firstName == 'Bill' } (=.lastName, '' + list([1,2,3])); }
+			query q() {  return user @ { .firstName == 'Bill' } (.lastName, '' + list([1,2,3])); }
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 		
@@ -1148,7 +1161,7 @@ class RellParsingTest {
 			query q16() { val a = [1, 2, 3]; val b = a; return a === b; }
 			query q17() { val a = [1, 2, 3]; val b = a; return a !== b; }
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
@@ -1166,7 +1179,7 @@ class RellParsingTest {
 			query q7() { val x = list<integer?>([123,456,null]); return x.containsAll(list<integer>([123])); }
 			query q8() { val x = list<integer?>([123,456,null]); return x.containsAll(list<integer?>([123,null])); }
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
@@ -1184,8 +1197,9 @@ class RellParsingTest {
 			query q7() = [1, 2, 3, 4, 5].calculate(-1) ;
 			query q8() = [1, 2, 3, 4, 5].calculate(5) ;
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
+		println(errors)
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
@@ -1199,23 +1213,23 @@ class RellParsingTest {
 			query q3() = list<integer>([1]).empty() ;
 			query q4() = list<integer>([1, 2, 3, 4, 5]).empty() ;
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	
-	// check list size, len
+	// check list size, .size
 	@Test
 	def void testListSizeLen() {
 		val result = parseHelper.parse('''
 			query q1() = list<integer>().size() ;
 			query q2() = list([1]).size() ;
 			query q3() = list([1, 2, 3, 4, 5]).size() ;
-			query q4() = list<integer>().len() ;
-			query q5() = list([1]).len() ;
-			query q6() = list([1, 2, 3, 4, 5]).len() ;
+			query q4() = list<integer>().size() ;
+			query q5() = list([1]).size() ;
+			query q6() = list([1, 2, 3, 4, 5]).size() ;
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
@@ -1231,7 +1245,7 @@ class RellParsingTest {
 			query q5() = list<integer?>(set<integer>()) ;
 			query q6() = list<integer?>(set<integer?>()) ;
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
@@ -1246,7 +1260,7 @@ class RellParsingTest {
 			                l.add('Bye');
 			                return f == foo(123, [bar(['Hello'], true)]); }
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
@@ -1372,7 +1386,7 @@ class RellParsingTest {
 		val result = parseHelper.parse('''
 			function f(x: integer): integer = x * x;
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 		
@@ -1385,7 +1399,7 @@ class RellParsingTest {
 			class user { name: text; mutable score: integer; }
 			function f(name: text, s: integer): integer { update user @ { name } ( score += s ); return s; } query q() = f('Bob', 500) ;
 		''')
-		Assert.assertNull(result)
+		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
 		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 		
