@@ -129,7 +129,7 @@ TableNameWithAlias:
 	{JustNameDecl} name=[ClassDefinition];
 
 VariableDeclarationRef:
-	decl=[VariableDeclaration|ValuableID] (accesToList=AccessToList?)  ('.' (part=[VariableDeclaration|ValuableID]|call=MethodCall))*;
+	decl=[VariableDeclaration|ValuableID] (accesToList=AccessToList?)  ('.' (part+=[VariableDeclaration|ValuableID]|call=MethodCall))*;
 
 MethodCall:name=MethodName arguments=ArgumentsInBrackets;
 

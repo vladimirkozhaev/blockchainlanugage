@@ -22,94 +22,94 @@ class RellIndexTest {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension RellIndex
 	
-	@Test def void testExportedEObjectDescriptions() {
-		
-		val result = parseHelper.parse('''class test {
-						field1:text;
-						field2:integer;
-						field3:byte_array;
-						field4:json;
-					}
-		''')
-		Assert.assertNotNull(result)
-		result.assertExportedEObjectDescriptions("test, test.field1, test.field2, test.field3, test.field4")
-	}
+//	@Test def void testExportedEObjectDescriptions() {
+//		
+//		val result = parseHelper.parse('''class test {
+//						field1:text;
+//						field2:integer;
+//						field3:byte_array;
+//						field4:json;
+//					}
+//		''')
+//		Assert.assertNotNull(result)
+//		result.assertExportedEObjectDescriptions("test, test.field1, test.field2, test.field3, test.field4")
+//	}
 	
-	@Test def void testClassesWithAttributesDescription() {
-		
-		val result = parseHelper.parse('''
-		class test1 {
-						field1:text;
-						field2:integer;
-						field3:byte_array;
-						field4:json;
-					}
-		class test2 {
-						field1:text;
-						field2:integer;
-						field3:byte_array;
-						field4:json;
-					}
-		''')
-		Assert.assertNotNull(result)
-		result.assertExportedEObjectDescriptions("test1, test1.field1, test1.field2, test1.field3, test1.field4, "
-											   + "test2, test2.field1, test2.field2, test2.field3, test2.field4")
-	}
-	
-	@Test def void tesClassesDescriptions() {
-		val result = parseHelper.parse(
-			'''
-				class test1 {}
-				class test2 {}
-			'''			
-		)
-		assertNotNull(result)
-		
-		result.assertExportedEObjectDescriptions("test1, test2")		
-	}
-	
-	@Test def void testClassesIndex() {
-		val result = 
-		'''
-			class test1 {}
-		'''.parse	
-		assertNotNull(result)
-		
-		'''
-			class test2 {}
-		'''.parse(result.eResource.resourceSet).
-			entities.head.assertClassesIndex("test1, test2")
-	}
-	
-	@Test def void testOperationsIndex() {
-		val result = 
-		'''
-			operation op1() {}
-		'''.parse
-		assertNotNull(result)
-		
-		'''
-			operation op2() {}
-		'''.parse(result.eResource.resourceSet).
-		operations.head.assertOperationsIndex("op1, op2")
-	}
-	
-	def private assertExportedEObjectDescriptions(EObject o, CharSequence expected) {
-		Assert.assertEquals(
-			expected.toString,
-			o.getExportedEObjectDescriptions.map[qualifiedName].join(", ")
-		)
-	}
-	
-	def private assertClassesIndex(EObject o, String expected) {
-		val visibleClassesDescriptions = o.getVisibleClassesDescriptions
-		expected.assertEquals(visibleClassesDescriptions.
-			map[it.qualifiedName].join(", "))
-	}
-	
-	def private assertOperationsIndex(EObject o, String expected) {
-		val visibleOperationsDescriptions = o.visibleOperationsDescriptions
-		expected.assertEquals(visibleOperationsDescriptions.
-			map[it.qualifiedName].join(", "))  
-	}
+//	@Test def void testClassesWithAttributesDescription() {
+//		
+//		val result = parseHelper.parse('''
+//		class test1 {
+//						field1:text;
+//						field2:integer;
+//						field3:byte_array;
+//						field4:json;
+//					}
+//		class test2 {
+//						field1:text;
+//						field2:integer;
+//						field3:byte_array;
+//						field4:json;
+//					}
+//		''')
+//		Assert.assertNotNull(result)
+//		result.assertExportedEObjectDescriptions("test1, test1.field1, test1.field2, test1.field3, test1.field4, "
+//											   + "test2, test2.field1, test2.field2, test2.field3, test2.field4")
+//	}
+//	
+//	@Test def void tesClassesDescriptions() {
+//		val result = parseHelper.parse(
+//			'''
+//				class test1 {}
+//				class test2 {}
+//			'''			
+//		)
+//		assertNotNull(result)
+//		
+//		result.assertExportedEObjectDescriptions("test1, test2")		
+//	}
+//	
+//	@Test def void testClassesIndex() {
+//		val result = 
+//		'''
+//			class test1 {}
+//		'''.parse	
+//		assertNotNull(result)
+//		
+//		'''
+//			class test2 {}
+//		'''.parse(result.eResource.resourceSet).
+//			entities.head.assertClassesIndex("test1, test2")
+//	}
+//	
+//	@Test def void testOperationsIndex() {
+//		val result = 
+//		'''
+//			operation op1() {}
+//		'''.parse
+//		assertNotNull(result)
+//		
+//		'''
+//			operation op2() {}
+//		'''.parse(result.eResource.resourceSet).
+//		operations.head.assertOperationsIndex("op1, op2")
+//	}
+//	
+//	def private assertExportedEObjectDescriptions(EObject o, CharSequence expected) {
+//		Assert.assertEquals(
+//			expected.toString,
+//			o.getExportedEObjectDescriptions.map[qualifiedName].join(", ")
+//		)
+//	}
+//	
+//	def private assertClassesIndex(EObject o, String expected) {
+//		val visibleClassesDescriptions = o.getVisibleClassesDescriptions
+//		expected.assertEquals(visibleClassesDescriptions.
+//			map[it.qualifiedName].join(", "))
+//	}
+//	
+//	def private assertOperationsIndex(EObject o, String expected) {
+//		val visibleOperationsDescriptions = o.visibleOperationsDescriptions
+//		expected.assertEquals(visibleOperationsDescriptions.
+//			map[it.qualifiedName].join(", "))  
+//	}
 }
