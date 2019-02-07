@@ -981,48 +981,213 @@ class RellParsingTest {
 		''')
 	}
 
-// check map type compatible
+// check map type/sub-type
 	@Test
 	def void testMapTypeCompatible() {
 		assertParsingTrue('''
-			query q1() { val x = map<integer,text>([123:'Hello']); val y = map<integer,text>(x); return ''+y; }
-			query q2() { val x = map<integer,text>([123:'Hello']); val y = map<integer?,text>(x); return ''+y; }
-			query q3() { val x = map<integer?,text>([123:'Hello']); val y = map<integer?,text>(x); return ''+y; }
-			query q4() { val x = map<integer,text>([123:'Hello']); val y = map<integer,text?>(x); return ''+y; }
-			query q5() { val x = map<integer,text?>([123:'Hello']); val y = map<integer,text?>(x); return ''+y; }
-			query q6() { val x = map<integer,text>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
-			query q7() { val x = map<integer?,text>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
-			query q8() { val x = map<integer,text?>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
-			query q9() { val x = map<integer?,text?>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
+			query q1() { val x = map<integer?,text>([123:'Hello']); return x[null];}
+			query q2() { val x = map<integer?,text?>([123:'Hello']); return x[null];}
+			uery q3() { val x = map<integer,text>(); x[123]='Hello'; return ''+x;}
+			query q4() { val x = map<integer?,text>(); x[123]='Hello'; return ''+x;}
+			query q5() { val x = map<integer?,text>(); x[null]='Hello'; return ''+x;}
+			query q6() { val x = map<integer,text>([123:'Hello']); val y = map<integer,text>(x); return ''+y; }
+			query q7() { val x = map<integer,text>([123:'Hello']); val y = map<integer?,text>(x); return ''+y; }
+			query q8() { val x = map<integer?,text>([123:'Hello']); val y = map<integer?,text>(x); return ''+y; }
+			query q9() { val x = map<integer,text>([123:'Hello']); val y = map<integer,text?>(x); return ''+y; }
+			query q10() { val x = map<integer,text?>([123:'Hello']); val y = map<integer,text?>(x); return ''+y; }
+			query q11() { val x = map<integer,text>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
+			query q12() { val x = map<integer?,text>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
+			query q13() { val x = map<integer,text?>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
+			query q14() { val x = map<integer?,text?>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
+			query q15() { val x: map<integer,text> = map<integer,text>([123:'Hello']); return ''+x; }
 		''')
 	}
 
-// check map type putAll compatible
+// check map put(), putAll() function
 	@Test
 	def void testMapTypePutAllCompatible() {
 		assertParsingTrue('''
-			query q1() { val x = map<integer?,text>([123:'Hello']); return x[null];}
-			query q2() { val x = map<integer?,text>([123:'Hello']); x.put(null,'World'); return x[null];}
-			query q3() { val x = map<integer?,text?>([123:'Hello']); return x[null];}
-			query q4() { val x = map<integer?,text?>([123:'Hello']); x.put(null,'World'); return x[null];}
-			query q5() { val x = map<integer,text>(); x.put(123,'Hello'); return ''+x;}
-			query q6() { val x = map<integer,text>(); x[123]='Hello'; return ''+x;}
-			query q7() { val x = map<integer?,text>(); x.put(123,'Hello'); return ''+x;}
-			query q8() { val x = map<integer?,text>(); x.put(null,'Hello'); return ''+x;}
-			query q9() { val x = map<integer?,text>(); x[123]='Hello'; return ''+x;}
-			query q10() { val x = map<integer?,text>(); x[null]='Hello'; return ''+x;}
-			query q11() { val x = map<integer,text?>(); x.put(123,'Hello'); return ''+x;}
-			query q12() { val x = map<integer,text?>(); x.put(123,null); return ''+x;}
-			query q13() { val x: map<integer,text> = map<integer,text>([123:'Hello']); return ''+x; }
-			query q14() { val x = map<integer,text>(); x.putAll(map<integer,text>([123:'Hello'])); return ''+x;}
-			query q15() { val x = map<integer?,text>(); x.putAll(map<integer,text>([123:'Hello'])); return ''+x;}
-			query q16() { val x = map<integer?,text>(); x.putAll(map<integer?,text>([123:'Hello'])); return ''+x;}
-			query q17() { val x = map<integer,text?>(); x.putAll(map<integer,text>([123:'Hello'])); return ''+x;}
-			query q18() { val x = map<integer,text?>(); x.putAll(map<integer,text?>([123:'Hello'])); return ''+x;}
-			query q19() { val x = map<integer?,text?>(); x.putAll(map<integer,text>([123:'Hello'])); return ''+x;}
-			query q20() { val x = map<integer?,text?>(); x.putAll(map<integer?,text>([123:'Hello'])); return ''+x;}
-			query q21() { val x = map<integer?,text?>(); x.putAll(map<integer,text?>([123:'Hello'])); return ''+x;}
-			query q22() { val x = map<integer?,text?>(); x.putAll(map<integer?,text?>([123:'Hello'])); return ''+x;}
+			query q1() { val x = map<integer?,text>([123:'Hello']); x.put(null,'World'); return x[null];}
+			query q2() { val x = map<integer?,text?>([123:'Hello']); x.put(null,'World'); return x[null];}
+			query q3() { val x = map<integer,text>(); x.put(123,'Hello'); return ''+x;}
+			query q4() { val x = map<integer?,text>(); x.put(123,'Hello'); return ''+x;}
+			query q5() { val x = map<integer?,text>(); x.put(null,'Hello'); return ''+x;}
+			query q6() { val x = map<integer,text?>(); x.put(123,'Hello'); return ''+x;}
+			query q7() { val x = map<integer,text?>(); x.put(123,null); return ''+x;}
+			query q8() { val x = map<integer,text>(); x.putAll(map<integer,text>([123:'Hello'])); return ''+x;}
+			query q9() { val x = map<integer?,text>(); x.putAll(map<integer,text>([123:'Hello'])); return ''+x;}
+			query q10() { val x = map<integer?,text>(); x.putAll(map<integer?,text>([123:'Hello'])); return ''+x;}
+			query q11() { val x = map<integer,text?>(); x.putAll(map<integer,text>([123:'Hello'])); return ''+x;}
+			query q12() { val x = map<integer,text?>(); x.putAll(map<integer,text?>([123:'Hello'])); return ''+x;}
+			query q13() { val x = map<integer?,text?>(); x.putAll(map<integer,text>([123:'Hello'])); return ''+x;}
+			query q14() { val x = map<integer?,text?>(); x.putAll(map<integer?,text>([123:'Hello'])); return ''+x;}
+			query q15() { val x = map<integer?,text?>(); x.putAll(map<integer,text?>([123:'Hello'])); return ''+x;}
+			query q16() { val x = map<integer?,text?>(); x.putAll(map<integer?,text?>([123:'Hello'])); return ''+x;}
+		''')
+	}
+	
+// check map calculate() function
+	@Test
+	def void testMapCalculate() {
+		assertParsingTrue('''
+			query q1() = map<text,integer>().calculate('Bob') ;
+			query q2() = ['Bob':123].calculate('Bob') ;
+			query q3() = ['Bob':123].calculate('Alice') ;
+			query q4() = ['Bob':123,'Alice':456].calculate('Bob') ;
+			query q5() = ['Bob':123,'Alice':456].calculate('Alice') ;
+			query q6() = ['Bob':123,'Alice':456].calculate('Trudy') ;
+		''')
+	}
+	
+// check map str() function
+	@Test
+	def void testMapStr() {
+		assertParsingTrue('''
+			query q1() = map<text,integer>().str() ;
+			query q2() = ['Bob':123].str() ;
+			query q3() = ['Bob':123,'Alice':456,'Trudy':789].str() ;
+			query q4() { val x = ['Bob':123,'Alice':456]; x.put('Trudy',555); return x.str(); }
+		''')
+	}
+	
+// check map clear() function
+	@Test
+	def void testMapClear() {
+		assertParsingTrue('''
+			query q() { val x = ['Bob':123,'Alice':567,'Trudy':789]; x.clear(); return x; }
+		''')
+	}
+	
+// check map empty() function
+	@Test
+	def void testMapEmpty() {
+		assertParsingTrue('''
+			query q1() = map<text,integer>().empty() ;
+			query q2() = ['Bob':123].empty() ;
+			query q3() = ['Bob':123,'Alice':456].empty() ;
+		''')
+	}
+
+// check map keys() function
+	@Test
+	def void testMapKeys() {
+		assertParsingTrue('''
+			query q1() = map<text,integer>().keys() ;
+			query q2() = ['Bob':123].keys() ;
+			query q3() = ['Bob':123,'Alice':456,'Trudy':789].keys() ;
+			query q4() { val x = ['Bob':123,'Alice':456]; x.keys().remove('Bob'); return ''+x; }
+			query q5() { val x = ['Bob':123,'Alice':456]; x.keys().clear(); return ''+x; }
+			query q6() { val x = ['Bob':123,'Alice':456]; x.keys().add('Trudy'); return ''+x; }
+		''')
+	}
+
+// check map values() function
+	@Test
+	def void testMapValues() {
+		assertParsingTrue('''
+			query q1() = ['Bob':123].values() ;
+			query q2() = ['Bob':123,'Alice':456,'Trudy':789].values() ;
+			query q3() { val x = ['Bob':123,'Alice':456]; x.values().clear(); return ''+x; }
+			query q4() { val x = ['Bob':123,'Alice':456]; val v = x.values(); x.clear(); return ''+x+' '+v; }
+		''')
+	}
+
+// check map size() function
+	@Test
+	def void testMapSize() {
+		assertParsingTrue('''
+			query q1() = map<text,integer>().size() ;
+			query q2() = ['Bob':123].size() ;
+			query q3() = ['Bob':123,'Alice':456].size() ;
+		''')
+	}
+
+// check 'in' map
+	@Test
+	def void testMapIn() {
+		assertParsingTrue('''
+			query q1() = 'Bob' in map<text,integer>() ;
+			query q2() = 'Bob' in ['Bob':123] ;
+			query q3() = 'Alice' in ['Bob':123] ;
+			query q4() = 'Bob' in ['Bob':123,'Alice':456] ;
+			query q5() = 'Alice' in ['Bob':123,'Alice':456] ;
+			query q6() = 'Trudy' in ['Bob':123,'Alice':456] ;
+		''')
+	}
+
+// check map contains() function
+	@Test
+	def void testMapContains() {
+		assertParsingTrue('''
+			query q1() = ['Bob':123].contains('Bob') ;
+			query q2() = ['Bob':123].contains('Alice') ;
+			query q3() = ['Bob':123,'Alice':456].contains('Bob') ;
+			query q4() = ['Bob':123,'Alice':456].contains('Alice') ;
+			query q5() = ['Bob':123,'Alice':456].contains('Trudy') ;
+		''')
+	}
+
+// check '==' map
+	@Test
+	def void testMapEquals() {
+		assertParsingTrue('''
+			query q1() = ['Bob':123,'Alice':456,'Trudy':789] == ['Bob':123,'Alice':456,'Trudy':789] ;
+			query q2() = ['Bob':123,'Alice':456,'Trudy':789] == ['Bob':321,'Alice':654,'Trudy':987] ;
+			query q3() = ['Bob':123,'Alice':456,'Trudy':789] == ['Bob':123,'Alice':456] ;
+			query q4() = ['Bob':123,'Alice':456,'Trudy':789] == ['Bob':123,'Alice':456,'Trudy':789,'Satoshi':555] ;
+			query q5() = ['Bob':123,'Alice':456,'Trudy':789] == map<text,integer>() ;		
+		''')
+	}
+
+// check map
+	@Test
+	def void testMap() {
+		assertParsingTrue('''
+			query q1() = ['Bob':123]['Bob'] ;
+			query q2() = ['Bob':123]['Alice'] ;
+			query q3() = ['Bob':123,'Alice':456]['Bob'] ;
+			query q4() = ['Bob':123,'Alice':456]['Alice'] ;
+			query q5() = ['Bob':123,'Alice':456]['Trudy'] ;
+			query q6() = map(['Bob':123])['Bob'] ;
+			query q7() = map(['Bob':123])['Alice'] ;
+			query q8() = map(['Bob':123,'Alice':456])['Bob'] ;
+			query q9() = map(['Bob':123,'Alice':456])['Alice'] ;
+			query q10() = map(['Bob':123,'Alice':456])['Trudy'] ;
+		''')
+	}
+	
+// check map with class
+	@Test
+	def void testMapWithClass() {
+		assertParsingTrue('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
+			query q() {  return user @ { .firstName == 'Bill' } (=.lastName, '' + map([123:'Hello'])); }
+		''')
+	}
+	
+// check map with record
+	@Test
+	def void testMapWithRecord() {
+		assertParsingTrue('''
+			record foo1 { mutable x: integer; }
+			record foo2 { x: text; b: bar; } record bar { p: integer; q: integer; }
+			query q1() = [ 'Hello' : foo1(123) ];
+			query q2() = [foo1(123)] ;
+			query q3() = map<text,foo1>();
+			query q4() { var m = [foo2('ABC', bar(p=123,q=456)) : 'X']; return m[foo2('ABC', bar(p=123,q=456))]; }
+			query q5() { var s = set([foo2('ABC', bar(p=123,q=456))]); return s; }
+			query q6() { var s = set([foo2('ABC', bar(p=123,q=456))]); return s.contains(foo2('ABC',bar(p=123,q=456))); }
+			query q7() { var m = [foo2('ABC', bar(p=123,q=456)) : 'X']; return m[foo2('DEF', bar(p=123,q=456))]; }
+		''')
+	}
+
+// check map with function 
+	@Test
+	def void testMapWithFunction() {
+		assertParsingTrue('''
+			function f1() : map<integer,text>? = null;
+			function f2() : map<integer,text>? = [123:'Hello',456:'World'];
 		''')
 	}
 
@@ -1054,11 +1219,34 @@ class RellParsingTest {
 		''')
 	}
 
-// check simple declaration of function 
+// check simple declaration of function (short form)
 	@Test
-	def void testsimpleFunctionDeclaration() {
+	def void testShortFunctionDeclaration() {
 		assertParsingTrue('''
 			function f(x: integer): integer = x * x;
+		''')
+	}
+	
+// check simple declaration of function (full form)
+	@Test
+	def void testFullFunctionDeclaration() {
+		assertParsingTrue('''
+			function f(x: integer): integer {
+			    return x * x;
+			}
+		''')
+	}
+	
+// check call function from another function
+	@Test
+	def void testCallFunctionFromFunction() {
+		assertParsingTrue('''
+			function f1() : integer = f2();
+			
+			function f2() : integer {
+			    val b = 2;			    
+			    return b * 2;
+			}
 		''')
 	}
 
