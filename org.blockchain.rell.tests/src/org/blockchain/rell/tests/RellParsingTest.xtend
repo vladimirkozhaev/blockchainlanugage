@@ -1277,27 +1277,14 @@ class RellParsingTest {
 
 	}
 
-	@Test
-	def void testDefaultVariableNameInsideTheOperation() {
-		assertParsingTrue('''	
-			operation test (pubkey) { var test:pubkey = i; }
-		''')
-	}
+	
 
-	@Test // This test will need to fail, but it's passed
-	def void testDefaultVariableNameInsideTheOperation1() {
-		assertParsingTrue('''	
-			operation test (pubkey) { var test:pubkey = i; }
-		''')
-	}
 
 	@Test // This test will need to fail, but it's passed
 	def void testAliases() {
 		assertParsingTrue('''
 			class Test{ t:text; }
-			class Test1{ t1:text; }
-			class Test3{ t2:text; }
-			operation o(){ val op=(a:Test,b:Test7)@{a.t=="rrrr"};}
+			operation o(){ val op=(a:Test)@{a.t=="rrrr"};}
 		''')
 
 	}
