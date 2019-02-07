@@ -15,7 +15,6 @@ import org.blockchain.rell.rell.StringConstant
 import org.blockchain.rell.rell.TypeReference
 import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableDeclaration
-import org.blockchain.rell.rell.VariableRef
 
 class RellTypeProvider {
 
@@ -37,10 +36,10 @@ class RellTypeProvider {
 			Equality: RellTypeProvider.BOOL_TYPE
 			And: RellTypeProvider.BOOL_TYPE
 			Or: RellTypeProvider.BOOL_TYPE
-			VariableRef:{
-				val VariableRef varRef=e as VariableRef
-				varRef.value.typeFor
-			}
+//			VariableRef:{
+//				val VariableRef varRef=e as VariableRef
+//				varRef.value.typeFor
+//			}
 			default: e.or.typeFor
 		}
 	}
@@ -100,12 +99,12 @@ class RellTypeProvider {
 		variable.name.typeFor
 	}
 
-	def dispatch RellType typeFor(VariableRef varRef) {
-		if (varRef.value === null)
-			return null
-		else
-			return varRef.value.typeFor
-	}
+//	def dispatch RellType typeFor(VariableDecarationRef varRef) {
+//		if (varRef.value === null)
+//			return null
+//		else
+//			return varRef.value.typeFor
+//	}
 
 	def isInt(RellType type) { type == RellTypeProvider.INT_TYPE }
 

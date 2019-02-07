@@ -5,6 +5,7 @@ import java.util.List
 import org.blockchain.rell.rell.And
 import org.blockchain.rell.rell.Comparison
 import org.blockchain.rell.rell.Create
+import org.blockchain.rell.rell.DotValueRef
 import org.blockchain.rell.rell.Equality
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.Minus
@@ -12,32 +13,62 @@ import org.blockchain.rell.rell.MulOrDiv
 import org.blockchain.rell.rell.Operation
 import org.blockchain.rell.rell.Or
 import org.blockchain.rell.rell.Plus
+import org.blockchain.rell.rell.Query
 import org.blockchain.rell.rell.RelAttrubutesList
 import org.blockchain.rell.rell.Relational
 import org.blockchain.rell.rell.Statement
 import org.blockchain.rell.rell.Variable
-import org.blockchain.rell.rell.VariableRef
 
 class RellModelUtil {
 
-	Variable v
-	
 	def List<VariableReferenceInfo> usedVariables(Operation operation) {
+//		val List<VariableReferenceInfo> variables = newArrayList
+//
+//		if (operation.parameters !== null) {
+//			operation.parameters.value.forEach([ x |
+//				{
+//					// var VariableReferenceInfo varRefInfo;
+//					val Variable v = x as Variable;
+//					new VariableReferenceInfo(v.name, true, v.expression !== null, false)
+//
+//				}
+//			])
+//		}
+//		if (operation.statements !== null) {
+//			operation.statements.forEach[el|variables.addAll(usedVariables(el))];
+//
+//		}
+		val parametersInfo = if  (operation.parameters !== null)	
+			operation.parameters.value.map [ parameter |
+			new VariableReferenceInfo((parameter as Variable).name, true, true, false)]
+			else 
+		newArrayList
+		val statementsInfo=if (operation.statements!==null)
+			operation.statements.flatMap[x|usedVariables(x)]
+		else
+			newArrayList;
+			
+		parametersInfo.addAll(statementsInfo)
+		return parametersInfo
+	}
+
+	def List<VariableReferenceInfo> usedVariables(Query operation) {
 		val List<VariableReferenceInfo> variables = newArrayList
 
-		if (operation.parameters!==null){
-			operation.parameters.value.forEach([x|{
-				//var VariableReferenceInfo varRefInfo;
-				val Variable v=x as Variable;
+		if (operation.parameters !== null) {
+			operation.parameters.value.forEach([ x |
+				{
+					// var VariableReferenceInfo varRefInfo;
+					val Variable v = x as Variable;
 //				Variable v=x as Variable;
-					new VariableReferenceInfo(v.name, true, v.expression!==null, false)
-				
-				
-			}])			
+					new VariableReferenceInfo(v.name, true, v.expression !== null, false)
+
+				}
+			])
 		}
-		if (operation.statements!==null){
+		if (operation.statements !== null) {
 			operation.statements.forEach[el|variables.addAll(usedVariables(el))];
-			
+
 		}
 		variables
 	}
@@ -47,10 +78,9 @@ class RellModelUtil {
 		val List<VariableReferenceInfo> variables = newArrayList
 
 		switch (statement) {
-			case statement.variable!==null: {
+			case statement.variable !== null: {
 				variables.addAll((statement.variable.variable).usedVariables)
 			}
-			
 			default: {
 				variables.addAll((statement.relation).usedVariables)
 			}
@@ -91,16 +121,14 @@ class RellModelUtil {
 //		update.conditions.elements.stream.forEach([x|variables.addAll(x.expr.usedVariables)])
 //		variables;
 //	}
-
 	def List<VariableReferenceInfo> usedVariables(Create create) {
 		val List<VariableReferenceInfo> variables = newArrayList
-		//create.attributeList.forEach([x|variables.addAll(x.usedVariables)]) //.attributeList.usedVariables
+		// create.attributeList.forEach([x|variables.addAll(x.usedVariables)]) //.attributeList.usedVariables
 		variables
-		
+
 	}
-	
+
 //	def List<VariableReferenceInfo> usedVariables(CreateAttrMember member){
-		
 //		if (member instanceof Default){
 //			val m=member as Default
 //			m.expr.usedVariables
@@ -110,8 +138,6 @@ class RellModelUtil {
 //			variables.add(new VariableReferenceInfo(ref.name,false,false,true))
 //			variables
 //		}
-
-		
 //		val List<VariableReferenceInfo> variables = newArrayList
 //		switch(member.name){
 //			case (member.name instanceof VariableDeclaration):{
@@ -125,14 +151,11 @@ class RellModelUtil {
 //		}
 //		variables
 //	}
-
-	def usedVariables(RelAttrubutesList rellAttributesList){
+	def usedVariables(RelAttrubutesList rellAttributesList) {
 		val List<VariableReferenceInfo> variables = newArrayList
 		rellAttributesList.value.forEach([x|variables.addAll(x.usedVariables)])
 		variables
 	}
-
-	
 
 	def List<VariableReferenceInfo> usedVariables(Variable variable) {
 		val List<VariableReferenceInfo> array = new ArrayList
@@ -153,9 +176,7 @@ class RellModelUtil {
 //
 //		variables
 //	}
-
-
-	def List<VariableReferenceInfo> processExpression(Expression expression){
+	def List<VariableReferenceInfo> processExpression(Expression expression) {
 		var List<VariableReferenceInfo> variables = newArrayList;
 		switch (expression) {
 			case (expression instanceof Or): {
@@ -190,26 +211,25 @@ class RellModelUtil {
 				variables = usedVariables((expression as MulOrDiv).left)
 				variables.addAll(usedVariables((expression as MulOrDiv).right))
 			}
-			case (expression instanceof VariableRef): {
-				variables.add(new VariableReferenceInfo((expression as VariableRef).value.decl,false,false,true))
+			case (expression instanceof DotValueRef): {
+				variables.add(
+					new VariableReferenceInfo((expression as DotValueRef).value.decl.decl, false, false, true))
 			}
-			
 			default:
-				variables=new ArrayList<VariableReferenceInfo>()
+				variables = new ArrayList<VariableReferenceInfo>()
 		}
 		variables
 	}
 
 	def List<VariableReferenceInfo> usedVariables(Expression expression) {
-		
-		val or = expression.or
-		if (or!==null){
-			processExpression(or);
-		}else{
-			processExpression(expression);
-			
-		}
 
+		val or = expression.or
+		if (or !== null) {
+			processExpression(or);
+		} else {
+			processExpression(expression);
+
+		}
 
 	}
 }
