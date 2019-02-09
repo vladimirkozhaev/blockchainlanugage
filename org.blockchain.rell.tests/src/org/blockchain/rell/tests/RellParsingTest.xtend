@@ -1219,11 +1219,34 @@ class RellParsingTest {
 		''')
 	}
 
-// check simple declaration of function 
+// check simple declaration of function (short form)
 	@Test
-	def void testsimpleFunctionDeclaration() {
+	def void testShortFunctionDeclaration() {
 		assertParsingTrue('''
 			function f(x: integer): integer = x * x;
+		''')
+	}
+	
+// check simple declaration of function (full form)
+	@Test
+	def void testFullFunctionDeclaration() {
+		assertParsingTrue('''
+			function f(x: integer): integer {
+			    return x * x;
+			}
+		''')
+	}
+	
+// check call function from another function
+	@Test
+	def void testCallFunctionFromFunction() {
+		assertParsingTrue('''
+			function f1() : integer = f2();
+			
+			function f2() : integer {
+			    val b = 2;			    
+			    return b * 2;
+			}
 		''')
 	}
 
