@@ -1,11 +1,11 @@
 package org.blockchain.rell.typing
 
 import java.util.ArrayList
+import java.util.Arrays
 import java.util.List
 import org.blockchain.rell.rell.And
 import org.blockchain.rell.rell.Comparison
 import org.blockchain.rell.rell.Create
-import org.blockchain.rell.rell.DotValueRef
 import org.blockchain.rell.rell.Equality
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.Minus
@@ -18,6 +18,7 @@ import org.blockchain.rell.rell.RelAttrubutesList
 import org.blockchain.rell.rell.Relational
 import org.blockchain.rell.rell.Statement
 import org.blockchain.rell.rell.Variable
+import org.blockchain.rell.rell.VariableDeclarationRef
 
 class RellModelUtil {
 
@@ -38,16 +39,17 @@ class RellModelUtil {
 //			operation.statements.forEach[el|variables.addAll(usedVariables(el))];
 //
 //		}
-		val parametersInfo = if  (operation.parameters !== null)	
-			operation.parameters.value.map [ parameter |
-			new VariableReferenceInfo((parameter as Variable).name, true, true, false)]
-			else 
-		newArrayList
-		val statementsInfo=if (operation.statements!==null)
-			operation.statements.flatMap[x|usedVariables(x)]
-		else
-			newArrayList;
-			
+		val parametersInfo = if (operation.parameters !== null)
+				operation.parameters.value.map [ parameter |
+					new VariableReferenceInfo((parameter as Variable).name, true, true, false)
+				]
+			else
+				newArrayList
+		val statementsInfo = if (operation.statements !== null)
+				operation.statements.flatMap[x|usedVariables(x)]
+			else
+				newArrayList;
+
 		parametersInfo.addAll(statementsInfo)
 		return parametersInfo
 	}
@@ -211,15 +213,34 @@ class RellModelUtil {
 				variables = usedVariables((expression as MulOrDiv).left)
 				variables.addAll(usedVariables((expression as MulOrDiv).right))
 			}
-			case (expression instanceof DotValueRef): {
+			case (expression instanceof VariableDeclarationRef): {
+			
+
 				variables.add(
-					new VariableReferenceInfo((expression as DotValueRef).value.decl.decl, false, false, true))
+					new VariableReferenceInfo((expression as VariableDeclarationRef).decl, false, false, true))
 			}
 			default:
 				variables = new ArrayList<VariableReferenceInfo>()
 		}
 		variables
 	}
+
+	def List<VariableReferenceInfo> usedVariables(VariableDeclarationRef variableDeclRef) {
+		return Arrays.asList(new VariableReferenceInfo(variableDeclRef.decl, false, false, true))
+	}
+
+//	def List<VariableReferenceInfo> usedVariables(DotValue dotValue) {
+//		if (dotValue instanceof VariableDeclarationRef) {
+//			(dotValue as VariableDeclarationRef).usedVariables
+//		} else {
+//			// dotValue.
+//			val left = dotValue.left.usedVariables
+//			val right = dotValue.right.usedVariables
+//			left.addAll(right)
+//			left
+//
+//		}
+//	}
 
 	def List<VariableReferenceInfo> usedVariables(Expression expression) {
 

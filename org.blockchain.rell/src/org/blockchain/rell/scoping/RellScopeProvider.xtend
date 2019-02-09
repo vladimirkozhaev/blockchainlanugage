@@ -3,7 +3,6 @@
  */
 package org.blockchain.rell.scoping
 
-import com.google.inject.Inject
 import java.util.List
 import org.blockchain.rell.rell.AtOperator
 import org.blockchain.rell.rell.AttributeListField
@@ -14,18 +13,12 @@ import org.blockchain.rell.rell.ClassRefDecl
 import org.blockchain.rell.rell.Create
 import org.blockchain.rell.rell.CreateWhatPart
 import org.blockchain.rell.rell.Delete
-import org.blockchain.rell.rell.DotValue
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.JustNameDecl
-import org.blockchain.rell.rell.Operation
-import org.blockchain.rell.rell.Query
-import org.blockchain.rell.rell.RelAttrubutesList
 import org.blockchain.rell.rell.TableNameWithAlias
 import org.blockchain.rell.rell.Update
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableDeclarationRef
-import org.blockchain.rell.typing.RellModelUtil
-import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
@@ -40,7 +33,6 @@ import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
  * on how and when to use it.
  */
 class RellScopeProvider extends AbstractDeclarativeScopeProvider {
-	@Inject extension RellModelUtil
 
 	def IScope getVariableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef, EReference ref) {
 
@@ -78,64 +70,55 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				val scope = makeWhatPartScope(container)
 				return scope
 			}
-			case (container instanceof Operation): {
-				val operation = container as Operation;
-				return variableScopeForOperationOrQuery(variableDeclarationRef, operation.usedVariables
-					)
-			}
-			case (container instanceof Query): {
-				val query = container as Query;
-				return variableScopeForOperationOrQuery(variableDeclarationRef, query.usedVariables)
-			}
 			case (container instanceof VariableDeclarationRef): {
 				val notExprContainer = container.notExressionContainer;
-//				switch (notExprContainer){
-//					case (notExprContainer instanceof AtOperator):{
-//						val atOperator=notExprContainer as AtOperator
-//						val List<VariableDeclaration> variableDeclarationList=newArrayList
-//						atOperator.tableNameWithAlias.forEach[tableNameWithAlias|{
-//							switch(tableNameWithAlias){
-//								case (tableNameWithAlias instanceof JustNameDecl):{
-//									val nameDecl=tableNameWithAlias as JustNameDecl
-//									val classDefinition=nameDecl.name
-//									variableDeclarationList.addAll(classDefinition.attributeListField.makeVariableDeclarationList)
-//								}
-//							}
-//						}]
-//						return Scopes::scopeFor(variableDeclarationList)
-				return super.getScope(variableDeclarationRef, ref)
-			}
-			case (container instanceof DotValue): {
-				val dotValue = container as DotValue;
-				var operatopnOrQuery = dotValue.operationOrQueryContainer
-//				if (dotValue.eContainer instanceof DotValue){
-//					return super.getScope(variableDeclarationRef, ref)
-//					
-//				}
-				switch (operatopnOrQuery) {
-					case (operatopnOrQuery instanceof Operation): {
-						return variableScopeForOperationOrQuery(variableDeclarationRef,
-							(operatopnOrQuery as Operation).usedVariables)
+				switch (notExprContainer) {
+					case (notExprContainer instanceof AtOperator): {
+						val atOperator = notExprContainer as AtOperator
+						val List<VariableDeclaration> variableDeclarationList = newArrayList
+						atOperator.tableNameWithAlias.forEach [ tableNameWithAlias |
+							{
+								switch (tableNameWithAlias) {
+									case (tableNameWithAlias instanceof JustNameDecl): {
+										val nameDecl = tableNameWithAlias as JustNameDecl
+										val classDefinition = nameDecl.name
+										variableDeclarationList.addAll(
+											classDefinition.attributeListField.makeVariableDeclarationList)
+									}
+								}
+							}
+						]
+						return Scopes::scopeFor(variableDeclarationList)
 					}
-					case (operatopnOrQuery instanceof Query): {
-						return variableScopeForOperationOrQuery(variableDeclarationRef,
-							(operatopnOrQuery as Query).usedVariables)
+					case (notExprContainer instanceof Update): {
+						val update = notExprContainer as Update
+						return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
 					}
+					case (notExprContainer instanceof Delete): {
+						val delete = notExprContainer as Delete
+						val List<VariableDeclaration> variableDeclarationList = delete.entity.attributeListField.
+							makeVariableDeclarationList
+						return Scopes::scopeFor(variableDeclarationList)
+					}
+					case (notExprContainer instanceof Create): {
+						val update = notExprContainer as Create
+						return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
+					}
+					case (notExprContainer instanceof CreateWhatPart): {
+						return notExprContainer.makeWhatPartScope
+
+					}
+					
+					
 				}
 			}
 		}
-		return IScope::NULLSCOPE;
+		return super.getScope(variableDeclarationRef, ref)
+		
 
 	}
 
-	def IScope variableScopeForOperationOrQuery(VariableDeclarationRef variableDeclarationRef,
-		List<VariableReferenceInfo> usedVariables) {
-						
-		return Scopes::scopeFor(usedVariables.map[x|x.variableDeclaration]);
-
-	}
-
-	def IScope makeWhatPartScope(EObject container) {
+	protected def IScope makeWhatPartScope(EObject container) {
 		var ClassDefinition en;
 		switch (container.eContainer) {
 			case container.eContainer instanceof Create: {
@@ -192,7 +175,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 	}
 
-	def List<VariableDeclaration> makeVariableDeclarationList(EList<AttributeListField> attrubuteListField) {
+	protected def List<VariableDeclaration> makeVariableDeclarationList(EList<AttributeListField> attrubuteListField) {
 		val List<VariableDeclaration> variableDeclarationList = newArrayList;
 		attrubuteListField.forEach [ x |
 			if (x.attributeList !== null) {
@@ -232,17 +215,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 	def notExressionContainer(EObject context) {
 		var privateContainer = context
-
 		while (privateContainer instanceof Expression) {
-			privateContainer = privateContainer.eContainer
-		}
-		return privateContainer;
-	}
-
-	def getOperationOrQueryContainer(EObject context) {
-		var privateContainer = context
-
-		while (!((privateContainer instanceof Operation) || (privateContainer instanceof Query))) {
 			privateContainer = privateContainer.eContainer
 		}
 		return privateContainer;

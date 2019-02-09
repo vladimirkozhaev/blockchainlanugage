@@ -847,7 +847,7 @@ class RellParsingTest {
 	}
 
 // check add, addAll set 
-	@Test
+	@Test	
 	def void testSetAdd() {
 		assertParsingTrue('''
 			query q1() { val x = set<integer>(); x.add(123); return ''+x; }
@@ -1213,7 +1213,7 @@ class RellParsingTest {
 				val x = list<integer>([123]); 
 				x[0] = 456;
 				val x = list<integer?>(); 
-				x.add(null);
+				//x.add(null);
 			}
 			
 		''')

@@ -131,7 +131,7 @@ TableNameWithAlias:
 VariableDeclarationRef:
 	decl=[VariableDeclaration|ValuableID];// (accesToList=AccessToList?)  ('.' (part+=[VariableDeclaration|ValuableID]|call=MethodCall))*;
 
-DotValue:decl=VariableDeclarationRef ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
+//DotValue:decl=VariableDeclarationRef ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
 
 
 MethodCall:name=MethodName arguments=ArgumentsInBrackets;
@@ -195,7 +195,7 @@ Atomic returns Expression:
 	| {NewSCreation} value=NewSetCreation
 	| {NewMCreation} value=NewMapCreation
 	| {TheNull} value=NULL
-	|{DotValueRef} value=DotValue;
+	|{VariableDeclarationRef} value=VariableDeclarationRef;
 
 
 MapCreationPart:exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
