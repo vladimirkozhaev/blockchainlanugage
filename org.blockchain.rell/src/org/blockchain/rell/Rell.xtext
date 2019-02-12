@@ -3,18 +3,15 @@ grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
 generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
-	entities+=(ClassDefinition | Record)*
+	entities+=ClassDefinition*
 	operations+=(Operation | Query)*;
 
 ClassDefinition:
-	'class' name=ID ('extends' superType=[ClassDefinition])? '{'
+	('class'|'record') name=ID ('extends' superType=[ClassDefinition])? '{'
 	attributeListField+=AttributeListField*
 	'}';
 
-Record:
-	'record' name=ID ('extends' superType=[ClassDefinition])? '{'
-	attributeListField+=AttributeListField*
-	'}';
+
 
 AttributeListField:
 	mutable=Mutable? key=Key? index=Index? attributeList+=RelAttrubutesList ';';
@@ -31,13 +28,11 @@ Query:
 	'return' returnExr=Expression ';'
 	'}'));
 
-
 Statement:
-	(relation=Relational | variable=OperationVariable|varInitiation=VarInitiation) ';';
+	(relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
 
 VarInitiation:
-	VariableDeclarationRef ('=' expression=Expression)?
-;
+	VariableDeclarationRef ('=' expression=Expression)?;
 
 OperationVariable:
 	assessModificator=(Var | Val) variable=Variable;
@@ -50,21 +45,18 @@ Relational:
 
 Update:
 	'update' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}' '('
-	createWhatPart+=CreateWhatPart (','		
+	createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*
 	')';
 
 Delete:
 	'delete' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}';
 
-
 Create:
 	'create' (entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*)? ')';
 
-CreateRecord:
-	(entity=[Record]) '(' (createWhatPart+=CreateWhatPartNoVariable (','
-	createWhatPart+=CreateWhatPartNoVariable)*)? ')';
+
 
 CreateWhatPart:
 	(varDeclRef=VariableDeclarationRef '=')?
@@ -87,33 +79,27 @@ ListCreation:
 	'[' arguments=Arguments ']' ('.' LIST_METHOD listMethodArguments+=ArgumentsInBrackets)*;
 
 MapCreation:
-	'[' mapPart+=MapCreationPart (',' mapPart+=MapCreationPart)* ']' ('.' MAP_METHOD listMethodArguments+=ArgumentsInBrackets)*
-;
+	'[' mapPart+=MapCreationPart (',' mapPart+=MapCreationPart)* ']' ('.' MAP_METHOD
+	listMethodArguments+=ArgumentsInBrackets)*;
 
 NewListCreation:
-	List {NewListCreation} (specification=ListSpecification?) 
-	'(' 
-		(
-			(
-				listCreation=ListCreation|
-				newListCreation=NewListCreation|
-				newSetCreation=NewSetCreation
-			)?
-		) 
-		')' ('.' LIST_METHOD arguments+=ArgumentsInBrackets)*;
+	List {NewListCreation} (specification=ListSpecification?)
+	'('
+	((listCreation=ListCreation |
+	newListCreation=NewListCreation |
+	newSetCreation=NewSetCreation)?)
+	')' ('.' LIST_METHOD arguments+=ArgumentsInBrackets)*;
 
 NewMapCreation:
-	Map {NewMapCreation	}specification=MapSpecification? '(' (creation=ListCreation?) ')' ('.' MAP_METHOD arguments+=Arguments )*;
+	Map {NewMapCreation} specification=MapSpecification? '(' (creation=ListCreation?) ')' ('.' MAP_METHOD
+	arguments+=Arguments)*;
 
 NewSetCreation:
-	Set {NewSetCreation} (specification=ListSpecification?) 
-	'(' 
-		(
-			(listCreation=ListCreation|newListCreation=NewListCreation|newSetCreation=NewSetCreation)?
-		) 
-	')' 
-	('.' LIST_METHOD arguments+=ArgumentsInBrackets )*;
-
+	Set {NewSetCreation} (specification=ListSpecification?)
+	'('
+	((listCreation=ListCreation | newListCreation=NewListCreation | newSetCreation=NewSetCreation)?)
+	')'
+	('.' LIST_METHOD arguments+=ArgumentsInBrackets)*;
 
 TupleValueMember:
 	(name=ValuableID '=')? value=Expression;
@@ -129,25 +115,24 @@ TableNameWithAlias:
 	{JustNameDecl} name=[ClassDefinition];
 
 VariableDeclarationRef:
-	decl=[VariableDeclaration|ValuableID];// (accesToList=AccessToList?)  ('.' (part+=[VariableDeclaration|ValuableID]|call=MethodCall))*;
+	decl=[VariableDeclaration|ValuableID]; 
+DotValue:
+	decl=(VariableDeclarationRef | MethodCall) ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
 
-//DotValue:decl=VariableDeclarationRef ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
+MethodCall:
+	name=MethodName arguments=ArgumentsInBrackets;
 
+Arguments:
+	listPart+=Expression (',' listPart+=Expression)*;
 
-MethodCall:name=MethodName arguments=ArgumentsInBrackets;
-
-Arguments:listPart+=Expression (','  listPart+=Expression)*;
-
-ArgumentsInBrackets: '(' arguments=Arguments? ')';
+ArgumentsInBrackets:
+	'(' arguments=Arguments? ')';
 
 MethodName:
-	LIST_METHOD
-;
-	
+	LIST_METHOD;
 
 AccessToList:
 	'[' expr=Expression ']';
-
 
 Expression:
 	or=Or;
@@ -159,7 +144,7 @@ And returns Expression:
 	Equality ({And.left=current} "and" right=Equality)*;
 
 Equality returns Expression:
-	Comparison ({Equality.left=current} op=(EQUALS | NOT_EQUALS|EQUALSS|NOT_EQUALSS)
+	Comparison ({Equality.left=current} op=(EQUALS | NOT_EQUALS | EQUALSS | NOT_EQUALSS)
 	right=Comparison)*;
 
 Comparison returns Expression:
@@ -186,8 +171,7 @@ Atomic returns Expression:
 	{BoolConstant} value=('true' | 'false') |
 	{SelectOp} value=AtOperator |
 	{MemberDefinition} value=ClassMemberDefinition |
-	{CreateAtom} value=Create |
-	{CreateRecordAtom} value=CreateRecord
+	{CreateAtom} value=Create 
 	| {TupleRes} value=TupleValue
 	| {ListCreation} value=ListCreation
 	| {MapCreation} value=MapCreation
@@ -195,41 +179,42 @@ Atomic returns Expression:
 	| {NewSCreation} value=NewSetCreation
 	| {NewMCreation} value=NewMapCreation
 	| {TheNull} value=NULL
-	|{VariableDeclarationRef} value=VariableDeclarationRef;
+	| {DotValue} value=DotValue;
+	//| {VariableDeclarationRef} value=VariableDeclarationRef;
 
-
-MapCreationPart:exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
+MapCreationPart:
+	exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
 
 RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
 
 VariableDeclaration:
 	name=ValuableID ((DOUBLE_QUOTE type=TypeReference)?);
-	
+
 TupleVarDeclaration:
 	(name=ValuableID DOUBLE_QUOTE)? type=TypeReference;
 
 TypeReference:
-	primitive=PrimitiveType | entityType=ClassType | tuple=TupleType | list=ListType|set=SetType|map=MapType;
+	type=PrimitiveType | entityType=[ClassDefinition]| tuple=TupleType | list=ListType | set=SetType | map=MapType;
 
 ListType:
 	List ListSpecification;
+
 SetType:
 	Set ListSpecification;
 
 MapType:
 	Map MapSpecification;
+
 ListSpecification:
 	LESS listType=TypeReference (QuestionChar?) MORE;
-	
+
 MapSpecification:
 	LESS keySpec=TypeReference (QuestionChar?) ',' valSpec=TypeReference (QuestionChar?) MORE;
 
 TupleType:
 	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
 
-ClassType:
-	type=[ClassDefinition];
 
 PrimitiveType:
 	Text | Tuid | Pubkey | Name | Timestamp | Integer | Json | ByteArray | Boolean;
@@ -240,7 +225,8 @@ ValuableID:
 AmpersandModificator:
 	PlusChar | MulChar | QuestionChar;
 
-IntWithMinus:MinusChar? INT;
+IntWithMinus:
+	MinusChar? INT;
 
 Name:
 	'name';
@@ -251,7 +237,7 @@ Pubkey:
 Timestamp:
 	'timestamp';
 
- Tuid:
+Tuid:
 	'tuid';
 
 Boolean:
@@ -272,7 +258,8 @@ ByteArray:
 List:
 	'list';
 
-Map:'map';
+Map:
+	'map';
 
 Set:
 	'set';
@@ -309,22 +296,23 @@ MulChar:
 
 DivChar:
 	'/';
-	
+
 LIST_METHOD:
-	"add"|"addAll"|"contains"|"containsAll"|"removeAll"|"calculate"|"sub"|"size"|"str"|"remove"|"removeAt"|"clear"|"empty"
-	;
-	
-MAP_METHOD:"empty"|"size"|"contains"|"get"|"str"|"clear"|"put"|"putAll"|"remove"|"keys"|"values";	
-//terminal SET_METHOD:LIST_METHOD;
-	
+	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" | "str" | "remove" |
+	"removeAt" | "clear" | "empty";
+
+MAP_METHOD:
+	"empty" | "size" | "contains" | "get" | "str" | "clear" | "put" | "putAll" | "remove" | "keys" | "values";
+	//terminal SET_METHOD:LIST_METHOD;
 terminal EQUALS:
 	'==';
+
 terminal EQUALSS:
 	'===';
 
 terminal NOT_EQUALS:
 	'!=';
-	
+
 terminal NOT_EQUALSS:
 	'!==';
 
@@ -341,9 +329,7 @@ terminal LESS:
 	'<';
 
 terminal DOUBLE_QUOTE:
-	':'
-;
-
+	':';
 
 terminal NULL:
 	'null';

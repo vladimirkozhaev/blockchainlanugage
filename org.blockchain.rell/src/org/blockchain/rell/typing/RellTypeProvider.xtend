@@ -74,14 +74,14 @@ class RellTypeProvider {
 			RellTypeProvider.INT_TYPE
 	}
 
-	def dispatch RellType typeFor(TypeReference e) {
-		if (e.primitive != null) {
-			e.primitive.typeFor;
-		} else {
-			null;
-		}
-
-	}
+//	def dispatch RellType typeFor(TypeReference e) {
+//		if (e.primitive != null) {
+//			e.primitive.typeFor;
+//		} else {
+//			null;
+//		}
+//
+//	}
 
 	def typeFor(String primitiveType) {
 		switch (primitiveType) {

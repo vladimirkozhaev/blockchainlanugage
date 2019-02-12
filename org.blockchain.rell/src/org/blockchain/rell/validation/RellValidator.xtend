@@ -4,20 +4,15 @@
 package org.blockchain.rell.validation
 
 import com.google.inject.Inject
-import java.util.ArrayList
-import java.util.List
 import org.blockchain.rell.rell.ClassDefinition
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.Model
-import org.blockchain.rell.rell.Operation
 import org.blockchain.rell.rell.RellPackage
 import org.blockchain.rell.typing.RellModelUtil
 import org.blockchain.rell.typing.RellType
 import org.blockchain.rell.typing.RellTypeProvider
-import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.validation.Check
-import org.blockchain.rell.rell.Record
 
 /**
  * Custom validation rules. 
@@ -177,26 +172,24 @@ class RellValidator extends AbstractRellValidator {
 //		}
 //	}
 	
-	@Check def checkUniqueClassName(Model model) {
-		val classNames = <String>newHashSet()
-		for(classDefinition : model.entities) {
-			val name=switch(classDefinition){
-				
-				case (classDefinition instanceof ClassDefinition):{
-					(classDefinition as ClassDefinition).name;
-				}
-				case (classDefinition instanceof Record):{
-					(classDefinition as Record).name;
-				}
-			}
-			if(classNames.contains(name)) {
-				error("Class names should be unique. Class with name " + name + " already exists",
-					RellPackage.Literals.CLASS_DEFINITION.getEIDAttribute(), NOT_UNIQUE_NANE)
-			}
-			classNames.add(name);
-		}
-		
-	}
+//	@Check def checkUniqueClassName(Model model) {
+//		val classNames = <String>newHashSet()
+//		for(classDefinition : model.entities) {
+//			val name=switch(classDefinition){
+//				
+//				case (classDefinition instanceof ClassDefinition):{
+//					(classDefinition as ClassDefinition).name;
+//				}
+//				
+//			}
+//			if(classNames.contains(name)) {
+//				error("Class names should be unique. Class with name " + name + " already exists",
+//					RellPackage.Literals.CLASS_DEFINITION.getEIDAttribute(), NOT_UNIQUE_NANE)
+//			}
+//			classNames.add(name);
+//		}
+//		
+//	}
 	
 
 //	@Check def checkUniqueVariableName(Operation operation) {

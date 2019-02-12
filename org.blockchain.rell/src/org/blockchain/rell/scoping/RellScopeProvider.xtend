@@ -25,6 +25,7 @@ import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
+import org.blockchain.rell.rell.DotValue
 
 /**
  * This class contains custom scoping description.
@@ -70,52 +71,61 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				val scope = makeWhatPartScope(container)
 				return scope
 			}
+			case (container instanceof DotValue): {
+				val DotValue dotValue = container as DotValue;
+				return variableDeclarationRefScope(variableDeclarationRef,ref,dotValue.eContainer.notExressionContainer);
+			}
 			case (container instanceof VariableDeclarationRef): {
 				val notExprContainer = container.notExressionContainer;
-				switch (notExprContainer) {
-					case (notExprContainer instanceof AtOperator): {
-						val atOperator = notExprContainer as AtOperator
-						val List<VariableDeclaration> variableDeclarationList = newArrayList
-						atOperator.tableNameWithAlias.forEach [ tableNameWithAlias |
-							{
-								switch (tableNameWithAlias) {
-									case (tableNameWithAlias instanceof JustNameDecl): {
-										val nameDecl = tableNameWithAlias as JustNameDecl
-										val classDefinition = nameDecl.name
-										variableDeclarationList.addAll(
-											classDefinition.attributeListField.makeVariableDeclarationList)
-									}
-								}
-							}
-						]
-						return Scopes::scopeFor(variableDeclarationList)
-					}
-					case (notExprContainer instanceof Update): {
-						val update = notExprContainer as Update
-						return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
-					}
-					case (notExprContainer instanceof Delete): {
-						val delete = notExprContainer as Delete
-						val List<VariableDeclaration> variableDeclarationList = delete.entity.attributeListField.
-							makeVariableDeclarationList
-						return Scopes::scopeFor(variableDeclarationList)
-					}
-					case (notExprContainer instanceof Create): {
-						val update = notExprContainer as Create
-						return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
-					}
-					case (notExprContainer instanceof CreateWhatPart): {
-						return notExprContainer.makeWhatPartScope
-
-					}
-					
-					
-				}
+				return variableDeclarationRefScope(variableDeclarationRef,ref,notExprContainer)
 			}
 		}
 		return super.getScope(variableDeclarationRef, ref)
-		
 
+	}
+
+	protected def IScope variableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef,EReference ref,EObject notExprContainer) {
+		switch (notExprContainer) {
+			case (notExprContainer instanceof AtOperator): {
+				val atOperator = notExprContainer as AtOperator
+				val List<VariableDeclaration> variableDeclarationList = newArrayList
+				atOperator.tableNameWithAlias.forEach [ tableNameWithAlias |
+					{
+						switch (tableNameWithAlias) {
+							case (tableNameWithAlias instanceof JustNameDecl): {
+								val nameDecl = tableNameWithAlias as JustNameDecl
+								val classDefinition = nameDecl.name
+								variableDeclarationList.addAll(
+									classDefinition.attributeListField.makeVariableDeclarationList)
+							}
+						}
+					}
+				]
+				return Scopes::scopeFor(variableDeclarationList)
+			}
+			case (notExprContainer instanceof Update): {
+				val update = notExprContainer as Update
+				return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
+			}
+			case (notExprContainer instanceof Delete): {
+				val delete = notExprContainer as Delete
+				val List<VariableDeclaration> variableDeclarationList = delete.entity.attributeListField.
+					makeVariableDeclarationList
+				return Scopes::scopeFor(variableDeclarationList)
+			}
+			case (notExprContainer instanceof Create): {
+				val update = notExprContainer as Create
+				return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
+			}
+			case (notExprContainer instanceof CreateWhatPart): {
+				return notExprContainer.makeWhatPartScope
+
+			}default:{
+				val scope=super.getScope(variableDeclarationRef,ref)
+				//println("scope"+scope.allElements)
+				return scope;
+			}
+		}
 	}
 
 	protected def IScope makeWhatPartScope(EObject container) {
