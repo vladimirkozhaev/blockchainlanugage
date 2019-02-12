@@ -29,3 +29,6 @@ Export-Package: org.blockchain.rell,
  org.blockchain.rell.typing,
  org.blockchain.rell.validation
 Import-Package: org.apache.log4j
+Bundle-ClassPath: .,
+ rellr-1.0-SNAPSHOT-jar-with-dependencies.jar,
+ postchain-base-2.4.0-SNAPSHOT-jar-with-dependencies.jar

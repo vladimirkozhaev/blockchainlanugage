@@ -13,3 +13,4 @@ Require-Bundle: org.blockchain.rell,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.blockchain.rell.ide.contentassist.antlr.internal,
  org.blockchain.rell.ide.contentassist.antlr
+
