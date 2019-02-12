@@ -928,11 +928,22 @@ class RellParsingTest {
 		assertParsingTrue('''
 			record foo1 { x: list<set<(a: text, b: integer)>>; }
 			record foo2 { x: list<set<(q: text, integer)>>; }
-			record foo3 { x: text; b: bar; } record bar { p: integer; q: integer; }
+			record bar { p: integer; q: integer; }
+			record foo3 { x: text; b: bar; } 
 			record foo4 { x: integer; }
 			query q1() { var s = set([foo3('ABC', bar(p=123,q=456))]); return s; }
 			query q2() { var s = set([foo3('ABC', bar(p=123,q=456))]); return s.contains(foo3('ABC',bar(p=123,q=456))); } 
 			query q3() { var s = set([foo4(123)]); return s; }
+		''')
+	}
+	
+	@Test
+	def void testTheRecordType() {
+		assertParsingTrue('''
+			
+			record bar { p: integer; q: integer; }
+			query q1() { var s:bar; return s; }
+			
 		''')
 	}
 
@@ -1291,7 +1302,10 @@ class RellParsingTest {
 
 	def void assertParsingTrue(String codeSnippet) {
 		val result = parseHelper.parse(codeSnippet)
-		Assert.assertNotNull(result)
+		val errors = result.eResource.errors
+		
+		Assert.assertTrue( '''Unexpected errors: «errors.join(", ")»''',errors.empty)
+		
 		result.assertNoErrors
 	}
 
