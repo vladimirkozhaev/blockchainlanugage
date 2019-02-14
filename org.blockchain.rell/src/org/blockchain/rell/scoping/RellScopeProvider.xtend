@@ -11,8 +11,10 @@ import org.blockchain.rell.rell.ClassMemberDefinition
 import org.blockchain.rell.rell.ClassRef
 import org.blockchain.rell.rell.ClassRefDecl
 import org.blockchain.rell.rell.Create
+import org.blockchain.rell.rell.CreateClassPart
 import org.blockchain.rell.rell.CreateWhatPart
 import org.blockchain.rell.rell.Delete
+import org.blockchain.rell.rell.DotValue
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.JustNameDecl
 import org.blockchain.rell.rell.TableNameWithAlias
@@ -25,7 +27,6 @@ import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
-import org.blockchain.rell.rell.DotValue
 
 /**
  * This class contains custom scoping description.
@@ -136,6 +137,9 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			}
 			case container.eContainer instanceof Update: {
 				en = (container.eContainer as Update).entity
+			}
+			case container.eContainer instanceof CreateClassPart:{
+				en=(container.eContainer as CreateClassPart).entity
 			}
 		}
 

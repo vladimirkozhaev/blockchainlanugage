@@ -7,11 +7,9 @@ Model:
 	operations+=(Operation | Query)*;
 
 ClassDefinition:
-	('class'|'record') name=ID ('extends' superType=[ClassDefinition])? '{'
+	('class' | 'record') name=ID ('extends' superType=[ClassDefinition])? '{'
 	attributeListField+=AttributeListField*
 	'}';
-
-
 
 AttributeListField:
 	mutable=Mutable? key=Key? index=Index? attributeList+=RelAttrubutesList ';';
@@ -56,21 +54,21 @@ Create:
 	'create' (entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*)? ')';
 
-
+	//There are problem with record part. So will check it in the validatiie
+CreateClassPart:
+	(entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart (','
+	createWhatPart+=CreateWhatPart)*)? ')';
 
 CreateWhatPart:
 	(varDeclRef=VariableDeclarationRef '=')?
 	condition+=Expression;
 
-CreateWhatPartNoVariable:
-	(varDeclRef=ID '=')?
-	condition+=Expression;
-
 AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand (ampersandModificator=AmpersandModificator?) '{'
-	(conditions+=Expression (',' conditions+=Expression)*)? '}' ((tupleValue=TupleValue?) | ('.'
-	variableDeclarationRef=VariableDeclarationRef));
+	(conditions+=Expression (',' conditions+=Expression)*)? '}'
+	(tupleValue=TupleValue | ('(' '.' dotExpr+=DotValue (',' '.'
+	dotExpr+=DotValue ')')*))?;
 
 TupleValue:
 	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
@@ -115,9 +113,7 @@ TableNameWithAlias:
 	{JustNameDecl} name=[ClassDefinition];
 
 VariableDeclarationRef:
-	decl=[VariableDeclaration|ValuableID]; 
-DotValue:
-	decl=(VariableDeclarationRef | MethodCall) ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
+	decl=[VariableDeclaration|ValuableID];
 
 MethodCall:
 	name=MethodName arguments=ArgumentsInBrackets;
@@ -171,7 +167,7 @@ Atomic returns Expression:
 	{BoolConstant} value=('true' | 'false') |
 	{SelectOp} value=AtOperator |
 	{MemberDefinition} value=ClassMemberDefinition |
-	{CreateAtom} value=Create 
+	{CreateAtom} value=Create
 	| {TupleRes} value=TupleValue
 	| {ListCreation} value=ListCreation
 	| {MapCreation} value=MapCreation
@@ -179,8 +175,12 @@ Atomic returns Expression:
 	| {NewSCreation} value=NewSetCreation
 	| {NewMCreation} value=NewMapCreation
 	| {TheNull} value=NULL
+	| {CreateClassPart} value=CreateClassPart
 	| {DotValue} value=DotValue;
-	//| {VariableDeclarationRef} value=VariableDeclarationRef;
+
+DotValue returns Expression:
+	decl=(VariableDeclarationRef | MethodCall | Create | TupleValue | ListCreation | MapCreation | NewListCreation |
+	TupleValue | ListCreation | MapCreation) ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
 
 MapCreationPart:
 	exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
@@ -195,7 +195,7 @@ TupleVarDeclaration:
 	(name=ValuableID DOUBLE_QUOTE)? type=TypeReference;
 
 TypeReference:
-	type=PrimitiveType | entityType=[ClassDefinition]| tuple=TupleType | list=ListType | set=SetType | map=MapType;
+	type=PrimitiveType | entityType=[ClassDefinition] | tuple=TupleType | list=ListType | set=SetType | map=MapType;
 
 ListType:
 	List ListSpecification;
@@ -207,14 +207,13 @@ MapType:
 	Map MapSpecification;
 
 ListSpecification:
-	LESS listType=TypeReference (QuestionChar?) MORE;
+	LESS listType=TypeReference (QuestionChar?) MORE (QuestionChar?);
 
 MapSpecification:
 	LESS keySpec=TypeReference (QuestionChar?) ',' valSpec=TypeReference (QuestionChar?) MORE;
 
 TupleType:
 	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
-
 
 PrimitiveType:
 	Text | Tuid | Pubkey | Name | Timestamp | Integer | Json | ByteArray | Boolean;
@@ -299,7 +298,7 @@ DivChar:
 
 LIST_METHOD:
 	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" | "str" | "remove" |
-	"removeAt" | "clear" | "empty";
+	"removeAt" | "clear" | "empty" | "requireNotEmpty";
 
 MAP_METHOD:
 	"empty" | "size" | "contains" | "get" | "str" | "clear" | "put" | "putAll" | "remove" | "keys" | "values";
