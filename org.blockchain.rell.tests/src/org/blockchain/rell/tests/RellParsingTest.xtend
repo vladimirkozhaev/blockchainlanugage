@@ -125,6 +125,28 @@ class RellParsingTest {
 			}
 		''')
 	}
+	
+	// Check tuple of three values from at expression
+	@Test
+	def void testOneChainTuple() {
+		assertParsingTrue('''
+			class company { name;  type : integer;}
+			operation op() {
+			    val u = company @ { .name == 'Bob' } ( .name, .type );
+			}
+		''')
+	}
+	
+	// Check tuple of three values from at expression
+	@Test
+	def void testAtOperator() {
+		assertParsingTrue('''
+			class company { name;  type : integer;}
+			operation op() {
+			    val u = company @ { .name == 'Bob' };
+			}
+		''')
+	}
 
 // Check record declaration 
 	@Test
@@ -1220,7 +1242,7 @@ class RellParsingTest {
 		assertParsingTrue('''
 			operation o(){
 				val t:integer;
-				t[0]=1;
+				t=1;
 				val x = list<integer>([123]); 
 				x[0] = 456;
 				val x = list<integer?>(); 
@@ -1379,6 +1401,9 @@ class RellParsingTest {
 
 	def void assertParsingTrue(String codeSnippet) {
 		val result = parseHelper.parse(codeSnippet)
+		Assert.assertNotNull(result);
+		Assert.assertNotNull(result.eResource)
+		Assert.assertNotNull(result.eResource.errors)
 		val errors = result.eResource.errors
 		
 		Assert.assertTrue( '''Unexpected errors: «errors.join(", ")»''',errors.empty)

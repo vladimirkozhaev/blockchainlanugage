@@ -217,7 +217,7 @@ class RellModelUtil {
 			
 
 				variables.add(
-					new VariableReferenceInfo((expression as VariableDeclarationRef).decl, false, false, true))
+					new VariableReferenceInfo((expression as VariableDeclarationRef).name, false, false, true))
 			}
 			default:
 				variables = new ArrayList<VariableReferenceInfo>()
@@ -226,7 +226,7 @@ class RellModelUtil {
 	}
 
 	def List<VariableReferenceInfo> usedVariables(VariableDeclarationRef variableDeclRef) {
-		return Arrays.asList(new VariableReferenceInfo(variableDeclRef.decl, false, false, true))
+		return Arrays.asList(new VariableReferenceInfo(variableDeclRef.name, false, false, true))
 	}
 
 //	def List<VariableReferenceInfo> usedVariables(DotValue dotValue) {
