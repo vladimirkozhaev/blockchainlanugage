@@ -30,7 +30,7 @@ Statement:
 	(relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
 
 VarInitiation:
-	VariableDeclarationRef ('=' expression=Expression)?;
+	name=VariableDeclarationRef (('[' expr=Expression']')?) ('=' expression=Expression)?;
 
 OperationVariable:
 	assessModificator=(Var | Val) variable=Variable;
@@ -67,7 +67,7 @@ AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand (ampersandModificator=AmpersandModificator?) '{'
 	(conditions+=Expression (',' conditions+=Expression)*)? '}'
-	(tupleValue=TupleValue | ('(' '.' dotExpr+=DotValue (',' '.'
+	(tupleValue=TupleValue | ('(' dotExpr+=DotValue (',' 
 	dotExpr+=DotValue ')')*))?;
 
 TupleValue:
@@ -113,7 +113,7 @@ TableNameWithAlias:
 	{JustNameDecl} name=[ClassDefinition];
 
 VariableDeclarationRef:
-	decl=[VariableDeclaration|ValuableID];
+	name=[VariableDeclaration|ValuableID];
 
 MethodCall:
 	name=MethodName arguments=ArgumentsInBrackets;
@@ -178,9 +178,9 @@ Atomic returns Expression:
 	| {CreateClassPart} value=CreateClassPart
 	| {DotValue} value=DotValue;
 
-DotValue returns Expression:
-	decl=(VariableDeclarationRef | MethodCall | Create | TupleValue | ListCreation | MapCreation | NewListCreation |
-	TupleValue | ListCreation | MapCreation) ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
+DotValue:
+	decl=(ClassMemberDefinition|VariableDeclarationRef | MethodCall | Create | TupleValue | ListCreation | MapCreation | NewListCreation |
+	 ListCreation | MapCreation) ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
 
 MapCreationPart:
 	exprKey=Expression DOUBLE_QUOTE exprValue=Expression;

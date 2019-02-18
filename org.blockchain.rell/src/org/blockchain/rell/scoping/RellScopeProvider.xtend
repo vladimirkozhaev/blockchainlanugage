@@ -67,27 +67,16 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	protected def IScope variableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef,EObject notExprContainer, EReference ref) {
 		switch (notExprContainer) {
 			case (notExprContainer instanceof AtOperator): {
-				val atOperator = notExprContainer as AtOperator
-				val List<VariableDeclaration> variableDeclarationList = 
-				atOperator.tableNameWithAlias.flatMap[ tableNameWithAlias |
-					{
-						switch (tableNameWithAlias) {
-							case (tableNameWithAlias instanceof JustNameDecl): {
-								val nameDecl = tableNameWithAlias as JustNameDecl
-								val classDefinition = nameDecl.name
-								return classDefinition.attributeListField.makeVariableDeclarationList
-							}
-							case (tableNameWithAlias instanceof ClassRefDecl):{
-								val nameDecl=tableNameWithAlias as ClassRefDecl
-								val classDef=nameDecl.classDef
-								return classDef.attributeListField.makeVariableDeclarationList
-							}
-						}
-					}
-				].toList
 
-				return Scopes::scopeFor(variableDeclarationList)
+				return (notExprContainer as AtOperator).getVariableDeclarationRefScope
+			}case (notExprContainer instanceof ClassMemberDefinition):{
+				val notNotExprContainer=(notExprContainer as ClassMemberDefinition).eContainer.notExressionContainer;
+				if (notNotExprContainer instanceof AtOperator){
+					return (notNotExprContainer as AtOperator).variableDeclarationRefScope
+				}
+				return super.getScope(variableDeclarationRef, ref) 
 			}
+				
 			case (notExprContainer instanceof Update): {
 				val update = notExprContainer as Update
 				return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
@@ -162,6 +151,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 //								variableDeclarationList.addAll(
 //									classDefinition.attributeListField.makeVariableDeclarationList)
 //							}
+
 //							case (tableNameWithAlias instanceof )
 //						}
 //					}
@@ -228,13 +218,16 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		return super.getScope(processedObject, ref);
 	}
 
+	/**
+	 * Get variable declaration list for the Table Declarations names
+	 */
 	def getClassMemberDefScope(AtOperator atOperator) {
 		val List<TableNameWithAlias> classDefList = newArrayList
 		atOperator.tableNameWithAlias.forEach[x|classDefList.add(x)]
 		return Scopes::scopeFor(classDefList);
 	}
 	/**
-	 * Return the variable declaration 
+	 * Return the variable declaration names scope for AtOperator
 	 */
 	def getVariableDeclarationRefScope(AtOperator atOperator) {
 		val List<VariableDeclaration> classDefList = atOperator.tableNameWithAlias.flatMap[x|x.getVarDeclList].toList
