@@ -27,6 +27,8 @@ import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
+import org.blockchain.rell.rell.TupleValueMember
+import org.blockchain.rell.rell.TupleValue
 
 /**
  * This class contains custom scoping description.
@@ -42,7 +44,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 		switch (container) {
 			case (container instanceof ClassMemberDefinition): {
-				return variableDeclarationRefScope(variableDeclarationRef,container,ref)
+				return variableDeclarationRefScope(variableDeclarationRef, container, ref)
 			}
 			case (container instanceof CreateWhatPart): {
 				val scope = makeWhatPartScope(container)
@@ -58,25 +60,34 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 				}
 			}
-			
 		}
 		return super.getScope(variableDeclarationRef, ref)
 
 	}
 
-	protected def IScope variableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef,EObject notExprContainer, EReference ref) {
+	protected def IScope variableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef,
+		EObject notExprContainer, EReference ref) {
 		switch (notExprContainer) {
 			case (notExprContainer instanceof AtOperator): {
 
 				return (notExprContainer as AtOperator).getVariableDeclarationRefScope
-			}case (notExprContainer instanceof ClassMemberDefinition):{
-				val notNotExprContainer=(notExprContainer as ClassMemberDefinition).eContainer.notExressionContainer;
-				if (notNotExprContainer instanceof AtOperator){
-					return (notNotExprContainer as AtOperator).variableDeclarationRefScope
-				}
-				return super.getScope(variableDeclarationRef, ref) 
 			}
-				
+			case (notExprContainer instanceof ClassMemberDefinition): {
+				val notNotExprContainer = (notExprContainer as ClassMemberDefinition).eContainer.notExressionContainer;
+				switch (notNotExprContainer) {
+					case (notNotExprContainer instanceof AtOperator): {
+						return (notNotExprContainer as AtOperator).variableDeclarationRefScope
+					}
+					case (notNotExprContainer instanceof TupleValueMember): {
+						val tupleValue = notNotExprContainer.eContainer as TupleValue
+						val nExprContainer = tupleValue.eContainer.notExressionContainer
+						if (nExprContainer instanceof AtOperator) {
+							return (nExprContainer as AtOperator).variableDeclarationRefScope
+						}
+					}
+				}
+
+			}
 			case (notExprContainer instanceof Update): {
 				val update = notExprContainer as Update
 				return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
@@ -95,12 +106,21 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				return notExprContainer.makeWhatPartScope
 
 			}
+			case (notExprContainer instanceof TupleValueMember): {
+				val tupleValue = notExprContainer.eContainer as TupleValue
+				val notNotExprContainer = tupleValue.eContainer.notExressionContainer
+				if (notNotExprContainer instanceof AtOperator) {
+					return (notNotExprContainer as AtOperator).variableDeclarationRefScope
+				}
+			}
 			default: {
 				val scope = super.getScope(variableDeclarationRef, ref)
 				// println("scope"+scope.allElements)
 				return scope;
 			}
 		}
+		val scope = super.getScope(variableDeclarationRef, ref)
+		return scope;
 	}
 
 	protected def IScope makeWhatPartScope(EObject container) {
@@ -151,7 +171,6 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 //								variableDeclarationList.addAll(
 //									classDefinition.attributeListField.makeVariableDeclarationList)
 //							}
-
 //							case (tableNameWithAlias instanceof )
 //						}
 //					}
@@ -173,7 +192,6 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 //		}
 //
 //	}
-
 	protected def List<VariableDeclaration> makeVariableDeclarationList(EList<AttributeListField> attrubuteListField) {
 		val List<VariableDeclaration> variableDeclarationList = newArrayList;
 		attrubuteListField.forEach [ x |
@@ -205,8 +223,8 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 	}
 
-	def IScope getClassMemberDefinition(ClassMemberDefinition classMemberDefinition,
-		EObject processedObject, EReference ref) {
+	def IScope getClassMemberDefinition(ClassMemberDefinition classMemberDefinition, EObject processedObject,
+		EReference ref) {
 		val notExprCont = classMemberDefinition.eContainer.notExressionContainer
 
 		switch (notExprCont) {
@@ -226,19 +244,19 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		atOperator.tableNameWithAlias.forEach[x|classDefList.add(x)]
 		return Scopes::scopeFor(classDefList);
 	}
+
 	/**
 	 * Return the variable declaration names scope for AtOperator
 	 */
 	def getVariableDeclarationRefScope(AtOperator atOperator) {
 		val List<VariableDeclaration> classDefList = atOperator.tableNameWithAlias.flatMap[x|x.getVarDeclList].toList
-		
+
 		return Scopes::scopeFor(classDefList);
 	}
 
 	def getVarDeclList(TableNameWithAlias tableNameWithAlias) {
 
-		var EList<AttributeListField> attrubuteListField=
-		switch (tableNameWithAlias) {
+		var EList<AttributeListField> attrubuteListField = switch (tableNameWithAlias) {
 			case (tableNameWithAlias instanceof ClassRefDecl): {
 				val classRefDecl = tableNameWithAlias as ClassRefDecl
 				classRefDecl.classDef.attributeListField;
@@ -248,7 +266,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				justNameDecl.name.attributeListField;
 			}
 		}
-		if (attrubuteListField===null){
+		if (attrubuteListField === null) {
 			return newArrayList
 		}
 		return makeVariableDeclarationList(attrubuteListField);

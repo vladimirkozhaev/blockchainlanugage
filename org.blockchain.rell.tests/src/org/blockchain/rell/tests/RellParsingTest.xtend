@@ -139,6 +139,18 @@ class RellParsingTest {
 	
 	// Check tuple of three values from at expression
 	@Test
+	def void testOneChainTupleWithoutCondition() {
+		assertParsingTrue('''
+			class company { name;  type : integer;}
+			operation op() {
+			    val u = company @ {} ( .name, .type );
+			}
+		''')
+	}
+	
+
+	// Check tuple of three values from at expression
+	@Test
 	def void testAtOperator() {
 		assertParsingTrue('''
 			class company { name;  type : integer;}
