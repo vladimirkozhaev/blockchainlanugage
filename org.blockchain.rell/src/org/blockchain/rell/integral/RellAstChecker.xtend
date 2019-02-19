@@ -109,11 +109,21 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 			} else {
 				throw new RuntimeException("Unsupported operation type");
 			}
+		} else if(currentStatement.variable != null) {
+			val variable = currentStatement.variable.variable;
+			if(currentStatement.variable.assessModificator == "val") {
+				currentsStatement = new S_ValStatement((new S_Name(new S_Pos(1,1), variable.name.name)), new S_NameType(new S_Name(new S_Pos(1,1), variable.name.type.type)), convertToS_Expr(variable.expression))
+			} else if(currentStatement.variable.assessModificator == "var") {
+				currentsStatement = new S_VarStatement((new S_Name(new S_Pos(1,1), variable.name.name)), new S_NameType(new S_Name(new S_Pos(1,1), variable.name.type.type)), convertToS_Expr(variable.expression))
+			} else {
+				throw new RuntimeException("Unknown assessModificator");
+			}
+		} else if(currentStatement.varInitiation != null) {
+			//todo
 		}
-		val x=  new S_OpDefinition(getName(operation, operation.name),
+		new S_OpDefinition(getName(operation, operation.name),
 			sNmmeTypePairs, currentsStatement
 		)
-		x
 	}
 	
 	private def S_Expr convertToS_Expr(Expression e) {
