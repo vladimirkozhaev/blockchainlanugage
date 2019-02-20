@@ -29,6 +29,9 @@ import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
 import org.blockchain.rell.rell.TupleValueMember
 import org.blockchain.rell.rell.TupleValue
+import javax.inject.Inject
+import org.blockchain.rell.typing.RellTypeProvider
+import org.blockchain.rell.typing.RellClassType
 
 /**
  * This class contains custom scoping description.
@@ -37,6 +40,8 @@ import org.blockchain.rell.rell.TupleValue
  * on how and when to use it.
  */
 class RellScopeProvider extends AbstractDeclarativeScopeProvider {
+	
+	@Inject extension RellTypeProvider
 
 	def IScope getVariableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef, EReference ref) {
 
@@ -51,8 +56,30 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				return scope
 			}
 			case (container instanceof DotValue): {
+				
+				
 				val DotValue dotValue = container as DotValue;
+				
+				
 				if (dotValue.eContainer instanceof DotValue) {
+					val parentDotValue= dotValue.eContainer as DotValue;
+					val parentValue=parentDotValue.decl;
+					
+					println("parentValue:"+parentValue)
+					switch(parentValue){
+						case (parentValue instanceof ClassMemberDefinition):{
+							val classMemberDefinition=parentValue as ClassMemberDefinition;
+							if (classMemberDefinition.variableDeclarationRef!==null){
+								val parentClassMemberDef=classMemberDefinition.variableDeclarationRef;
+								val typeFor=parentClassMemberDef.typeFor
+								if (typeFor instanceof RellClassType){
+									val variableDeclarationList=(typeFor as RellClassType).rellClassDefinition.attributeListField.makeVariableDeclarationList
+									return Scopes::scopeFor(variableDeclarationList)
+								}
+							}
+							println(classMemberDefinition.dotValue)
+						}
+					}
 					return variableDeclarationRefScope(variableDeclarationRef,
 						dotValue.eContainer.notExressionContainer, ref);
 				} else {
@@ -64,6 +91,8 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		return super.getScope(variableDeclarationRef, ref)
 
 	}
+
+	
 
 	protected def IScope variableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef,
 		EObject notExprContainer, EReference ref) {

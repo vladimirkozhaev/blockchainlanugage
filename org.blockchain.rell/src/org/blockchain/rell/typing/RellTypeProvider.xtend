@@ -15,6 +15,7 @@ import org.blockchain.rell.rell.StringConstant
 import org.blockchain.rell.rell.TypeReference
 import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableDeclaration
+import org.blockchain.rell.rell.VariableDeclarationRef
 
 class RellTypeProvider {
 
@@ -27,8 +28,8 @@ class RellTypeProvider {
 	def dispatch RellType typeFor(Expression e) {
 		switch (e) {
 			StringConstant: RellTypeProvider.STRING_TYPE
-			IntConstant: RellTypeProvider.INT_TYPE
 			BoolConstant: RellTypeProvider.BOOL_TYPE
+			IntConstant: RellTypeProvider.INT_TYPE
 			Not: RellTypeProvider.BOOL_TYPE
 			MulOrDiv: RellTypeProvider.INT_TYPE
 			Minus: RellTypeProvider.INT_TYPE
@@ -36,10 +37,10 @@ class RellTypeProvider {
 			Equality: RellTypeProvider.BOOL_TYPE
 			And: RellTypeProvider.BOOL_TYPE
 			Or: RellTypeProvider.BOOL_TYPE
-//			VariableRef:{
-//				val VariableRef varRef=e as VariableRef
-//				varRef.value.typeFor
-//			}
+			VariableDeclarationRef:{
+				val VariableDeclarationRef varRef=e as VariableDeclarationRef
+				return varRef.typeFor;
+			}
 			default: e.or.typeFor
 		}
 	}
@@ -73,6 +74,17 @@ class RellTypeProvider {
 		else
 			RellTypeProvider.INT_TYPE
 	}
+	
+	def dispatch RellType typeForTypeRef(TypeReference typeReference){
+		switch (typeReference){
+			case (typeReference.type!==null ):{
+				return typeReference.type.typeForString
+				
+			}case (typeReference.entityType!==null):{
+				return new RellClassType(typeReference.entityType)
+			}
+		}
+	}
 
 //	def dispatch RellType typeFor(TypeReference e) {
 //		if (e.primitive != null) {
@@ -83,7 +95,7 @@ class RellTypeProvider {
 //
 //	}
 
-	def typeFor(String primitiveType) {
+	dispatch def typeForString(String primitiveType) {
 		switch (primitiveType) {
 			case "text": RellTypeProvider.STRING_TYPE
 			case "tuid": RellTypeProvider.STRING_TYPE
@@ -93,6 +105,16 @@ class RellTypeProvider {
 			case "bool": RellTypeProvider.BOOL_TYPE
 		}
 
+	}
+	
+	def typeFor(VariableDeclarationRef variableDeclarationRef){
+		if (variableDeclarationRef.name instanceof VariableDeclaration){
+			val variableDeclaration=variableDeclarationRef.name as VariableDeclaration;
+			
+			val TypeReference typeReference=variableDeclaration.type
+			
+			return typeReference.typeForTypeRef
+		}
 	}
 
 	def dispatch RellType typeFor(Variable variable) {

@@ -103,7 +103,7 @@ TupleValueMember:
 	(name=ValuableID '=')? value=Expression;
 
 ClassMemberDefinition:
-	(classRef=ClassRef)? "." variableDeclarationRef=VariableDeclarationRef;
+	(classRef=ClassRef)? "." (variableDeclarationRef=VariableDeclarationRef|dotValue=DotValue);
 
 ClassRef:
 	value=[TableNameWithAlias];

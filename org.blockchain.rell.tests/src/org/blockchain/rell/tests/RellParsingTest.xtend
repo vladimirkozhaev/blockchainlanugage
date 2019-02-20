@@ -126,6 +126,31 @@ class RellParsingTest {
 		''')
 	}
 	
+	
+	// Check tuple of three values from at expression
+	@Test
+	def void testNestedTupleTwoTypesWithTypeSpecification() {
+		assertParsingTrue('''
+			class company { name:name; address : name; type : integer;}
+			class user { name,company:company; }
+			operation op() {
+			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address );
+			}
+		''')
+	}
+	
+	// Check tuple of three values from at expression
+	@Test
+	def void testNestedTupleTwoTypesWithoutSelectCondition() {
+		assertParsingTrue('''
+			class company { name; address : name; type : integer;}
+			class user { name; company; }
+			operation op() {
+			    val u = user @ {} (.company.address,.company.address);
+			}
+		''')
+	}
+	
 	// Check tuple of three values from at expression
 	@Test
 	def void testOneChainTuple() {
