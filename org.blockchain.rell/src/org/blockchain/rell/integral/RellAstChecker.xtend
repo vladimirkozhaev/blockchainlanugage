@@ -88,33 +88,33 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 			val op = currentStatement.relation.operation;
 			if(op instanceof Update) {
 				val List<S_AtExprFrom> from = newArrayList
-				from.add(new S_AtExprFrom(null, new S_Name(new S_Pos(1,1), op.entity.name)))
+				from.add(new S_AtExprFrom(null, new S_Name(getPos(op), op.entity.name)))
 				val conditions = op.conditions.map[it | convertToS_Expr(it)].toList()
 				val where = new S_AtExprWhere(conditions)
 				
-				val what = op.createWhatPart.map[it| new S_UpdateWhat(new S_Pos(1,1), new S_Name(new S_Pos(1,1), it.varDeclRef.name.name), S_AssignOpCode.EQ, convertToS_Expr(it.condition.get(0)))]
-				currentsStatement = new S_UpdateStatement(new S_Pos(1,1), from, where, what)
+				val what = op.createWhatPart.map[it| new S_UpdateWhat(getPos(it), new S_Name(getPos(it), it.varDeclRef.name.name), S_AssignOpCode.EQ, convertToS_Expr(it.condition.get(0)))]
+				currentsStatement = new S_UpdateStatement(getPos(op), from, where, what)
 			} else if(op instanceof Create) {
 				val List<S_AtExprFrom> from = newArrayList
-				from.add(new S_AtExprFrom(null, new S_Name(new S_Pos(1,1), op.entity.name)))
+				from.add(new S_AtExprFrom(null, new S_Name(getPos(op), op.entity.name)))
 				val conditions = op.createWhatPart.flatMap[it | it.condition].map[it | convertToS_Expr(it)].toList()
 				val to = new S_AtExprWhere(conditions)
-				currentsStatement = new S_DeleteStatement(new S_Pos(1,1), from, to)
+				currentsStatement = new S_DeleteStatement(getPos(op), from, to)
 			} else if(op instanceof Delete) {
 				val List<S_AtExprFrom> from = newArrayList
-				from.add(new S_AtExprFrom(null, new S_Name(new S_Pos(1,1), op.entity.name)))
+				from.add(new S_AtExprFrom(null, new S_Name(getPos(op), op.entity.name)))
 				val conditions = op.conditions.map[it | convertToS_Expr(it)].toList()
 				val to = new S_AtExprWhere(conditions)
-				currentsStatement = new S_DeleteStatement(new S_Pos(1,1), from, to)
+				currentsStatement = new S_DeleteStatement(getPos(op), from, to)
 			} else {
 				throw new RuntimeException("Unsupported operation type");
 			}
 		} else if(currentStatement.variable != null) {
 			val variable = currentStatement.variable.variable;
 			if(currentStatement.variable.assessModificator == "val") {
-				currentsStatement = new S_ValStatement((new S_Name(new S_Pos(1,1), variable.name.name)), new S_NameType(new S_Name(new S_Pos(1,1), variable.name.type.type)), convertToS_Expr(variable.expression))
+				currentsStatement = new S_ValStatement((new S_Name(getPos(variable), variable.name.name)), new S_NameType(new S_Name(getPos(variable), variable.name.type.type)), convertToS_Expr(variable.expression))
 			} else if(currentStatement.variable.assessModificator == "var") {
-				currentsStatement = new S_VarStatement((new S_Name(new S_Pos(1,1), variable.name.name)), new S_NameType(new S_Name(new S_Pos(1,1), variable.name.type.type)), convertToS_Expr(variable.expression))
+				currentsStatement = new S_VarStatement((new S_Name(getPos(variable), variable.name.name)), new S_NameType(new S_Name(getPos(variable), variable.name.type.type)), convertToS_Expr(variable.expression))
 			} else {
 				throw new RuntimeException("Unknown assessModificator");
 			}
@@ -128,59 +128,59 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 	
 	private def S_Expr convertToS_Expr(Expression e) {
 		switch (e) {
-			StringConstant: new S_StringLiteralExpr(new S_Pos(1,1), e.value)
-			IntConstant: new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf(e.value))
-			BoolConstant: new S_BooleanLiteralExpr(new S_Pos(1,1), Boolean.valueOf(e.value))
-			Not: new S_UnaryExpr(new S_Pos(1,1), new S_Node(new S_Pos(1,1),S_UnaryOp_Not), new S_NameExpr(new S_Name(new S_Pos(1,1), "")))
+			StringConstant: new S_StringLiteralExpr(getPos(e), e.value)
+			IntConstant: new S_IntLiteralExpr(getPos(e), Integer.valueOf(e.value))
+			BoolConstant: new S_BooleanLiteralExpr(getPos(e), Boolean.valueOf(e.value))
+			Not: new S_UnaryExpr(getPos(e), new S_Node(getPos(e),S_UnaryOp_Not), new S_NameExpr(new S_Name(getPos(e), "")))
 			MulOrDiv: {
 				val binaryExpressionTails = newArrayList
-				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(new S_Pos(1,1), S_BinaryOpCode.PLUS), new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.right as IntConstant).value))))
+				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(getPos(e), S_BinaryOpCode.PLUS), new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.right as IntConstant).value))))
 					new S_BinaryExpr(
-						new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.left as IntConstant).value)), 
+						new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.left as IntConstant).value)), 
 						binaryExpressionTails
 				)
 			}	
 			Minus: {
 				val binaryExpressionTails = newArrayList
-				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(new S_Pos(1,1), S_BinaryOpCode.MINUS), new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.right as IntConstant).value))))
+				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(getPos(e), S_BinaryOpCode.MINUS), new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.right as IntConstant).value))))
 					new S_BinaryExpr(
-						new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.left as IntConstant).value)), 
+						new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.left as IntConstant).value)), 
 						binaryExpressionTails
 				)
 			}
 			Comparison: {
 				val binaryExpressionTails = newArrayList
-				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(new S_Pos(1,1), S_BinaryOpCode.EQ_REF), new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.right as IntConstant).value))))
+				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(getPos(e), S_BinaryOpCode.EQ_REF), new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.right as IntConstant).value))))
 					new S_BinaryExpr(
-						new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.left as IntConstant).value)), 
+						new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.left as IntConstant).value)), 
 						binaryExpressionTails
 				)
 			}
 			Equality: {
 				val binaryExpressionTails = newArrayList
-				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(new S_Pos(1,1), S_BinaryOpCode.EQ), new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.right as IntConstant).value))))
+				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(getPos(e), S_BinaryOpCode.EQ), new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.right as IntConstant).value))))
 					new S_BinaryExpr(
-						new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.left as IntConstant).value)), 
+						new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.left as IntConstant).value)), 
 						binaryExpressionTails
 				)
 			}
 			And: {
 				val binaryExpressionTails = newArrayList
-				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(new S_Pos(1,1), S_BinaryOpCode.AND), new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.right as IntConstant).value))))
+				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(getPos(e), S_BinaryOpCode.AND), new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.right as IntConstant).value))))
 					new S_BinaryExpr(
-						new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.left as IntConstant).value)), 
+						new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.left as IntConstant).value)), 
 						binaryExpressionTails
 				)
 			}
 			Or: {
 				val binaryExpressionTails = newArrayList
-				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(new S_Pos(1,1), S_BinaryOpCode.OR), new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.right as IntConstant).value))))
+				binaryExpressionTails.add(new S_BinaryExprTail(new S_Node(getPos(e), S_BinaryOpCode.OR), new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.right as IntConstant).value))))
 					new S_BinaryExpr(
-						new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf((e.left as IntConstant).value)), 
+						new S_IntLiteralExpr(getPos(e), Integer.valueOf((e.left as IntConstant).value)), 
 						binaryExpressionTails
 				)
 			}
-			ExpressionImpl: new S_IntLiteralExpr(new S_Pos(1,1), Integer.valueOf("123"))
+			ExpressionImpl: new S_IntLiteralExpr(getPos(e), Integer.valueOf("123"))
 			default: throw new RuntimeException("Unknown expression")
 		}
 	}
@@ -206,24 +206,24 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 		val returnType =
 			if(type.tuple != null) {
 				val List<kotlin.Pair<S_Name, S_NameType>> fields = type.tuple.getVarDecl().map[e|
-					val name = new S_Name(new S_Pos(1,1), e.name)
+					val name = new S_Name(getPos(e), e.name)
 					new kotlin.Pair(name, new S_NameType(name))
 				]
 				new S_TupleType(fields)
 			} else if(type.map != null){
 				val key = type.map.map.keySpec.type;
 				val value = type.map.map.valSpec.type;
-				new S_MapType(new S_Pos(1,1), 
-					new S_NameType(new S_Name(new S_Pos(1,1), key)), 
-						new S_NameType(new S_Name(new S_Pos(1,1), key)));
+				new S_MapType(getPos(type), 
+					new S_NameType(new S_Name(getPos(type), key)), 
+						new S_NameType(new S_Name(getPos(type), key)));
 			} else if(type.set != null){
 				val setType = type.set.set.listType.type;
-				new S_SetType(new S_Pos(1,1), 
-					new S_NameType(new S_Name(new S_Pos(1,1), setType)));
+				new S_SetType(getPos(type), 
+					new S_NameType(new S_Name(getPos(type), setType)));
 			} else if(type.list != null){
 				val listType = type.list.list.listType.type;
-				new S_ListType(new S_Pos(1,1), 
-					new S_NameType(new S_Name(new S_Pos(1,1), listType)));
+				new S_ListType(getPos(type), 
+					new S_NameType(new S_Name(getPos(type), listType)));
 			} else {
 				throw new RuntimeException("Type not supported");
 			}
@@ -260,8 +260,8 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 	} 
 	
 	def computeErrors (Model m, Map<EObject, List<RellError>> target) {
-		val modDef = make_S_ModuleDefinition(m)
 		try {
+			val modDef = make_S_ModuleDefinition(m)
 			val rModule = modDef.compile(true)
 			System.out.println()
 		} catch (C_Error e) {
@@ -270,7 +270,11 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 			if (obj === null) obj = m; // this really should not happen...
 			logger.warn("Creating error for" + obj.toString)
 			target.put(obj, #[new RellError("rellr says: " + e.errMsg)])
-		}		
+		} catch(RuntimeException e) {
+			logger.error("Caught error via rellr" + e)
+			var obj = m
+			target.put(obj, #[new RellError("rellr says: " + e)])
+		}
 	}
 	
 }

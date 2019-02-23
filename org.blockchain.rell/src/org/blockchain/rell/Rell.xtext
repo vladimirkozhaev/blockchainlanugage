@@ -39,7 +39,7 @@ Variable:
 	name=VariableDeclaration (('=' expression=Expression)?);
 
 Relational:
-	Update | Delete | Create | AtOperator;
+	operation = (Update | Delete | Create | AtOperator);
 
 Update:
 	'update' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}' '('
@@ -198,13 +198,13 @@ TypeReference:
 	type=PrimitiveType | entityType=[ClassDefinition] | tuple=TupleType | list=ListType | set=SetType | map=MapType;
 
 ListType:
-	List ListSpecification;
+	List list = ListSpecification;
 
 SetType:
-	Set ListSpecification;
+	Set set = ListSpecification;
 
 MapType:
-	Map MapSpecification;
+	Map map = MapSpecification;
 
 ListSpecification:
 	LESS listType=TypeReference (QuestionChar?) MORE (QuestionChar?);
