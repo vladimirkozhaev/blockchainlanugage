@@ -92,7 +92,7 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 				val conditions = op.conditions.map[it | convertToS_Expr(it)].toList()
 				val where = new S_AtExprWhere(conditions)
 				
-				val what = op.createWhatPart.map[it| new S_UpdateWhat(new S_Pos(1,1), new S_Name(new S_Pos(1,1), it.varDeclRef.decl.name), S_AssignOpCode.EQ, convertToS_Expr(it.condition.get(0)))]
+				val what = op.createWhatPart.map[it| new S_UpdateWhat(new S_Pos(1,1), new S_Name(new S_Pos(1,1), it.varDeclRef.name.name), S_AssignOpCode.EQ, convertToS_Expr(it.condition.get(0)))]
 				currentsStatement = new S_UpdateStatement(new S_Pos(1,1), from, where, what)
 			} else if(op instanceof Create) {
 				val List<S_AtExprFrom> from = newArrayList
@@ -263,6 +263,7 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 		val modDef = make_S_ModuleDefinition(m)
 		try {
 			val rModule = modDef.compile(true)
+			System.out.println()
 		} catch (C_Error e) {
 			logger.error("Caught error via rellr" + e.errMsg)
 			var obj = reverseObjectMap.get(e.pos.row)

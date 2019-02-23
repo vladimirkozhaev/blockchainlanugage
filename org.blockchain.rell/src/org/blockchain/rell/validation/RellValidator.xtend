@@ -17,7 +17,6 @@ import org.blockchain.rell.typing.RellTypeProvider
 import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.validation.Check
-import org.blockchain.rell.rell.Record
 import org.blockchain.rell.integral.RellCompleteValidationAPI
 import org.eclipse.emf.ecore.EObject
 import org.blockchain.rell.rell.VariableDeclaration
@@ -201,9 +200,9 @@ class RellValidator extends AbstractRellValidator {
 				case (classDefinition instanceof ClassDefinition):{
 					(classDefinition as ClassDefinition).name;
 				}
-				case (classDefinition instanceof Record):{
-					(classDefinition as Record).name;
-				}
+//				case (classDefinition instanceof Record):{
+//					(classDefinition as Record).name;
+//				}
 			}
 			if(classNames.contains(name)) {
 				error("Class names should be unique. Class with name " + name + " already exists",
