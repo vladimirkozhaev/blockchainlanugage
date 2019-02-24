@@ -100,9 +100,9 @@ class RellValidatorTest {
 	def void testVariableDeclarationConflict() {
 		val validated = '''
 			operation test() {
-							val x=1;
-							val j=1;
-							val j=1;
+							val x:integer=1;
+							val j:integer=1;
+							val j:integer=1;
 			}
 		'''.parse.validate()
 		Assert.assertTrue(validated.get(0).getCode() == RellValidator::DUPLICATE_ATTRIBUTE_NAME)

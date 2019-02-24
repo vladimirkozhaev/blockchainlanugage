@@ -259,7 +259,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		var EList<AttributeListField> attrubuteListField = switch (tableNameWithAlias) {
 			case (tableNameWithAlias instanceof ClassRefDecl): {
 				val classRefDecl = tableNameWithAlias as ClassRefDecl
-				classRefDecl.classDef.attributeListField;
+				if(classRefDecl.classDef == null) null else classRefDecl.classDef.attributeListField;
 			}
 			case (tableNameWithAlias instanceof JustNameDecl): {
 				val justNameDecl = tableNameWithAlias as JustNameDecl

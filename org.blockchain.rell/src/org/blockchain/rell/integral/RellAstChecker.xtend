@@ -8,6 +8,7 @@ import org.eclipse.emf.ecore.EObject
 import java.util.Map
 import org.apache.log4j.Logger;
 import org.blockchain.rell.rell.impl.ExpressionImpl
+import org.blockchain.rell.rell.impl.IntConstantImpl
 
 class RellAstChecker {
 	
@@ -106,15 +107,24 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 				val conditions = op.conditions.map[it | convertToS_Expr(it)].toList()
 				val to = new S_AtExprWhere(conditions)
 				currentsStatement = new S_DeleteStatement(getPos(op), from, to)
+			} else if(op instanceof AtOperator) {
+				currentsStatement = new S_VarStatement((new S_Name(getPos(op), "")), new S_NameType(new S_Name(getPos(op), "")), null)
+				System.out.println(op);
 			} else {
 				throw new RuntimeException("Unsupported operation type");
 			}
 		} else if(currentStatement.variable != null) {
 			val variable = currentStatement.variable.variable;
 			if(currentStatement.variable.assessModificator == "val") {
-				currentsStatement = new S_ValStatement((new S_Name(getPos(variable), variable.name.name)), new S_NameType(new S_Name(getPos(variable), variable.name.type.type)), convertToS_Expr(variable.expression))
+				val sName = new S_Name(getPos(variable), variable.name.name)
+				val typeName = variable.name.type?.type ?: ""
+				val sNameType = new S_NameType(new S_Name(getPos(variable), typeName))
+				currentsStatement = new S_ValStatement(sName, sNameType, convertToS_Expr(variable.expression))
 			} else if(currentStatement.variable.assessModificator == "var") {
-				currentsStatement = new S_VarStatement((new S_Name(getPos(variable), variable.name.name)), new S_NameType(new S_Name(getPos(variable), variable.name.type.type)), convertToS_Expr(variable.expression))
+				val sName = new S_Name(getPos(variable), variable.name.name)
+				val typeName = variable.name.type?.type ?: ""
+				val sNameType = new S_NameType(new S_Name(getPos(variable), typeName))
+				currentsStatement = new S_VarStatement(sName, sNameType, convertToS_Expr(variable.expression))
 			} else {
 				throw new RuntimeException("Unknown assessModificator");
 			}
@@ -242,7 +252,6 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 	    else if(e instanceof Query)
 	        return make_S_QueryDefinition(e)
 		else throw new RuntimeException("Operation not supported")
-
 	}
 
 	def S_Definition make_S_Definition_Entity(EObject e) {
