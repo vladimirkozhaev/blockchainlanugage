@@ -47,9 +47,11 @@ class RellValidator extends AbstractRellValidator {
 
 	public static val TYPE_MISMATCH = ISSUE_CODE_PREFIX + "TypeMismatch"
 
-	public static val NOT_UNIQUE_NANE = "Name should be unique"
+	public static val NOT_UNIQUE_NANE = "Name conflict"
 
-	public static val DUPLICATE_ATTRIBUTE_NAME = "Attribute with the same name already is defined"
+	public static val DUPLICATE_VARIABLE_NAME = "Duplicate variable"
+	
+	public static val DUPLICATE_ATTRIBUTE_NAME = "Duplicate attribute"
 
 	public static val SEMANTIC_ERROR = "It doesn't really work"
 

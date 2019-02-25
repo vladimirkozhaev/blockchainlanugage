@@ -31,26 +31,30 @@ class RellAstChecker {
 		new S_Name(getPos(o), name)
 	}
 		
-def S_AttributeClause make_S_RelClause(AttributeListField alf) {
-		val a = alf.attributeList.get(0).value.get(0)		
-		val name = a.name.name
-		val type = a.name.type
-		val typename = if (type !== null) {
-				new S_NameType(getName(a.name.type, type.type))
+	def List<S_AttributeClause> make_S_RelClause(AttributeListField alf) {
+		var response = newArrayList;
+		for(var i = 0; i < alf.attributeList.get(0).value.size(); i++) {
+			val a = alf.attributeList.get(0).value.get(0)		
+			val name = a.name.name
+			val type = a.name.type
+			val typename = if (type !== null) {
+					new S_NameType(getName(a.name.type, type.type))
+			}
+			val attr = new S_NameTypePair(
+				getName(a.name, name),
+				typename			
+			)
+			response.add(new S_AttributeClause(
+				attr, alf.mutable !== null, if(a.expression != null)convertToS_Expr(a.expression) else null			
+			))
 		}
-		val attr = new S_NameTypePair(
-			getName(a.name, name),
-			typename			
-		)
-		new S_AttributeClause(
-			attr, alf.mutable !== null, null			
-		)
+		return response;
 	}
 
 	def S_ClassDefinition make_S_ClassDefinition(ClassDefinition cd) {
 		val List<S_AttributeClause> clauses = cd.attributeListField.map[
 			alf| make_S_RelClause(alf)
-		]
+		].flatMap[it].toList()
 		new S_ClassDefinition(getName(cd, cd.name),
 			clauses
 		)
@@ -83,56 +87,61 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 				sNmmeTypePairs.add(attr)
 			}
 		}
-		val currentStatement = operation.getStatements().get(0)
-		var S_Statement currentsStatement = null
-		if(currentStatement.relation != null) {
-			val op = currentStatement.relation.operation;
-			if(op instanceof Update) {
-				val List<S_AtExprFrom> from = newArrayList
-				from.add(new S_AtExprFrom(null, new S_Name(getPos(op), op.entity.name)))
-				val conditions = op.conditions.map[it | convertToS_Expr(it)].toList()
-				val where = new S_AtExprWhere(conditions)
-				
-				val what = op.createWhatPart.map[it| new S_UpdateWhat(getPos(it), new S_Name(getPos(it), it.varDeclRef.name.name), S_AssignOpCode.EQ, convertToS_Expr(it.condition.get(0)))]
-				currentsStatement = new S_UpdateStatement(getPos(op), from, where, what)
-			} else if(op instanceof Create) {
-				val List<S_AtExprFrom> from = newArrayList
-				from.add(new S_AtExprFrom(null, new S_Name(getPos(op), op.entity.name)))
-				val conditions = op.createWhatPart.flatMap[it | it.condition].map[it | convertToS_Expr(it)].toList()
-				val to = new S_AtExprWhere(conditions)
-				currentsStatement = new S_DeleteStatement(getPos(op), from, to)
-			} else if(op instanceof Delete) {
-				val List<S_AtExprFrom> from = newArrayList
-				from.add(new S_AtExprFrom(null, new S_Name(getPos(op), op.entity.name)))
-				val conditions = op.conditions.map[it | convertToS_Expr(it)].toList()
-				val to = new S_AtExprWhere(conditions)
-				currentsStatement = new S_DeleteStatement(getPos(op), from, to)
-			} else if(op instanceof AtOperator) {
-				currentsStatement = new S_VarStatement((new S_Name(getPos(op), "")), new S_NameType(new S_Name(getPos(op), "")), null)
-				System.out.println(op);
-			} else {
-				throw new RuntimeException("Unsupported operation type");
+		var statements = newArrayList;
+		for(var i = 0; i < operation.getStatements().size(); i++) {
+			val currentStatement = operation.getStatements().get(i)
+			var S_Statement currentsStatement = null
+			if(currentStatement.relation != null) {
+				val op = currentStatement.relation.operation;
+				if(op instanceof Update) {
+					val List<S_AtExprFrom> from = newArrayList
+					from.add(new S_AtExprFrom(null, new S_Name(getPos(op), op.entity.name)))
+					val conditions = op.conditions.map[it | convertToS_Expr(it)].toList()
+					val where = new S_AtExprWhere(conditions)
+					
+					val what = op.createWhatPart.map[it| new S_UpdateWhat(getPos(it), new S_Name(getPos(it), it.varDeclRef.name.name), S_AssignOpCode.EQ, convertToS_Expr(it.condition.get(0)))]
+					currentsStatement = new S_UpdateStatement(getPos(op), from, where, what)
+				} else if(op instanceof Create) {
+					val List<S_AtExprFrom> from = newArrayList
+					from.add(new S_AtExprFrom(null, new S_Name(getPos(op), op.entity.name)))
+					val conditions = op.createWhatPart.flatMap[it | it.condition].map[it | convertToS_Expr(it)].toList()
+					val to = new S_AtExprWhere(conditions)
+					currentsStatement = new S_DeleteStatement(getPos(op), from, to)
+				} else if(op instanceof Delete) {
+					val List<S_AtExprFrom> from = newArrayList
+					from.add(new S_AtExprFrom(null, new S_Name(getPos(op), op.entity.name)))
+					val conditions = op.conditions.map[it | convertToS_Expr(it)].toList()
+					val to = new S_AtExprWhere(conditions)
+					currentsStatement = new S_DeleteStatement(getPos(op), from, to)
+				} else if(op instanceof AtOperator) {
+					currentsStatement = new S_VarStatement((new S_Name(getPos(op), "")), new S_NameType(new S_Name(getPos(op), "")), null)
+					System.out.println(op);
+				} else {
+					throw new RuntimeException("Unsupported operation type");
+				}
+			} else if(currentStatement.variable != null) {
+				val variable = currentStatement.variable.variable;
+				if(currentStatement.variable.assessModificator == "val") {
+					val sName = new S_Name(getPos(variable), variable.name.name)
+					val typeName = variable.name.type?.type ?: ""
+					val sNameType = new S_NameType(new S_Name(getPos(variable), typeName))
+					currentsStatement = new S_ValStatement(sName, sNameType, convertToS_Expr(variable.expression))
+				} else if(currentStatement.variable.assessModificator == "var") {
+					val sName = new S_Name(getPos(variable), variable.name.name)
+					val typeName = variable.name.type?.type ?: ""
+					val sNameType = new S_NameType(new S_Name(getPos(variable), typeName))
+					currentsStatement = new S_VarStatement(sName, sNameType, convertToS_Expr(variable.expression))
+				} else {
+					throw new RuntimeException("Unknown assessModificator");
+				}
+			} else if(currentStatement.varInitiation != null) {
+				//todo
 			}
-		} else if(currentStatement.variable != null) {
-			val variable = currentStatement.variable.variable;
-			if(currentStatement.variable.assessModificator == "val") {
-				val sName = new S_Name(getPos(variable), variable.name.name)
-				val typeName = variable.name.type?.type ?: ""
-				val sNameType = new S_NameType(new S_Name(getPos(variable), typeName))
-				currentsStatement = new S_ValStatement(sName, sNameType, convertToS_Expr(variable.expression))
-			} else if(currentStatement.variable.assessModificator == "var") {
-				val sName = new S_Name(getPos(variable), variable.name.name)
-				val typeName = variable.name.type?.type ?: ""
-				val sNameType = new S_NameType(new S_Name(getPos(variable), typeName))
-				currentsStatement = new S_VarStatement(sName, sNameType, convertToS_Expr(variable.expression))
-			} else {
-				throw new RuntimeException("Unknown assessModificator");
-			}
-		} else if(currentStatement.varInitiation != null) {
-			//todo
+			statements.add(currentsStatement)
 		}
+		
 		new S_OpDefinition(getName(operation, operation.name),
-			sNmmeTypePairs, currentsStatement
+			sNmmeTypePairs, new S_BlockStatement(statements)
 		)
 	}
 	
@@ -274,15 +283,15 @@ def S_AttributeClause make_S_RelClause(AttributeListField alf) {
 			val rModule = modDef.compile(true)
 			System.out.println()
 		} catch (C_Error e) {
-			logger.error("Caught error via rellr" + e.errMsg)
+			logger.error(e.errMsg)
 			var obj = reverseObjectMap.get(e.pos.row)
 			if (obj === null) obj = m; // this really should not happen...
 			logger.warn("Creating error for" + obj.toString)
-			target.put(obj, #[new RellError("rellr says: " + e.errMsg)])
+			target.put(obj, #[new RellError(e.errMsg)])
 		} catch(RuntimeException e) {
-			logger.error("Caught error via rellr" + e)
+			logger.error(e)
 			var obj = m
-			target.put(obj, #[new RellError("rellr says: " + e)])
+			target.put(obj, #[new RellError(e.toString())])
 		}
 	}
 	
