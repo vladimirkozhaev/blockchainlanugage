@@ -27,7 +27,7 @@ Query:
 	'}'));
 
 Statement:
-	(relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
+	(methodCall=DotValue|relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
 
 VarInitiation:
 	name=VariableDeclarationRef (('[' expr=Expression']')?) ('=' expression=Expression)?;
@@ -179,7 +179,7 @@ Atomic returns Expression:
 
 DotValue:
 	decl=(VariableDeclarationRef|ClassMemberDefinition | MethodCall | Create | TupleValue | ListCreation | MapCreation | NewListCreation |
-	 ListCreation | MapCreation) ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
+	 ListCreation | MapCreation)  ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
 
 MapCreationPart:
 	exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
