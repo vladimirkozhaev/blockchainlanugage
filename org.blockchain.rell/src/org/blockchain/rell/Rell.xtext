@@ -166,7 +166,6 @@ Atomic returns Expression:
 	{ByteArrayConstant} value=BYTE_ARRAY_VALUE |
 	{BoolConstant} value=('true' | 'false') |
 	{SelectOp} value=AtOperator |
-	{MemberDefinition} value=ClassMemberDefinition |
 	{CreateAtom} value=Create
 	| {TupleRes} value=TupleValue
 	| {ListCreation} value=ListCreation
@@ -179,7 +178,7 @@ Atomic returns Expression:
 	| {DotValue} value=DotValue;
 
 DotValue:
-	decl=(ClassMemberDefinition|VariableDeclarationRef | MethodCall | Create | TupleValue | ListCreation | MapCreation | NewListCreation |
+	decl=(VariableDeclarationRef|ClassMemberDefinition | MethodCall | Create | TupleValue | ListCreation | MapCreation | NewListCreation |
 	 ListCreation | MapCreation) ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
 
 MapCreationPart:

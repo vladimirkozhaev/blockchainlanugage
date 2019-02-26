@@ -942,6 +942,28 @@ class RellParsingTest {
 			query q3() { var s = set([foo4(123)]); return s; }
 		''')
 	}
+	@Test
+	def void testMethodCall(){
+		assertParsingTrue('''operation o(){
+			val s=set<integer>([123]);
+			val isContains=s.contains(1);
+		}''')
+	}
+	
+	// check set with records
+	@Test
+	def void testSetMethodsCall() {
+		assertParsingTrue('''
+			record foo1 { x: list<set<(a: text, b: integer)>>; }
+			record foo2 { x: list<set<(q: text, integer)>>; }
+			record bar { p: integer; q: integer; }
+			record foo3 { x: text; b: bar; } 
+			record foo4 { x: integer; }
+			query q1() { var s = set([foo3('ABC', bar(p=123,q=456))]); return s; }
+			query q2() { var s = set([foo3('ABC', bar(p=123,q=456))]); return s.contains(foo3('ABC',bar(p=123,q=456))); } 
+			query q3() { var s = set([foo4(123)]); return s; }
+		''')
+	}
 
 	@Test
 	def void testTheRecordType() {

@@ -259,7 +259,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		}
 		return super.getScope(classRef, ref);
 
-	}
+	}	
 
 	def IScope getClassMemberDefinition(ClassMemberDefinition classMemberDefinition, EObject processedObject,
 		EReference ref) {
