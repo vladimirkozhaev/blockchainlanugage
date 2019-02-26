@@ -72,7 +72,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 					val parentDotValue= dotValue.eContainer as DotValue;
 					val parentValue=parentDotValue.decl;
 					
-					parentValue.eResource
+					
 					switch(parentValue){
 						case (parentValue instanceof ClassMemberDefinition):{
 							val classMemberDefinition=parentValue as ClassMemberDefinition;
