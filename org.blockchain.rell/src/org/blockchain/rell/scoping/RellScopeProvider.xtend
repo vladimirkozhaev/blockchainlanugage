@@ -4,6 +4,7 @@
 package org.blockchain.rell.scoping
 
 import java.util.List
+import javax.inject.Inject
 import org.blockchain.rell.rell.AtOperator
 import org.blockchain.rell.rell.AttributeListField
 import org.blockchain.rell.rell.ClassDefinition
@@ -18,20 +19,21 @@ import org.blockchain.rell.rell.DotValue
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.JustNameDecl
 import org.blockchain.rell.rell.TableNameWithAlias
+import org.blockchain.rell.rell.TupleValue
+import org.blockchain.rell.rell.TupleValueMember
 import org.blockchain.rell.rell.Update
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableDeclarationRef
+import org.blockchain.rell.typing.RellClassType
+import org.blockchain.rell.typing.RellTypeProvider
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.mwe.ResourceDescriptionsProvider
+import org.eclipse.xtext.resource.IContainer
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
-import org.blockchain.rell.rell.TupleValueMember
-import org.blockchain.rell.rell.TupleValue
-import javax.inject.Inject
-import org.blockchain.rell.typing.RellTypeProvider
-import org.blockchain.rell.typing.RellClassType
 
 /**
  * This class contains custom scoping description.
@@ -42,6 +44,11 @@ import org.blockchain.rell.typing.RellClassType
 class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	
 	@Inject extension RellTypeProvider
+	@Inject ResourceDescriptionsProvider rdp
+	
+	
+	@Inject
+	IContainer.Manager containerManager;
 
 	def IScope getVariableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef, EReference ref) {
 
@@ -65,19 +72,21 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 					val parentDotValue= dotValue.eContainer as DotValue;
 					val parentValue=parentDotValue.decl;
 					
-					println("parentValue:"+parentValue)
+					parentValue.eResource
 					switch(parentValue){
 						case (parentValue instanceof ClassMemberDefinition):{
 							val classMemberDefinition=parentValue as ClassMemberDefinition;
 							if (classMemberDefinition.variableDeclarationRef!==null){
 								val parentClassMemberDef=classMemberDefinition.variableDeclarationRef;
+								parentClassMemberDef.eResource
 								val typeFor=parentClassMemberDef.typeFor
+								//EcoreUtil2.getContainerOfType()
 								if (typeFor instanceof RellClassType){
 									val variableDeclarationList=(typeFor as RellClassType).rellClassDefinition.attributeListField.makeVariableDeclarationList
 									return Scopes::scopeFor(variableDeclarationList)
 								}
 							}
-							println(classMemberDefinition.dotValue)
+							
 						}
 					}
 					return variableDeclarationRefScope(variableDeclarationRef,
