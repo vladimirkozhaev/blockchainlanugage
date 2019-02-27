@@ -21,7 +21,7 @@ class RellParsingTest {
 	@Inject extension ValidationTestHelper
 
 // Check initialization byte_array
-	@Test
+//	@Test
 	def void testInitValueToByteArray() {
 		assertParsingTrue('''
 			class foo {
@@ -31,7 +31,7 @@ class RellParsingTest {
 	}
 
 // Check initialization pubkey
-	@Test
+//	@Test
 	def void testInitValueToPubkey() {
 		assertParsingTrue('''
 			class foo {
@@ -41,7 +41,7 @@ class RellParsingTest {
 	}
 
 // Check create tuple with named fields and two values 
-	@Test
+//	@Test
 	def void testCreateSimpleTupleTwoValues() {
 		assertParsingTrue('''
 			operation op() {
@@ -51,7 +51,7 @@ class RellParsingTest {
 	}
 
 // Check create tuple with named fields and two values 
-	@Test
+//	@Test
 	def void testCreateSimpleNamedTupleTwoValues() {
 		assertParsingTrue('''
 			operation op() {
@@ -61,7 +61,7 @@ class RellParsingTest {
 	}
 
 // Check create nested tuple 
-	@Test
+//	@Test
 	def void testCreateNestedTuple() {
 		assertParsingTrue('''
 			operation op() {
@@ -71,7 +71,7 @@ class RellParsingTest {
 	}
 
 // Check create named nested tuple 
-	@Test
+//	@Test
 	def void testCreateNamedNestedTuple() {
 		assertParsingTrue('''
 			operation op() {
@@ -81,7 +81,7 @@ class RellParsingTest {
 	}
 
 // Check return tuple of reference types of values
-	@Test
+//	@Test
 	def void testAssignTupleWithExplicitValues() {
 		assertParsingTrue('''
 			class city { name: text;}
@@ -93,7 +93,7 @@ class RellParsingTest {
 	}
 
 // Check tuple of two values from at expression
-	@Test
+//	@Test
 	def void testSimpleTuple() {
 		assertParsingTrue('''
 			operation op() {
@@ -103,7 +103,7 @@ class RellParsingTest {
 	}
 
 // Check tuple of three values from at expression 
-	@Test
+//	@Test
 	def void testTupleThreeValues() {
 		assertParsingTrue('''
 			class company { name; address : name; type : integer; }
@@ -114,8 +114,8 @@ class RellParsingTest {
 		''')
 	}
 
-// Check tuple of three values from at expression
-	@Test
+// Check tuple of two values from at expression
+//	@Test
 	def void testNestedTupleTwoTypes() {
 		assertParsingTrue('''
 			class company { name; address : name; type : integer;}
@@ -125,35 +125,21 @@ class RellParsingTest {
 			}
 		''')
 	}
-
 	
-	
-	// Check tuple of three values from at expression
-	@Test
-	def void testNestedTupleTwoTypesWithTypeSpecification() {
-		assertParsingTrue('''
-			class company { name:name; address : name; type : integer;}
-			class user { name,company:company; }
-			operation op() {
-			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address );
-			}
-		''')
-	}
-	
-	// Check tuple of three values from at expression
-	@Test
+	// Check tuple of two values from at expression
+//	@Test
 	def void testNestedTupleTwoTypesWithoutSelectCondition() {
 		assertParsingTrue('''
 			class company { name; address : name; type : integer;}
 			class user { name; company; }
 			operation op() {
-			    val u = user @ {} (.company.address,.company.address);
+			    val u = user @ {} (.company.address, .company.address);
 			}
 		''')
 	}
 
-	// Check tuple of three values from at expression
-	@Test
+	// Check a tuple of two values from at expression with condition 
+	//@Test
 	def void testOneChainTuple() {
 		assertParsingTrue('''
 			class company { name;  type : integer;}
@@ -163,8 +149,8 @@ class RellParsingTest {
 		''')
 	}
 
-	// Check tuple of three values from at expression
-	@Test
+	// Check return a tuple of two values from at expression without condition
+	//@Test
 	def void testOneChainTupleWithoutCondition() {
 		assertParsingTrue('''
 			class company { name;  type : integer;}
@@ -174,8 +160,8 @@ class RellParsingTest {
 		''')
 	}
 
-	// Check tuple of three values from at expression
-	@Test
+	// Check at operator
+	//@Test
 	def void testAtOperator() {
 		assertParsingTrue('''
 			class company { name;  type : integer;}
@@ -185,7 +171,7 @@ class RellParsingTest {
 		''')
 	}
 
-	@Test
+//	@Test
 	def void testIndexWithAttributeDefinition() {
 		assertParsingTrue(''' 
 			class test { index testIndex : text; }
@@ -193,7 +179,7 @@ class RellParsingTest {
 	}
 
 // Check default values for attribute
-	@Test
+//	@Test
 	def void testDefaultAttributeValue() {
 		assertParsingTrue(''' 
 			class test { testText: text = 'test_text'; }
@@ -201,7 +187,7 @@ class RellParsingTest {
 	}
 
 // Check set default attribute value via at-operator 
-	@Test
+//	@Test
 	def void testDefaultAttributeValueWithAtOperator() {
 		assertParsingTrue(''' 
 			class version { id : pubkey; value: integer; }
@@ -210,7 +196,7 @@ class RellParsingTest {
 	}
 
 // Check set default attribute value via at-operator with 'where' part
-	@Test
+//	@Test
 	def void testDefaultAttributeValueWithAtOperatorWherePart() {
 		assertParsingTrue(''' 
 			class version { id : pubkey; value: integer; }
@@ -219,7 +205,7 @@ class RellParsingTest {
 	}
 
 // Check set default attribute value via at-operator that return value from 'what' part
-	@Test
+//	@Test
 	def void testDefAttribValWithAtOperatorReturnWhatPart() {
 		assertParsingTrue(''' 
 			class version { id : pubkey; value: integer; }
@@ -237,7 +223,7 @@ class RellParsingTest {
 	}
 
 // Check that a class can have the 'key' clause after an attribute definition
-	@Test
+//	@Test
 	def void testKeyAfterAttributeDefinition() {
 		assertParsingTrue(''' 
 			class test { testKey : text; key testKey; }
@@ -245,7 +231,7 @@ class RellParsingTest {
 	}
 
 // Check that a class can have the 'key' clause with an attribute definition	
-	@Test
+//	@Test
 	def void testKeyWithAttributeDefinition() {
 		assertParsingTrue(''' 
 			class test {
@@ -255,7 +241,7 @@ class RellParsingTest {
 	}
 
 // Check that a class can have the composite "key" clause with multiple attributes in definition
-	@Test
+//	@Test
 	def void testCompositeKeyWithAttributeDefinition() {
 		assertParsingTrue('''
 			class test {
@@ -265,7 +251,7 @@ class RellParsingTest {
 	}
 
 // Check that a class can have the composite "key" clause with multiple attributes after their definition
-	@Test
+//	@Test
 	def void testCompositeKeyAfterAttributeDefinition() {
 		assertParsingTrue('''
 			class test { firstField : text; secondField : text; key firstField, secondField; }
@@ -273,7 +259,7 @@ class RellParsingTest {
 	}
 
 // Check that a class can have the 'index' clause after an attribute definition
-	@Test
+//	@Test
 	def void testIndexAfterAttributeDefinition() {
 		assertParsingTrue(''' 
 			class test { testIndex : text; index testIndex; }
@@ -281,7 +267,7 @@ class RellParsingTest {
 	}
 
 // Check that a class can have the 'index' clause with an attribute definition
-	@Test
+//	@Test
 	def void testIndexWihAttributeDefiniton() {
 		assertParsingTrue(''' 
 			class test { index testIndex : text; }
@@ -289,7 +275,7 @@ class RellParsingTest {
 	}
 
 // Check that a class can have the composite "index" clause with multiple attributes in definition
-	@Test
+//	@Test
 	def void testCompositeIndexWithAttributeDefinition() {
 		assertParsingTrue('''
 			class test { index firstField : text, secondField : text; }
@@ -297,7 +283,7 @@ class RellParsingTest {
 	}
 
 // Check that a class can have the composite composite "index" clause with multiple attributes after their definition
-	@Test
+//	@Test
 	def void testCompositeIndexAfterAttributeDefinition() {
 		assertParsingTrue('''
 			class test { firstField : text; secondField : text; index firstField, secondField; }
@@ -305,7 +291,7 @@ class RellParsingTest {
 	}
 
 // Check an attribute, that has reference type to a class, as index clause	
-	@Test
+//	@Test
 	def void testIndexOnAttributeWithRefType() {
 		assertParsingTrue('''
 			class test1 {}
@@ -314,7 +300,7 @@ class RellParsingTest {
 	}
 
 // Check the 'mutable' keyword to an attribute	
-	@Test
+//	@Test
 	def void testMutableToAttribute() {
 		assertParsingTrue('''
 			class test {
@@ -324,7 +310,7 @@ class RellParsingTest {
 	}
 
 // Check creating the object of a class within 'operation' 	
-	@Test
+//	@Test
 	def void testCreateObjectWithinOperation() {
 		assertParsingTrue('''
 			class test {a: text; b: text; c : text; key a; index b; }
@@ -346,7 +332,7 @@ class RellParsingTest {
 	}
 
 // Check assign a value of returning 'create' statement to 'val' within 'operation'	
-	@Test
+//	@Test
 	def void testAssignValueFromCreateStatment() {
 		assertParsingTrue('''
 			class test {a: text; b: text; c : text; key a; index b; }
@@ -357,7 +343,7 @@ class RellParsingTest {
 	}
 
 // Check creating the object of a class with default values of attributes within 'operation' 	
-	@Test
+//	@Test
 	def void testCreateObjectDefaultValuesWithinOperation() {
 		assertParsingTrue('''
 			class test {a: text='akey'; b: text='btext'; c : text='ctext'; key a; index b; }
@@ -368,7 +354,7 @@ class RellParsingTest {
 	}
 
 // Check '@'(exactly one) cardinality with Where-part '{}'
-	@Test
+//	@Test
 	def void testExactlyOneCardinalityWherePart() {
 		assertParsingTrue('''
 			class test {field: text; key field; }
@@ -379,7 +365,7 @@ class RellParsingTest {
 	}
 
 // Check '@*'(zero or more) cardinality with Where-part '{}'
-	@Test
+//	@Test
 	def void testZeroOrMoreCardinalityWherePart() {
 		assertParsingTrue('''
 			class test {field: text; key field; }
@@ -389,7 +375,7 @@ class RellParsingTest {
 		''')
 	}
 
-	@Test
+//	@Test
 	def void testVarAndValOperation() {
 		assertParsingTrue('''
 			operation o() { val x = 1; var y = 1; }
@@ -397,7 +383,7 @@ class RellParsingTest {
 	}
 
 // Check '@*'(zero or one, fails if more than one found) cardinality with Where-part '{}'
-	@Test
+//	@Test
 	def void testZeroOrMoreFailCardinalityWherePart() {
 		assertParsingTrue('''
 			class test {field: text; key field; }
@@ -408,7 +394,7 @@ class RellParsingTest {
 	}
 
 // Check '@*'(one or more) cardinality with Where-part '{}'
-	@Test
+//	@Test
 	def void testOneOrMoreCardinalityWherePart() {
 		assertParsingTrue('''
 			class test {field: text; key field; }
@@ -419,7 +405,7 @@ class RellParsingTest {
 	}
 
 // check create new object with explicit attributes initialization in 'create' statement
-	@Test
+//	@Test
 	def void testCreateStatementWithExplicitAttributeInit() {
 		assertParsingTrue('''
 			class foo { id : integer; name : text; }
@@ -431,7 +417,7 @@ class RellParsingTest {
 	}
 
 // check create new object with implicit attributes initialization in 'create' statement
-	@Test
+//	@Test
 	def void testCreateStatementWithImplicitAttributeInit() {
 		assertParsingTrue('''
 			class foo { id : integer; name1 : text; }
@@ -442,7 +428,7 @@ class RellParsingTest {
 	}
 
 // check nested 'create' statement with explicit attributes initialization
-	@Test
+//	@Test
 	def void testNestedCreateStatementWithExplicitAttributeInit() {
 		assertParsingTrue('''
 			class foo { id : integer; name : text; }
@@ -454,7 +440,7 @@ class RellParsingTest {
 	}
 
 // check nested 'create' statement with implicit attributes initialization
-	@Test
+//	@Test
 	def void testNestedCreateStatementWithImlicitAttributeInit() {
 		assertParsingTrue('''
 			class foo { id : integer; name : text; }
@@ -478,7 +464,7 @@ class RellParsingTest {
 	}
 
 // check arbitrary order of 'create' statement parameters with implicit attributes initialization
-	@Test
+//	@Test
 	def void testImplicitArbitraryOrderOfParameters() {
 		assertParsingTrue('''
 			class foo { id : integer; name : text; }
@@ -490,7 +476,7 @@ class RellParsingTest {
 	}
 
 // check at-operator within 'create' statement as parameter
-	@Test
+//	@Test
 	def void testAtOperatorAsParameterInCreate() {
 		assertParsingTrue('''
 			class foo { id : integer; name : text; }
@@ -524,7 +510,7 @@ class RellParsingTest {
 	}
 
 // check explicit reference to a class variable in 'where' part within operation
-	@Test
+//	@Test
 	def void testExplicitRefWherePart() {
 		assertParsingTrue('''
 			class foo { key k: integer; name; }
@@ -535,7 +521,7 @@ class RellParsingTest {
 	}
 
 // check explicit reference to a class variable in 'what' part within operation
-	@Test
+//	@Test
 	def void testExplicitRefWhatPart() {
 		assertParsingTrue('''
 			class foo { key k: integer; name; }
@@ -568,7 +554,7 @@ class RellParsingTest {
 	}
 
 // check pass val variable to where part of at expression 
-	@Test
+//	@Test
 	def void testUpdateOperationValInWherePart() {
 		assertParsingTrue('''
 			class foo { key k: integer; mutable name; }
@@ -580,7 +566,7 @@ class RellParsingTest {
 	}
 
 // check update operation with alias !ERROR (5:24) Syntax error
-//	@Test
+	@Test
 	def void testUpdateOperationWithAlias() {
 		assertParsingTrue('''
 			class country { name: text; }
@@ -598,7 +584,7 @@ class RellParsingTest {
 	}
 
 // check alias in at-expression in update statement !ERROR (4:29) Syntax error
-//	@Test
+	@Test
 	def void testUpdateOperationAliasWithAssignFromAt() {
 		assertParsingTrue('''
 			class country { name: text; }
@@ -628,7 +614,7 @@ class RellParsingTest {
 	}
 
 // check query short form
-	@Test
+//	@Test
 	def void testQueryShortForm() {
 		assertParsingTrue('''
 			query q(x: integer): integer = x * x;
@@ -636,7 +622,7 @@ class RellParsingTest {
 	}
 
 // check query full from
-	@Test
+//	@Test
 	def void testQueryFullForm() {
 		assertParsingTrue('''
 			query q(x: integer): integer { return x * x; }
@@ -644,7 +630,7 @@ class RellParsingTest {
 	}
 
 // check return record from query
-	@Test
+//	@Test
 	def void testReturnRecordWithinQuery() {
 		assertParsingTrue('''
 			record foo { i: integer; s: text; q: text = 'test'; }
@@ -677,7 +663,7 @@ class RellParsingTest {
 	}
 
 // check list addAll, removeAll, containsAll
-	@Test
+//	@Test
 	def void testListaddAllremoveAllcontainsAll() {
 		assertParsingTrue('''
 			query q1() { val x = list<integer?>(); x.addAll(list<integer>([123])); return ''+x; }
@@ -700,7 +686,7 @@ class RellParsingTest {
 	}
 
 // check list calculate
-	@Test
+//	@Test
 	def void testListCalculate() {
 		assertParsingTrue('''
 			query q1() = list([1, 2, 3, 4, 5]).calculate(0) ;
@@ -715,7 +701,7 @@ class RellParsingTest {
 	}
 
 // check list clear, empty
-	@Test
+//	@Test
 	def void testListClearEmpty() {
 		assertParsingTrue('''
 			query q1() { val x = [1, 2, 3]; x.clear(); return x; }
@@ -725,7 +711,7 @@ class RellParsingTest {
 		''')
 	}
 
-	@Test
+//	@Test
 	def void testListSizeLen() {
 		assertParsingTrue('''
 			query q1() = list<integer>().size() ;
@@ -738,7 +724,7 @@ class RellParsingTest {
 	}
 
 // check list from set
-	@Test
+//	@Test
 	def void testListFromSet() {
 		assertParsingTrue('''
 			query q1() = list<integer>(list<integer>()) ;
@@ -763,7 +749,7 @@ class RellParsingTest {
 	}
 
 // check simple create of set
-	@Test
+//	@Test
 	def void testCreateSet() {
 		assertParsingTrue('''
 			query q1() = set<integer>() ;
@@ -775,7 +761,7 @@ class RellParsingTest {
 	}
 
 // check create set from list, set
-	@Test
+//	@Test
 	def void testCreateSetFromListSet() {
 		assertParsingTrue('''
 			query q1() = set<integer>(list<integer>());
@@ -788,7 +774,7 @@ class RellParsingTest {
 	}
 
 // check equals of set 
-	@Test
+//	@Test
 	def void testSetEqualsOperator() {
 		assertParsingTrue('''
 			query q1() { val a = set([1, 2, 3]); val b = set([1, 2, 3]); return a == b; }
@@ -813,6 +799,7 @@ class RellParsingTest {
 		''')
 	}
 
+	@Test
 	def void testInSet() {
 		assertParsingTrue('''
 			query q1() = 123 in set([123, 456]);
@@ -823,7 +810,7 @@ class RellParsingTest {
 	}
 
 // check contains, containsAll set 
-	@Test
+//	@Test
 	def void testSetContains() {
 		assertParsingTrue('''
 			query q1() { val x = set<integer>([123]); return x.contains(123); }
@@ -852,7 +839,7 @@ class RellParsingTest {
 	}
 
 // check add, addAll set 
-	@Test
+//	@Test
 	def void testSetAdd() {
 		assertParsingTrue('''
 			query q1() { val x = set<integer>(); x.add(123); return ''+x; }
@@ -869,7 +856,7 @@ class RellParsingTest {
 	}
 
 // check remove, removeAll set 
-	@Test
+//	@Test
 	def void testSetRemove() {
 		assertParsingTrue('''
 			query q1() { val x = set([1, 2, 3]); val r = x.remove(1); return ''+r+' '+x; }
@@ -887,8 +874,8 @@ class RellParsingTest {
 		''')
 	}
 
-// check set to list, list to set incorrect test Unknown type: 'foo' (will need to add class/record 'foo')
-//	@Test
+// check map methods
+	@Test
 	def void testMapMethods() {
 		assertParsingTrue('''
 			record foo { mutable x: integer; }
@@ -897,10 +884,9 @@ class RellParsingTest {
 			query q3() = map<text,integer>().calculate('Bob') ;
 			query q4() = ['Bob':123,'Alice':456].calculate('Bob') ;
 		''')
-
 	}
 
-	@Test
+//	@Test
 	def void testListCreation() {
 		assertParsingTrue(
 			'''
@@ -913,7 +899,6 @@ class RellParsingTest {
 				}
 			'''
 		)
-
 	}
 
 	@Test
@@ -929,7 +914,7 @@ class RellParsingTest {
 	}
 
 // check set with records
-	@Test
+//	@Test
 	def void testSetWithRecords() {
 		assertParsingTrue('''
 			record foo1 { x: list<set<(a: text, b: integer)>>; }
@@ -942,16 +927,18 @@ class RellParsingTest {
 			query q3() { var s = set([foo4(123)]); return s; }
 		''')
 	}
-	@Test
+	
+//	@Test
 	def void testMethodCall(){
 		assertParsingTrue('''operation o(){
 			val s=set<integer>([123]);
 			val isContains=s.contains(1);
-		}''')
+		}
+		''')
 	}
 	
 	// check set with records
-	@Test
+	//@Test
 	def void testSetMethodsCall() {
 		assertParsingTrue('''
 			record foo1 { x: list<set<(a: text, b: integer)>>; }
@@ -965,7 +952,7 @@ class RellParsingTest {
 		''')
 	}
 
-	@Test
+//	@Test
 	def void testTheRecordType() {
 		assertParsingTrue('''		
 			record bar { p: integer; q: integer; }
@@ -973,7 +960,7 @@ class RellParsingTest {
 		''')
 	}
 
-// check set underline
+// check changing value by position in a set 
 	@Test
 	def void testSetUnderline() {
 		assertParsingTrue('''
@@ -1007,7 +994,7 @@ class RellParsingTest {
 	}
 
 // check set requireNotEmpty
-	@Test
+//	@Test
 	def void testSetRequireNotEmpty() {
 		assertParsingTrue('''
 			query q1() { val x = set<integer>(); return requireNotEmpty(x); }
@@ -1088,7 +1075,7 @@ class RellParsingTest {
 	}
 
 // check map clear() function
-	@Test
+//	@Test
 	def void testMapClear() {
 		assertParsingTrue('''
 			query q() { val x = ['Bob':123,'Alice':567,'Trudy':789]; x.clear(); return x; }
@@ -1153,7 +1140,7 @@ class RellParsingTest {
 	}
 
 // check map contains() function
-	@Test
+//	@Test
 	def void testMapContains() {
 		assertParsingTrue('''
 			query q1() = ['Bob':123].contains('Bob') ;
@@ -1165,7 +1152,7 @@ class RellParsingTest {
 	}
 
 // check '==' map
-	@Test
+//	@Test
 	def void testMapEquals() {
 		assertParsingTrue('''
 			query q1() = ['Bob':123,'Alice':456,'Trudy':789] == ['Bob':123,'Alice':456,'Trudy':789] ;
@@ -1268,7 +1255,7 @@ class RellParsingTest {
 		''')
 	}
 
-	@Test
+//	@Test
 	def void testCreateInOperation() {
 		assertParsingTrue('''
 			class user { key pubkey; index username: text; firstName: text; lastName: text; email: text; }
