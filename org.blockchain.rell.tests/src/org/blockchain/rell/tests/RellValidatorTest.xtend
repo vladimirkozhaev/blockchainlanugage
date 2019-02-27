@@ -18,15 +18,6 @@ class RellValidatorTest {
 	@Inject extension ParseHelper<ClassDefinition>
 	@Inject extension ValidationTestHelper
 	
-
-//	@Test
-//	def void forwardReferencesTest() {
-//		'''operation o(){
-//			j:integer=i;
-//			i:integer;
-//		}'''.parse.assertError(RellPackage.eINSTANCE.operation, RellValidator::FORWARD_REFERENCE,
-//			"Forward reference i")
-//	}
 	@Test
 	def void keyFieldTest() {
 		'''class test {
@@ -37,15 +28,6 @@ class RellValidatorTest {
 						field3:timestamp;
 						field4:signer;
 					}'''.parse.assertNoError("Key index is allowed")
-	}
-	
-	@Test
-	def void forwardReferencesTest1() {
-		val validatedResult = '''operation test(o:integer){
-			j:integer=i+1;
-			i:integer;
-		}'''.parse.validate();
-		Assert.assertTrue(validatedResult.get(0) != null);
 	}
 	
 	@Test
@@ -73,16 +55,16 @@ class RellValidatorTest {
 		Assert.assertTrue(validated.get(0).message.startsWith(RellValidator::NOT_UNIQUE_NANE))
 	}
 	
-//	@Test
-//	def void testDublicateAttributeNameDeclaration() {
-//		val validated = '''
-//			class test {
-//				i : integer;
-//				i : integer;
-//			}
-//		'''.parse.validate()
-//		Assert.assertTrue(validated.get(0).getCode() == RellValidator::DUPLICATE_ATTRIBUTE_NAME)
-//	}
+	@Test
+	def void testDublicateAttributeNameDeclaration() {
+		val validated = '''
+			class test {
+				i : integer;
+				i : integer;
+			}
+		'''.parse.validate()
+		Assert.assertTrue(validated.get(0).message.startsWith(RellValidator::DUPLICATE_ATTRIBUTE_NAME))
+	}
 	
 	@Test
 	def void testDublicateAttributeNameDeclarationInOneLine() {
