@@ -74,10 +74,10 @@ TupleValue:
 	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
 
 ListCreation:
-	'[' arguments=Arguments ']' ('.' LIST_METHOD listMethodArguments+=ArgumentsInBrackets)*;
+	'[' arguments=Arguments ']' (DOT LIST_METHOD listMethodArguments+=ArgumentsInBrackets)*;
 
 MapCreation:
-	'[' mapPart+=MapCreationPart (',' mapPart+=MapCreationPart)* ']' ('.' MAP_METHOD
+	'[' mapPart+=MapCreationPart (',' mapPart+=MapCreationPart)* ']' (DOT MAP_METHOD
 	listMethodArguments+=ArgumentsInBrackets)*;
 
 NewListCreation:
@@ -86,10 +86,10 @@ NewListCreation:
 	((listCreation=ListCreation |
 	newListCreation=NewListCreation |
 	newSetCreation=NewSetCreation)?)
-	')' ('.' LIST_METHOD arguments+=ArgumentsInBrackets)*;
+	')' (DOT LIST_METHOD arguments+=ArgumentsInBrackets)*;
 
 NewMapCreation:
-	Map {NewMapCreation} specification=MapSpecification? '(' (creation=ListCreation?) ')' ('.' MAP_METHOD
+	Map {NewMapCreation} specification=MapSpecification? '(' (creation=ListCreation?) ')' (DOT MAP_METHOD
 	arguments+=Arguments)*;
 
 NewSetCreation:
@@ -97,13 +97,13 @@ NewSetCreation:
 	'('
 	((listCreation=ListCreation | newListCreation=NewListCreation | newSetCreation=NewSetCreation)?)
 	')'
-	('.' LIST_METHOD arguments+=ArgumentsInBrackets)*;
+	(DOT LIST_METHOD arguments+=ArgumentsInBrackets)*;
 
 TupleValueMember:
 	(name=ValuableID '=')? value=Expression;
 
 ClassMemberDefinition:
-	(classRef=ClassRef)? "." (variableDeclarationRef=VariableDeclarationRef|dotValue=DotValue);
+	(classRef=ClassRef)? DOT (variableDeclarationRef=VariableDeclarationRef|dotValue=DotValue);
 
 ClassRef:
 	value=[TableNameWithAlias];
@@ -158,7 +158,8 @@ MulOrDiv returns Expression:
 Primary returns Expression:
 	'(' Expression ')' |
 	{Not} "not" expression=Primary |
-	Atomic;
+	DotValue;
+	
 
 Atomic returns Expression:
 	{IntConstant} value=IntWithMinus |
@@ -175,11 +176,13 @@ Atomic returns Expression:
 	| {NewMCreation} value=NewMapCreation
 	| {TheNull} value=NULL
 	| {CreateClassPart} value=CreateClassPart
-	| {DotValue} value=DotValue;
+	| {VariableDeclarationRef} value=VariableDeclarationRef
+	|{ClassMemberDefinition} value=ClassMemberDefinition
+	|{MethodCall} value=MethodCall
+	;
 
 DotValue:
-	decl=(VariableDeclarationRef|ClassMemberDefinition | MethodCall | Create | TupleValue | ListCreation | MapCreation | NewListCreation |
-	 ListCreation | MapCreation)  ((accesToList=AccessToList?) '.' dotPart=DotValue)?;
+	atom=Atomic  ((accesToList=AccessToList?) DOT dotPart=DotValue)?;
 
 MapCreationPart:
 	exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
@@ -331,6 +334,8 @@ terminal DOUBLE_QUOTE:
 
 terminal NULL:
 	'null';
+	
+terminal DOT:'.';
 
 terminal BYTE_ARRAY_CHAR:
 	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D'

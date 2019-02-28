@@ -70,7 +70,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				
 				if (dotValue.eContainer instanceof DotValue) {
 					val parentDotValue= dotValue.eContainer as DotValue;
-					val parentValue=parentDotValue.decl;
+					val parentValue=parentDotValue.atom;
 					
 					
 					switch(parentValue){
