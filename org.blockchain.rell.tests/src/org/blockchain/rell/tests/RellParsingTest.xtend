@@ -19,6 +19,8 @@ class RellParsingTest {
 	@Inject
 	extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
+	
+	
 
 // Check initialization byte_array
 //	@Test
@@ -573,7 +575,7 @@ class RellParsingTest {
 			class city { name: text; country; }
 			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
 			operation o() { 
-			            update p: person (c1: city, c2: city) @ {
+			            update (p: person, c1: city, c2: city) @ {
 			                p.homeCity.name == c1.name,
 			                p.workCity.name == c2.name,
 			                c1.country.name == 'Germany',
@@ -590,7 +592,7 @@ class RellParsingTest {
 			class country { name: text; }
 			class city { name: text; country; }
 			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
-			operation o() { update p1: person (p2: person) @ { p1.homeCity == p2.workCity } ( score = p1.score * 3 + p2.score ); }
+			operation o() { update (p1: person, p2: person) @ { p1.homeCity == p2.workCity } ( score = p1.score * 3 + p2.score ); }
 		''')
 	}
 
