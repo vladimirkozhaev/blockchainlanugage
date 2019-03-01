@@ -132,7 +132,8 @@ class RellTypeProvider {
 	}
 
 	def typeFor(VariableDeclarationRef variableDeclarationRef) {
-		if (variableDeclarationRef.name instanceof VariableDeclaration) {
+		val name =variableDeclarationRef.name
+		if (name instanceof VariableDeclaration) {
 			val variableDeclaration = variableDeclarationRef.name as VariableDeclaration;
 
 			val TypeReference typeReference = variableDeclaration.type
@@ -155,6 +156,8 @@ class RellTypeProvider {
 
 			return null
 
+		}else{
+			return null
 		}
 	}
 

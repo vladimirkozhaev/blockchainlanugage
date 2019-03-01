@@ -1052,18 +1052,7 @@ class RellParsingTest {
 		''')
 	}
 
-// check map calculate() function
-	@Test
-	def void testMapCalculate() {
-		assertParsingTrue('''
-			query q1() = map<text,integer>().calculate('Bob') ;
-			query q2() = ['Bob':123].calculate('Bob') ;
-			query q3() = ['Bob':123].calculate('Alice') ;
-			query q4() = ['Bob':123,'Alice':456].calculate('Bob') ;
-			query q5() = ['Bob':123,'Alice':456].calculate('Alice') ;
-			query q6() = ['Bob':123,'Alice':456].calculate('Trudy') ;
-		''')
-	}
+
 
 // check map str() function
 	@Test
@@ -1118,15 +1107,7 @@ class RellParsingTest {
 		''')
 	}
 
-// check map size() function
-	@Test
-	def void testMapSize() {
-		assertParsingTrue('''
-			query q1() = map<text,integer>().size() ;
-			query q2() = ['Bob':123].size() ;
-			query q3() = ['Bob':123,'Alice':456].size() ;
-		''')
-	}
+
 
 // check 'in' map
 	@Test

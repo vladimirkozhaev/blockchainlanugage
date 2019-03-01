@@ -713,6 +713,16 @@ class WorkingTests {
 			query q5() = ['Bob':123,'Alice':456].contains('Trudy') ;
 		''')
 	}
+	
+	// check map size() function
+	@Test
+	def void testMapSize() {
+		assertParsingTrue('''
+			query q1() = map<text,integer>().size() ;
+			query q2() = ['Bob':123].size() ;
+			query q3() = ['Bob':123,'Alice':456].size() ;
+		''')
+	}
 
 	// check '==' map
 	@Test
@@ -733,6 +743,19 @@ class WorkingTests {
 			    operation add_user (admin_pubkey: integer, pubkey, username: text, firstName: text, lastName: text, email: text) {
 			           create user (pubkey, username, firstName, lastName, email);
 			    }
+		''')
+	}
+
+	// check map calculate() function
+	@Test
+	def void testMapCalculate() {
+		assertParsingTrue('''
+			query q1() = map<text,integer>().calculate('Bob') ;
+			query q2() = ['Bob':123].calculate('Bob') ;
+			query q3() = ['Bob':123].calculate('Alice') ;
+			query q4() = ['Bob':123,'Alice':456].calculate('Bob') ;
+			query q5() = ['Bob':123,'Alice':456].calculate('Alice') ;
+			query q6() = ['Bob':123,'Alice':456].calculate('Trudy') ;
 		''')
 	}
 
