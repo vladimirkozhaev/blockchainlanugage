@@ -103,7 +103,7 @@ TupleValueMember:
 	(name=ValuableID '=')? value=Expression;
 
 ClassMemberDefinition:
-	(classRef=ClassRef)? DOT (variableDeclarationRef=VariableDeclarationRef|dotValue=DotValue);
+	(classRef=ClassRef)? DOT (variableDeclarationRef=VariableDeclarationRef);
 
 ClassRef:
 	value=[TableNameWithAlias];
@@ -162,8 +162,8 @@ Primary returns Expression:
 	
 
 Atomic returns Expression:
-	{IntConstant} value=IntWithMinus |
-	{StringConstant} value=STRING |
+	{IntConstant} value=IntWithMinus 
+	|{StringConstant} value=STRING |
 	{ByteArrayConstant} value=BYTE_ARRAY_VALUE |
 	{BoolConstant} value=('true' | 'false') |
 	{SelectOp} value=AtOperator |
@@ -177,7 +177,7 @@ Atomic returns Expression:
 	| {TheNull} value=NULL
 	| {CreateClassPart} value=CreateClassPart
 	| {VariableDeclarationRef} value=VariableDeclarationRef
-	|{ClassMemberDefinition} value=ClassMemberDefinition
+	|{ClassMemberDef} value=ClassMemberDefinition
 	|{MethodCall} value=MethodCall
 	;
 

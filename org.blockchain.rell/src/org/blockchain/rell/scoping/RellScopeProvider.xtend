@@ -29,6 +29,7 @@ import org.blockchain.rell.typing.RellTypeProvider
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.mwe.ResourceDescriptionsProvider
 import org.eclipse.xtext.resource.IContainer
 import org.eclipse.xtext.scoping.IScope
@@ -42,11 +43,10 @@ import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
  * on how and when to use it.
  */
 class RellScopeProvider extends AbstractDeclarativeScopeProvider {
-	
+
 	@Inject extension RellTypeProvider
 	@Inject ResourceDescriptionsProvider rdp
-	
-	
+
 	@Inject
 	IContainer.Manager containerManager;
 
@@ -56,37 +56,52 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 		switch (container) {
 			case (container instanceof ClassMemberDefinition): {
-				return variableDeclarationRefScope(variableDeclarationRef, container, ref)
+				
+				val classMemberDefinition= container as ClassMemberDefinition;
+				val classRef=classMemberDefinition.classRef;
+				if (classRef!==null){
+					val varDeclList = classRef.value.getVarDeclList
+					return Scopes::scopeFor(varDeclList)
+					
+				}else{
+					val relContainer=variableDeclarationRef.relationalContainer
+					switch (relContainer){
+						case (relContainer instanceof AtOperator):{
+							return (relContainer as AtOperator).getVariableDeclarationRefScope
+						}
+					}
+				}
+				
+				
+
 			}
 			case (container instanceof CreateWhatPart): {
 				val scope = makeWhatPartScope(container)
 				return scope
 			}
 			case (container instanceof DotValue): {
-				
-				
+
 				val DotValue dotValue = container as DotValue;
-				
-				
+
 				if (dotValue.eContainer instanceof DotValue) {
-					val parentDotValue= dotValue.eContainer as DotValue;
-					val parentValue=parentDotValue.atom;
-					
-					
-					switch(parentValue){
-						case (parentValue instanceof ClassMemberDefinition):{
-							val classMemberDefinition=parentValue as ClassMemberDefinition;
-							if (classMemberDefinition.variableDeclarationRef!==null){
-								val parentClassMemberDef=classMemberDefinition.variableDeclarationRef;
+					val parentDotValue = dotValue.eContainer as DotValue;
+					val parentValue = parentDotValue.atom;
+
+					switch (parentValue) {
+						case (parentValue instanceof ClassMemberDefinition): {
+							val classMemberDefinition = parentValue as ClassMemberDefinition;
+							if (classMemberDefinition.variableDeclarationRef !== null) {
+								val parentClassMemberDef = classMemberDefinition.variableDeclarationRef;
 								parentClassMemberDef.eResource
-								val typeFor=parentClassMemberDef.typeFor
-								//EcoreUtil2.getContainerOfType()
-								if (typeFor instanceof RellClassType){
-									val variableDeclarationList=(typeFor as RellClassType).rellClassDefinition.attributeListField.makeVariableDeclarationList
+								val typeFor = parentClassMemberDef.typeFor
+								// EcoreUtil2.getContainerOfType()
+								if (typeFor instanceof RellClassType) {
+									val variableDeclarationList = (typeFor as RellClassType).rellClassDefinition.
+										attributeListField.makeVariableDeclarationList
 									return Scopes::scopeFor(variableDeclarationList)
 								}
 							}
-							
+
 						}
 					}
 					return variableDeclarationRefScope(variableDeclarationRef,
@@ -101,17 +116,15 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 	}
 
-	
+	protected def IScope variableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef, EObject container,
+		EReference ref) {
+		switch (container) {
+			case (container instanceof AtOperator): {
 
-	protected def IScope variableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef,
-		EObject notExprContainer, EReference ref) {
-		switch (notExprContainer) {
-			case (notExprContainer instanceof AtOperator): {
-
-				return (notExprContainer as AtOperator).getVariableDeclarationRefScope
+				return (container as AtOperator).getVariableDeclarationRefScope
 			}
-			case (notExprContainer instanceof ClassMemberDefinition): {
-				val notNotExprContainer = (notExprContainer as ClassMemberDefinition).eContainer.notExressionContainer;
+			case (container instanceof ClassMemberDefinition): {
+				val notNotExprContainer = (container as ClassMemberDefinition).notClassMemberDefinition
 				switch (notNotExprContainer) {
 					case (notNotExprContainer instanceof AtOperator): {
 						return (notNotExprContainer as AtOperator).variableDeclarationRefScope
@@ -123,29 +136,53 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 							return (nExprContainer as AtOperator).variableDeclarationRefScope
 						}
 					}
+					case (notNotExprContainer instanceof DotValue): {
+
+						val parentDotValue = notNotExprContainer as DotValue;
+						val atom = parentDotValue.atom;
+
+						switch (atom) {
+							case (atom instanceof ClassMemberDefinition): {
+
+								val classMemberDefinition = atom as ClassMemberDefinition;
+								val variableDclarationRef = classMemberDefinition.variableDeclarationRef
+								if (variableDclarationRef != null) {
+
+									val typeFor = variableDclarationRef.typeFor
+									// EcoreUtil2.getContainerOfType()
+									if (typeFor instanceof RellClassType) {
+										val variableDeclarationList = (typeFor as RellClassType).rellClassDefinition.
+											attributeListField.makeVariableDeclarationList
+										return Scopes::scopeFor(variableDeclarationList)
+									}
+								}
+
+							}
+						}
+					}
 				}
 
 			}
-			case (notExprContainer instanceof Update): {
-				val update = notExprContainer as Update
+			case (container instanceof Update): {
+				val update = container as Update
 				return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
 			}
-			case (notExprContainer instanceof Delete): {
-				val delete = notExprContainer as Delete
+			case (container instanceof Delete): {
+				val delete = container as Delete
 				val List<VariableDeclaration> variableDeclarationList = delete.entity.attributeListField.
 					makeVariableDeclarationList
 				return Scopes::scopeFor(variableDeclarationList)
 			}
-			case (notExprContainer instanceof Create): {
-				val update = notExprContainer as Create
+			case (container instanceof Create): {
+				val update = container as Create
 				return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
 			}
-			case (notExprContainer instanceof CreateWhatPart): {
-				return notExprContainer.makeWhatPartScope
+			case (container instanceof CreateWhatPart): {
+				return container.makeWhatPartScope
 
 			}
-			case (notExprContainer instanceof TupleValueMember): {
-				val tupleValue = notExprContainer.eContainer as TupleValue
+			case (container instanceof TupleValueMember): {
+				val tupleValue = container.eContainer as TupleValue
 				val notNotExprContainer = tupleValue.eContainer.notExressionContainer
 				if (notNotExprContainer instanceof AtOperator) {
 					return (notNotExprContainer as AtOperator).variableDeclarationRefScope
@@ -259,7 +296,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		}
 		return super.getScope(classRef, ref);
 
-	}	
+	}
 
 	def IScope getClassMemberDefinition(ClassMemberDefinition classMemberDefinition, EObject processedObject,
 		EReference ref) {
@@ -313,6 +350,22 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	def notExressionContainer(EObject context) {
 		var privateContainer = context
 		while (privateContainer instanceof Expression) {
+			privateContainer = privateContainer.eContainer
+		}
+		return privateContainer;
+	}
+	
+	def relationalContainer(EObject context) {
+		var privateContainer = context
+		while (!(privateContainer instanceof AtOperator||privateContainer instanceof Create||privateContainer instanceof Update)) {
+			privateContainer = privateContainer.eContainer
+		}
+		return privateContainer;
+	}
+
+	def notClassMemberDefinition(EObject context) {
+		var privateContainer = context
+		while (privateContainer instanceof ClassMemberDefinition) {
 			privateContainer = privateContainer.eContainer
 		}
 		return privateContainer;
