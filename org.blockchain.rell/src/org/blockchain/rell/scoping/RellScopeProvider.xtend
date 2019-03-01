@@ -35,6 +35,7 @@ import org.eclipse.xtext.resource.IContainer
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
+import org.blockchain.rell.rell.ClassMemberDef
 
 /**
  * This class contains custom scoping description.
@@ -50,11 +51,46 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	@Inject
 	IContainer.Manager containerManager;
 
+
+	protected def classMemberDefinitionScope(ClassMemberDefinition classMemberDefinition,
+		VariableDeclarationRef variableDeclarationRef) {
+		if (classMemberDefinition.variableDeclarationRef !== null) {
+			val parentClassMemberDef = classMemberDefinition.variableDeclarationRef;
+			parentClassMemberDef.eResource
+			val typeFor = parentClassMemberDef.typeFor
+			// EcoreUtil2.getContainerOfType()
+			if (typeFor instanceof RellClassType) {
+				val variableDeclarationList = (typeFor as RellClassType).rellClassDefinition.attributeListField.
+					makeVariableDeclarationList
+				return Scopes::scopeFor(variableDeclarationList)
+			}
+		}
+	}
 	def IScope getVariableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef, EReference ref) {
 
 		val container = variableDeclarationRef.eContainer;
 
 		switch (container) {
+			case (container instanceof VariableDeclarationRef):{
+				if (container.eContainer instanceof DotValue){
+					val dotValue=container.eContainer as DotValue
+					val parent=dotValue.eContainer
+					 
+					switch (parent ){
+						case (parent instanceof DotValue):{
+							val parentDotValue=(parent as DotValue)
+							val currentAtom=parentDotValue.atom;
+							if (currentAtom instanceof ClassMemberDef){
+								return classMemberDefinitionScope((currentAtom as ClassMemberDef).value,variableDeclarationRef)
+							}
+							
+						} case (parent.eContainer instanceof CreateWhatPart): {
+							val scope = makeWhatPartScope(parent.eContainer)
+							return scope
+						}
+					}
+				}
+			}
 			case (container instanceof ClassMemberDefinition): {
 				
 				val classMemberDefinition= container as ClassMemberDefinition;
