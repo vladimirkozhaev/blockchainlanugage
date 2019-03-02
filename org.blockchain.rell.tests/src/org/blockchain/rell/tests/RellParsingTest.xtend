@@ -19,8 +19,164 @@ class RellParsingTest {
 	@Inject
 	extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
-	
-	
+
+	/*Object type (from Rell v7). Attributes of an object must have default values, 
+	 * cannot to be applied to object attributes 'key' and 'index'
+	 */
+	@Test
+	def void testObjectType() {
+		assertParsingTrue('''
+			object obj {
+			    k : pubkey = x'e04fd020ea3a6910a2d808002b30309d';
+			    mutable value : integer = 0;
+			    mutable text : text = 'text';
+			    mutable active : boolean = true; 
+			}
+		''')
+	}
+
+// Update object
+	@Test
+	def void testObjectUpdateOperation() {
+		assertParsingTrue('''
+			object obj {
+			    k : pubkey = x'e04fd020ea3a6910a2d808002b30309d';
+			    mutable value : integer = 0;
+			    mutable text : text = 'text';
+			    mutable active : boolean = true; 
+			}
+			operation op_obj() { update obj (value *= 2, text = 'new text', active = false);}
+		''')
+	}
+
+// Read object attributes
+	@Test
+	def void testReadObjectAtributes() {
+		assertParsingTrue('''
+			object obj {
+			    k : pubkey = x'e04fd020ea3a6910a2d808002b30309d';
+			    mutable value : integer = 0;
+			    mutable text : text = 'text';
+			    mutable active : boolean = true; 
+			}
+			
+			query get_obj_k() = obj.k;
+			query get_obj_value() = obj.value;
+			query get_obj_text() = obj.text;
+			query get_obj_active() = obj.active;
+		''')
+	}
+
+	/*Enum type (from Rell v7) Values are stored in a database as integers. 
+	 * Each constant has a numeric value equal to its position in the enum (the first value is 0).
+	 */
+	@Test
+	def void testEnumType() {
+		assertParsingTrue('''
+			enum countryCode {
+			    AF, AD, BE, BR, CA, EE,
+			    DE, LT, MD, NL, GB, UA,
+			    US, SA, SK, VU, VN, ZW 
+			}
+		''')
+	}
+
+// Operations with Enum type
+	@Test
+	def void testEnumTypeOperation() {
+		assertParsingTrue('''
+			enum countryCode {
+			    AF, AD, BE, BR, CA, EE,
+			    DE, LT, MD, NL, GB, UA,
+			    US, SA, SK, VU, VN, ZW 
+			}
+			
+			enum currency {
+			USD, EUR, GBP
+			}
+			
+			operation op() {
+			    var ccode1 = countryCode.value('UA');
+			    var ccode2 = countryCode.value(5);
+			    
+			    var c: currency;
+			    c = currency.USD;
+			    val eurStr: text = currency.EUR.name;
+			    val eurValue: integer = currency.EUR.value;
+			    
+			    val countryCodes: list<countryCode> = countryCode.values();
+			    val currencies: list<currency> = currency.values();
+			}
+		''')
+	}
+
+// "if" can be used in expressions (from Rell v7)
+	@Test
+	def void testIfInExpressions() {
+		assertParsingTrue('''
+			query q(a : integer, b : integer) = if(a >= b) a else b;
+		''')
+	}
+
+// Update accept expression (from Rell v7)
+	@Test
+	def void testUpdate() {
+		assertParsingTrue('''
+			class user { name: text; mutable score: integer; }
+			operation o(i : integer) { 
+			    val u = user @* { .name == 'Alice' }; 
+			    update u ( score += 100 ); 
+			    update u ( score *= 2 );
+			    update u ( score *= 4 * i );
+			    update u ( score /= 6 * i * i );
+			    update u ( score -= 8 + .score - i );
+			}
+		''')
+	}
+
+// Create statement
+	@Test
+	def void testCreate1() {
+		assertParsingTrue('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { create city('London', country @ { 'England' }); }
+		''')
+	}
+
+// Create statement
+	@Test
+	def void testCreateCase1() {
+		assertParsingTrue('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { create person('John', homeCity = city @ { 'New York' }, workCity = city @ { 'London' }, score = 100); }
+		''')
+
+	}
+
+// Create statement
+	@Test
+	def void testCreateCase2() {
+		assertParsingTrue('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { create person('John', homeCity = city @ { 'New York' }, workCity = city @ { 'London' }, score = 100); }
+		''')
+
+	}
+
+// Create statement
+	@Test
+	def void testCreateCase3() {
+		assertParsingTrue('''
+			class default_score { mutable value: integer; }
+			class person { name: text; score: integer = default_score@{}.value; }
+		''')
+	}
 
 // Check initialization byte_array
 //	@Test
@@ -127,7 +283,7 @@ class RellParsingTest {
 			}
 		''')
 	}
-	
+
 	// Check tuple of two values from at expression
 //	@Test
 	def void testNestedTupleTwoTypesWithoutSelectCondition() {
@@ -141,7 +297,7 @@ class RellParsingTest {
 	}
 
 	// Check a tuple of two values from at expression with condition 
-	//@Test
+	// @Test
 	def void testOneChainTuple() {
 		assertParsingTrue('''
 			class company { name;  type : integer;}
@@ -152,7 +308,7 @@ class RellParsingTest {
 	}
 
 	// Check return a tuple of two values from at expression without condition
-	//@Test
+	// @Test
 	def void testOneChainTupleWithoutCondition() {
 		assertParsingTrue('''
 			class company { name;  type : integer;}
@@ -163,7 +319,7 @@ class RellParsingTest {
 	}
 
 	// Check at operator
-	//@Test
+	// @Test
 	def void testAtOperator() {
 		assertParsingTrue('''
 			class company { name;  type : integer;}
@@ -929,18 +1085,18 @@ class RellParsingTest {
 			query q3() { var s = set([foo4(123)]); return s; }
 		''')
 	}
-	
+
 //	@Test
-	def void testMethodCall(){
+	def void testMethodCall() {
 		assertParsingTrue('''operation o(){
 			val s=set<integer>([123]);
 			val isContains=s.contains(1);
 		}
 		''')
 	}
-	
+
 	// check set with records
-	//@Test
+	// @Test
 	def void testSetMethodsCall() {
 		assertParsingTrue('''
 			record foo1 { x: list<set<(a: text, b: integer)>>; }
@@ -1052,8 +1208,6 @@ class RellParsingTest {
 		''')
 	}
 
-
-
 // check map str() function
 	@Test
 	def void testMapStr() {
@@ -1106,8 +1260,6 @@ class RellParsingTest {
 			query q4() { val x = ['Bob':123,'Alice':456]; val v = x.values(); x.clear(); return ''+x+' '+v; }
 		''')
 	}
-
-
 
 // check 'in' map
 	@Test
