@@ -38,7 +38,7 @@ class RellAstChecker {
 			val name = a.name.name
 			val type = a.name.type
 			val typename = if (type !== null) {
-					new S_NameType(getName(a.name.type, type.type))
+					new S_NameType(getName(type, type.type))
 			}
 			val attr = new S_NameTypePair(
 				getName(a.name, name),
@@ -150,6 +150,9 @@ class RellAstChecker {
 			StringConstant: new S_StringLiteralExpr(getPos(e), e.value)
 			IntConstant: new S_IntLiteralExpr(getPos(e), Integer.valueOf(e.value))
 			BoolConstant: new S_BooleanLiteralExpr(getPos(e), Boolean.valueOf(e.value))
+			ByteArrayConstant: {
+				new S_ByteArrayLiteralExpr(getPos(e), hexStringToByteArray(e.value.substring(1)))
+			}
 			Not: new S_UnaryExpr(getPos(e), new S_Node(getPos(e),S_UnaryOp_Not), new S_NameExpr(new S_Name(getPos(e), "")))
 			MulOrDiv: {
 				val binaryExpressionTails = newArrayList
@@ -199,7 +202,11 @@ class RellAstChecker {
 						binaryExpressionTails
 				)
 			}
-			ExpressionImpl: new S_IntLiteralExpr(getPos(e), Integer.valueOf("123"))
+			ExpressionImpl: {
+				convertToS_Expr(e.or)
+			//	new S_StringLiteralExpr(getPos(e), e.or.value)
+				
+			}
 			default: throw new RuntimeException("Unknown expression")
 		}
 	}
@@ -294,5 +301,15 @@ class RellAstChecker {
 			target.put(obj, #[new RellError(e.toString())])
 		}
 	}
+	
+	def hexStringToByteArray(String s) {
+    val len = s.length();
+    val data = newByteArrayOfSize(len / 2);
+    for (var i = 0; i < len; i += 2) {
+    	val nextByte = Byte.valueOf(((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16)).toString)
+        data.set(i / 2, nextByte);
+    }
+    return data;
+}
 	
 }

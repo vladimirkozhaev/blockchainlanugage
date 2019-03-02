@@ -19,6 +19,81 @@ class RellValidatorTest {
 	@Inject extension ValidationTestHelper
 	
 	@Test
+	def void emptyClassTest() {
+		val response = '''class Test {}'''.parse.validate()
+		Assert.assertTrue(response.isEmpty())
+	}
+	
+	@Test
+	def void emptyRecordTest() {
+		val response = '''record Test {}'''.parse.validate()
+		Assert.assertTrue(response.isEmpty())
+	}
+	
+	@Test
+	def void classWithNotInitializedFieldWithoutTypeTest() {
+		val response = '''class Test {
+			test;
+		}'''.parse.validate()
+		Assert.assertTrue(response.get(0).message.startsWith("Type for 'test' not specified and no type called 'test'"))
+	}
+	
+	@Test
+	def void classWithNotInitializedFieldTest() {
+		val response = '''class Test {
+			test:text;
+		}'''.parse.validate()
+		Assert.assertTrue(response.isEmpty())
+	}
+	
+	@Test
+	def void classWithNotInitializedMutableKeyIndexFieldTest() {
+		val response = '''class Test {
+			mutable key index test:text;
+		}'''.parse.validate()
+		Assert.assertTrue(response.isEmpty())
+	}
+	
+	@Test
+	def void classWithNotInitializedFieldsTest() {
+		val response = '''class Test {
+			test:text;
+			test2:text;
+		}'''.parse.validate()
+		Assert.assertTrue(response.isEmpty())
+	}
+	
+	@Test
+	def void classWithNotInitializedFieldsCommaTest() {
+		val response = '''class Test {
+			test:text, test2:text;
+		}'''.parse.validate()
+		Assert.assertTrue(response.isEmpty())
+	}
+	
+	@Test
+	def void classWithInitializedFieldAllPrimitivesTest() {
+		var response = "class Test { test: text = \"test\" ;	}".parse.validate()
+		Assert.assertTrue(response.isEmpty())
+		response = "class Test { test: integer = 1;	}".parse.validate()
+		Assert.assertTrue(response.isEmpty())
+		response = "class Test { test: tuid = \"test\";	}".parse.validate()
+		Assert.assertTrue(response.isEmpty())
+		response = "class Test { test: name = \"test\";	}".parse.validate()
+		Assert.assertTrue(response.isEmpty())
+		response = "class Test { test: timestamp = 12345;	}".parse.validate()
+		Assert.assertTrue(response.isEmpty())
+		response = "class Test { test: boolean = true;	}".parse.validate()
+		Assert.assertTrue(response.isEmpty())
+//		var response = "class Test { test: json = \"{}\";	}".parse.validate()
+//		Assert.assertTrue(response.isEmpty())
+		response = "class Test { test: pubkey = x'00';	}".parse.validate()
+		Assert.assertTrue(response.isEmpty())
+		response = "class Test { test: byte_array = x'0011';	}".parse.validate()
+		Assert.assertTrue(response.isEmpty())
+	}
+	
+	@Test
 	def void keyFieldTest() {
 		'''class test {
 						key field1:pubkey;
