@@ -93,6 +93,14 @@ class RellValidatorTest {
 		Assert.assertTrue(response.isEmpty())
 	}
 	
+//	@Test
+//	def void classWithInitializedListFieldTest() {
+//		val response = '''class X {
+//			test: list <integer> = [1,2];
+//		}'''.parse.validate();
+//		Assert.assertTrue(response.isEmpty())
+//	}
+	
 	@Test
 	def void keyFieldTest() {
 		'''class test {
@@ -163,5 +171,61 @@ class RellValidatorTest {
 		'''.parse.validate()
 		Assert.assertTrue(validated.get(0).message.startsWith(RellValidator::DUPLICATE_VARIABLE_NAME))
 	}
+	
+	
+	@Test
+	def void testEmptyOperation() {
+		val validated = '''
+			operation test() {}
+		'''.parse.validate()
+		Assert.assertTrue(validated.isEmpty)
+	}
+	
+	@Test
+	def void testOperationWithAttributes() {
+		val validated = '''
+			operation test(test:integer = 1, test2:integer = 1) {}
+		'''.parse.validate()
+		Assert.assertTrue(validated.isEmpty)
+	}
+	
+	@Test
+	def void testOperationWithOperationVariableStatements() {
+		val validated = '''
+			operation test() {
+				val test: integer = 1;
+				var test2: integer = 1;
+			}
+		'''.parse.validate()
+		Assert.assertTrue(validated.isEmpty)
+	}
+	
+//	@Test
+//	def void testOperationWithCreateStatements() {
+//		val validated = '''
+//			class X{
+//				test: integer = 1;
+//			}
+//			operation test() {
+//				create X@(xx:integer = 22)
+//			}
+//		'''.parse.validate()
+//		Assert.assertTrue(validated.isEmpty)
+//	}
+	
+//	@Test
+//	def void testOperationWithUpdateStatements() {
+//		val validated = '''
+//			class X{
+//				test: integer = 1;
+//			}
+//			operation test() {
+//				update X@{
+//					2
+//				}(test2:integer = 1)
+//			}
+//		'''.parse.validate()
+//		Assert.assertTrue(validated.isEmpty)
+//	}
 
 }

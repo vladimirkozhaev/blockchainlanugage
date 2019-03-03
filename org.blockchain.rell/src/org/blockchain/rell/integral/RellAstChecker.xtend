@@ -34,11 +34,11 @@ class RellAstChecker {
 	def List<S_AttributeClause> make_S_RelClause(AttributeListField alf) {
 		var response = newArrayList;
 		for(var i = 0; i < alf.attributeList.get(0).value.size(); i++) {
-			val a = alf.attributeList.get(0).value.get(0)		
+			val a = alf.attributeList.get(0).value.get(i)		
 			val name = a.name.name
 			val type = a.name.type
 			val typename = if (type !== null) {
-					new S_NameType(getName(type, type.type))
+					new S_NameType(getName(type, getTypeName(type)))
 			}
 			val attr = new S_NameTypePair(
 				getName(a.name, name),
@@ -49,6 +49,16 @@ class RellAstChecker {
 			))
 		}
 		return response;
+	}
+	
+	private def getTypeName(TypeReference type) {
+		if(type.list != null) {
+			return type.list.list.listType.type;
+		} else if(type.map != null) {
+			return type.map.map.keySpec.type;
+		} else if(type.set != null) {
+			return type.set.set.listType.type;
+		} else return type.type;
 	}
 
 	def S_ClassDefinition make_S_ClassDefinition(ClassDefinition cd) {
@@ -77,7 +87,7 @@ class RellAstChecker {
 				val name = a.name.name
 				val type = a.name.type
 				val typename = if (type !== null) {
-						new S_NameType(getName(a.name.type, name))
+						new S_NameType(getName(a.name.type, getTypeName(type)))
 				}
 				val attr = new S_NameTypePair(
 					getName(a.name, name),
@@ -115,7 +125,6 @@ class RellAstChecker {
 					currentsStatement = new S_DeleteStatement(getPos(op), from, to)
 				} else if(op instanceof AtOperator) {
 					currentsStatement = new S_VarStatement((new S_Name(getPos(op), "")), new S_NameType(new S_Name(getPos(op), "")), null)
-					System.out.println(op);
 				} else {
 					throw new RuntimeException("Unsupported operation type");
 				}
@@ -150,6 +159,13 @@ class RellAstChecker {
 			StringConstant: new S_StringLiteralExpr(getPos(e), e.value)
 			IntConstant: new S_IntLiteralExpr(getPos(e), Integer.valueOf(e.value))
 			BoolConstant: new S_BooleanLiteralExpr(getPos(e), Boolean.valueOf(e.value))
+			ListCreation: {
+				//new S_ListType(getPos(e), new S_NameType(new S_Name(getPos(e), "integer")))
+				new S_ListExpr(getPos(e), null, e.value.getArguments().listPart.map[it| convertToS_Expr(it)])
+			}
+			DotValue: {
+				throw new RuntimeException("Unknown expression")
+			}
 			ByteArrayConstant: {
 				new S_ByteArrayLiteralExpr(getPos(e), hexStringToByteArray(e.value.substring(1)))
 			}
@@ -288,7 +304,6 @@ class RellAstChecker {
 		try {
 			val modDef = make_S_ModuleDefinition(m)
 			val rModule = modDef.compile(true)
-			System.out.println()
 		} catch (C_Error e) {
 			logger.error(e.errMsg)
 			var obj = reverseObjectMap.get(e.pos.row)
