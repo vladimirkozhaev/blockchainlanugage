@@ -19,6 +19,64 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 
+
+//class version { id : pubkey; value: integer; }
+//operation O(){
+//	val version : integer = version@{.id == x'0123abcd'}.value;
+//}
+
+
+// check map empty() function
+	@Test
+	def void testMapEmpty() {
+		assertParsingTrue('''
+			query q1() = map<text,integer>().empty() ;
+			query q2() = ['Bob':123].empty() ;
+			query q3() = ['Bob':123,'Alice':456].empty() ;
+		''')
+	}
+
+
+// check assign value from at-expression in update statement
+	@Test
+	def void testAssesToVariableFromSelect() {
+		assertParsingTrue('''
+			class default_score { name : text; value: integer; }
+			class person { name: text; mutable score: integer = default_score@{}.value; }
+		''')
+	}
+
+// Test at in the dot value
+	@Test
+	def void testAtInTheDotValue() {
+		assertParsingTrue(''' 
+			class version { id : pubkey; value: integer; }
+			operation O(){
+				val version : integer = version@{.id == x'0123abcd'}.value;
+			}
+		''')
+	}
+	
+// Check default attribute value via at-operator that return value by member access
+	@Test
+	def void testDefAttribValWithAtOperatorReturnMemberAccess() {
+		assertParsingTrue(''' 
+			class version { id : pubkey; value: integer; }
+			class model { name: text; version : integer = version@{.id == x'0123abcd'}.value; }
+		''')
+	}
+
+	// Check a tuple of two values from at expression with condition 
+	@Test
+	def void testOneChainTuple() {
+		assertParsingTrue('''
+			class company { name;  type : integer;}
+			operation op() {
+			    val u = company @ { .name == 'Bob' } ( .name, .type );
+			}
+		''')
+	}
+	
 	// Check initialization byte_array
 	@Test
 	def void testInitValueToByteArray() {
@@ -91,16 +149,7 @@ class WorkingTests {
 		''')
 	}
 
-	// Check a tuple of two values from at expression with condition 
-	@Test
-	def void testOneChainTuple() {
-		assertParsingTrue('''
-			class company { name;  type : integer;}
-			operation op() {
-			    val u = company @ { .name == 'Bob' } ( .name, .type );
-			}
-		''')
-	}
+
 
 	// Check return a tuple of two values from at expression without condition
 	@Test

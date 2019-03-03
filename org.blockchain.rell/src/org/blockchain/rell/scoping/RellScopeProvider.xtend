@@ -8,6 +8,7 @@ import javax.inject.Inject
 import org.blockchain.rell.rell.AtOperator
 import org.blockchain.rell.rell.AttributeListField
 import org.blockchain.rell.rell.ClassDefinition
+import org.blockchain.rell.rell.ClassMemberDef
 import org.blockchain.rell.rell.ClassMemberDefinition
 import org.blockchain.rell.rell.ClassRef
 import org.blockchain.rell.rell.ClassRefDecl
@@ -18,6 +19,7 @@ import org.blockchain.rell.rell.Delete
 import org.blockchain.rell.rell.DotValue
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.JustNameDecl
+import org.blockchain.rell.rell.SelectOp
 import org.blockchain.rell.rell.TableNameWithAlias
 import org.blockchain.rell.rell.TupleValue
 import org.blockchain.rell.rell.TupleValueMember
@@ -29,13 +31,11 @@ import org.blockchain.rell.typing.RellTypeProvider
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
-import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.mwe.ResourceDescriptionsProvider
 import org.eclipse.xtext.resource.IContainer
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
-import org.blockchain.rell.rell.ClassMemberDef
 
 /**
  * This class contains custom scoping description.
@@ -51,7 +51,6 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	@Inject
 	IContainer.Manager containerManager;
 
-
 	protected def classMemberDefinitionScope(ClassMemberDefinition classMemberDefinition,
 		VariableDeclarationRef variableDeclarationRef) {
 		if (classMemberDefinition.variableDeclarationRef !== null) {
@@ -66,25 +65,33 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			}
 		}
 	}
+
 	def IScope getVariableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef, EReference ref) {
 
 		val container = variableDeclarationRef.eContainer;
 
 		switch (container) {
-			case (container instanceof VariableDeclarationRef):{
-				if (container.eContainer instanceof DotValue){
-					val dotValue=container.eContainer as DotValue
-					val parent=dotValue.eContainer
-					 
-					switch (parent ){
-						case (parent instanceof DotValue):{
-							val parentDotValue=(parent as DotValue)
-							val currentAtom=parentDotValue.atom;
-							if (currentAtom instanceof ClassMemberDef){
-								return classMemberDefinitionScope((currentAtom as ClassMemberDef).value,variableDeclarationRef)
+			case (container instanceof VariableDeclarationRef): {
+				if (container.eContainer instanceof DotValue) {
+					val dotValue = container.eContainer as DotValue
+					val parent = dotValue.eContainer
+
+					switch (parent ) {
+						case (parent instanceof DotValue): {
+							val parentDotValue = (parent as DotValue)
+							val currentAtom = parentDotValue.atom;
+							switch (currentAtom) {
+								case (currentAtom instanceof ClassMemberDef): {
+									return classMemberDefinitionScope((currentAtom as ClassMemberDef).value,
+										variableDeclarationRef)
+								}
+								case (currentAtom instanceof SelectOp): {
+									return (currentAtom as SelectOp).value.getVariableDeclarationRefScope
+								}
 							}
-							
-						} case (parent.eContainer instanceof CreateWhatPart): {
+
+						}
+						case (parent.eContainer instanceof CreateWhatPart): {
 							val scope = makeWhatPartScope(parent.eContainer)
 							return scope
 						}
@@ -92,23 +99,21 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				}
 			}
 			case (container instanceof ClassMemberDefinition): {
-				
-				val classMemberDefinition= container as ClassMemberDefinition;
-				val classRef=classMemberDefinition.classRef;
-				if (classRef!==null){
+
+				val classMemberDefinition = container as ClassMemberDefinition;
+				val classRef = classMemberDefinition.classRef;
+				if (classRef !== null) {
 					val varDeclList = classRef.value.getVarDeclList
 					return Scopes::scopeFor(varDeclList)
-					
-				}else{
-					val relContainer=variableDeclarationRef.relationalContainer
-					switch (relContainer){
-						case (relContainer instanceof AtOperator):{
+
+				} else {
+					val relContainer = variableDeclarationRef.relationalContainer
+					switch (relContainer) {
+						case (relContainer instanceof AtOperator): {
 							return (relContainer as AtOperator).getVariableDeclarationRefScope
 						}
 					}
 				}
-				
-				
 
 			}
 			case (container instanceof CreateWhatPart): {
@@ -390,10 +395,11 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		}
 		return privateContainer;
 	}
-	
+
 	def relationalContainer(EObject context) {
 		var privateContainer = context
-		while (!(privateContainer instanceof AtOperator||privateContainer instanceof Create||privateContainer instanceof Update)) {
+		while (!(privateContainer instanceof AtOperator || privateContainer instanceof Create ||
+			privateContainer instanceof Update)) {
 			privateContainer = privateContainer.eContainer
 		}
 		return privateContainer;

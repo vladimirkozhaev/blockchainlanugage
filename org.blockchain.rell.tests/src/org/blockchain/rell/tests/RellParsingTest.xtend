@@ -213,14 +213,7 @@ class RellParsingTest {
 		''')
 	}
 
-// Check default attribute value via at-operator that return value by member access
-	@Test
-	def void testDefAttribValWithAtOperatorReturnMemberAccess() {
-		assertParsingTrue(''' 
-			class version { id : pubkey; value: integer; }
-			class model { name: text; version : integer = version@{.id == x'0123abcd'}.value; }
-		''')
-	}
+
 
 // Check that a class can have the 'key' clause after an attribute definition
 //	@Test
@@ -451,17 +444,7 @@ class RellParsingTest {
 		''')
 	}
 
-// check arbitrary order of 'create' statement parameters with explicit attributes initialization
-	@Test
-	def void testExplicitArbitraryOrderOfParameters() {
-		assertParsingTrue('''
-			class foo { id : integer; name1 : text; }
-			operation op() {
-				create foo(.id = 1, .name1 = 'test');
-				create foo(.name1 = 'test', .id = 1);
-			}
-		''')
-	}
+
 
 // check arbitrary order of 'create' statement parameters with implicit attributes initialization
 //	@Test
@@ -604,14 +587,7 @@ class RellParsingTest {
 		''')
 	}
 
-// check assign value from at-expression in update statement
-	@Test
-	def void testAssesToVariableFromSelect() {
-		assertParsingTrue('''
-			class default_score { name : text; value: integer; }
-			class person { name: text; mutable score: integer = default_score@{}.value; }
-		''')
-	}
+
 
 // check query short form
 //	@Test
@@ -1071,15 +1047,7 @@ class RellParsingTest {
 		''')
 	}
 
-// check map empty() function
-	@Test
-	def void testMapEmpty() {
-		assertParsingTrue('''
-			query q1() = map<text,integer>().empty() ;
-			query q2() = ['Bob':123].empty() ;
-			query q3() = ['Bob':123,'Alice':456].empty() ;
-		''')
-	}
+
 
 // check map keys() function
 	@Test
