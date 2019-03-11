@@ -20,6 +20,8 @@ class WorkingTests {
 	@Inject extension ValidationTestHelper
 
 
+
+
 // Check operation parameters
 	@Test
 	def void testOperationMustProvideParameters() {

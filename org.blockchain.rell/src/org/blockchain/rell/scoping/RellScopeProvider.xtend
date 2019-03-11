@@ -96,7 +96,11 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 						}
 						case (parent.eContainer instanceof CreateWhatPart): {
 							val scope = makeWhatPartVariableDeclarations(parent.eContainer)
-									
+							val operation=EcoreUtil2.getContainerOfType(variableDeclarationRef, Operation)
+							if (operation!==null){
+								var operationVars=RellModelUtil.usedVariables(operation as Operation).filter[variableInfo|variableInfo.declared].map[variableInfo|variableInfo.variableDeclaration]		
+								scope.addAll(operationVars)
+							}
 							return Scopes::scopeFor(scope)
 						}
 					}

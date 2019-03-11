@@ -430,16 +430,7 @@ class RellParsingTest {
 		''')
 	}
 
-// Check operation parameters
-	@Test
-	def void testOperationMustProvideParameters() {
-		assertParsingTrue('''
-			class test {a: text; b: text; c : text; key a; index b; }
-			operation createTest(aParameter : text, bParameter : text, cParameter : text) {
-			    create test(a=aParameter, b=bParameter, c=cParameter);
-			}
-		''')
-	}
+
 
 // Check assign a value of returning 'create' statement to 'val' within 'operation'	
 //	@Test
