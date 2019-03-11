@@ -42,7 +42,7 @@ Relational:
 	Update | Delete | Create | AtOperator;
 
 Update:
-	'update' entity=[ClassDefinition] Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}' '('
+	'update' entity=[ClassDefinition] Ampersand '{' ((conditions+=Expression (',' conditions+=Expression)*)?) '}' '('
 	createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*
 	')';
@@ -60,7 +60,7 @@ CreateClassPart:
 	createWhatPart+=CreateWhatPart)*)? ')';
 
 CreateWhatPart:
-	(varDeclRef=VariableDeclarationRef '=')?
+	 (DOT? varDeclRef=VariableDeclarationRef '=')?
 	condition+=Expression;
 
 AtOperator:

@@ -20,6 +20,27 @@ class WorkingTests {
 	@Inject extension ValidationTestHelper
 
 
+// check assign value from at-expression in update statement
+	@Test
+	def void testUpdateOperationWithAssignFromAt() {
+		assertParsingTrue('''
+			class default_score { name : text; value: integer; }
+			class person { name: text; mutable score: integer = default_score@{}.value; }
+			operation o() { update person @ {} (.score = default_score @{.name == "super_score"}.value); }
+		''')
+	}
+
+// Check tuple of two values from at expression
+	@Test
+	def void testNestedTupleTwoTypes() {
+		assertParsingTrue('''
+			class company { name; address : name; type : integer;}
+			class user { name; company; }
+			operation op() {
+			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address );
+			}
+		''')
+	}
 
 
 // Check operation parameters
