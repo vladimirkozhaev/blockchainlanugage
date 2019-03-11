@@ -20,6 +20,33 @@ class WorkingTests {
 	@Inject extension ValidationTestHelper
 
 
+// Check tuple of three values from at expression 
+	@Test
+	def void testTupleThreeValues() {
+		assertParsingTrue('''
+			class company { name; address : name; type : integer; }
+			class user { name; company; }
+			operation op() {
+			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address, .company.type );
+			}
+		''')
+	}
+
+@Test
+	def void testUpdateWithOperationBeforeTheAssing() {
+		assertParsingTrue('''
+			class user { name: text; mutable score: integer; }
+			operation o(i : integer) { 
+			
+			    update user  ( score += 100 ); 
+			    update user  ( score *= 2 );
+			    update user  ( score *= 4 * i );
+			    update user ( score /= 6 * i * i );
+			    update user ( score -= 8 + .score - i );
+			}
+		''')
+	}
+
 // check assign value from at-expression in update statement
 	@Test
 	def void testUpdateOperationWithAssignFromAt() {

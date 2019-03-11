@@ -20,7 +20,7 @@ Operation:
 Query:
 	"query" name=ID '(' parameters=RelAttrubutesList? ')'
 	(DOUBLE_QUOTE type=TypeReference)?
-	(('=' returnExr=Expression ';') |
+	((ASSIGNMENT returnExr=Expression ';') |
 	('{'
 	statements+=Statement*
 	'return' returnExr=Expression ';'
@@ -30,19 +30,19 @@ Statement:
 	(methodCall=DotValue|relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
 
 VarInitiation:
-	name=VariableDeclarationRef (('[' expr=Expression']')?) ('=' expression=Expression)?;
+	name=VariableDeclarationRef (('[' expr=Expression']')?) (ASSIGNMENT expression=Expression)?;
 
 OperationVariable:
 	assessModificator=(Var | Val) variable=Variable;
 
 Variable:
-	name=VariableDeclaration (('=' expression=Expression)?);
+	name=VariableDeclaration ((ASSIGNMENT expression=Expression)?);
 
 Relational:
 	Update | Delete | Create | AtOperator;
 
 Update:
-	'update' entity=[ClassDefinition] Ampersand '{' ((conditions+=Expression (',' conditions+=Expression)*)?) '}' '('
+	'update' entity=[ClassDefinition] ((Ampersand '{' ((conditions+=Expression (',' conditions+=Expression)*)?) '}')?) '('
 	createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*
 	')';
@@ -60,7 +60,7 @@ CreateClassPart:
 	createWhatPart+=CreateWhatPart)*)? ')';
 
 CreateWhatPart:
-	 (DOT? varDeclRef=VariableDeclarationRef '=')?
+	 (DOT? varDeclRef=VariableDeclarationRef (ASSIGNMENT|PLUS_ASSGIN|MINUS_ASSGIN|DIV_ASSGIN|MUL_ASSGIN))?
 	condition+=Expression;
 
 AtOperator:
@@ -100,7 +100,7 @@ NewSetCreation:
 	(DOT LIST_METHOD arguments+=ArgumentsInBrackets)*;
 
 TupleValueMember:
-	(name=ValuableID '=')? value=Expression;
+	(name=ValuableID ASSIGNMENT)? value=Expression;
 
 ClassMemberDefinition:
 	(classRef=ClassRef)? DOT (variableDeclarationRef=VariableDeclarationRef);
@@ -305,6 +305,13 @@ LIST_METHOD:
 MAP_METHOD:
 	"empty" | "size" | "contains" | "get" | "str" | "clear" | "put" | "putAll" | "remove" | "keys" | "values";
 	//terminal SET_METHOD:LIST_METHOD;
+	
+terminal ASSIGNMENT:'=';
+terminal DIV_ASSGIN:'/=';
+terminal MUL_ASSGIN:'*=';
+terminal PLUS_ASSGIN:'+=';
+terminal MINUS_ASSGIN:'-=';
+
 terminal EQUALS:
 	'==';
 

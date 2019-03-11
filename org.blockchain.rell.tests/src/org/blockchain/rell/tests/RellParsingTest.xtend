@@ -20,20 +20,7 @@ class RellParsingTest {
 	extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 
-	/*Object type (from Rell v7). Attributes of an object must have default values, 
-	 * cannot to be applied to object attributes 'key' and 'index'
-	 */
-	@Test
-	def void testObjectType() {
-		assertParsingTrue('''
-			object obj {
-			    k : pubkey = x'e04fd020ea3a6910a2d808002b30309d';
-			    mutable value : integer = 0;
-			    mutable text : text = 'text';
-			    mutable active : boolean = true; 
-			}
-		''')
-	}
+	
 
 // Update object
 	@Test
@@ -67,19 +54,7 @@ class RellParsingTest {
 		''')
 	}
 
-	/*Enum type (from Rell v7) Values are stored in a database as integers. 
-	 * Each constant has a numeric value equal to its position in the enum (the first value is 0).
-	 */
-	@Test
-	def void testEnumType() {
-		assertParsingTrue('''
-			enum countryCode {
-			    AF, AD, BE, BR, CA, EE,
-			    DE, LT, MD, NL, GB, UA,
-			    US, SA, SK, VU, VN, ZW 
-			}
-		''')
-	}
+	
 
 // Operations with Enum type
 	@Test
@@ -110,47 +85,9 @@ class RellParsingTest {
 		''')
 	}
 
-// "if" can be used in expressions (from Rell v7)
-	@Test
-	def void testIfInExpressions() {
-		assertParsingTrue('''
-			query q(a : integer, b : integer) = if(a >= b) a else b;
-		''')
-	}
-
-// Update accept expression (from Rell v7)
-	@Test
-	def void testUpdate() {
-		assertParsingTrue('''
-			class user { name: text; mutable score: integer; }
-			operation o(i : integer) { 
-			    val u = user @* { .name == 'Alice' }; 
-			    update u ( score += 100 ); 
-			    update u ( score *= 2 );
-			    update u ( score *= 4 * i );
-			    update u ( score /= 6 * i * i );
-			    update u ( score -= 8 + .score - i );
-			}
-		''')
-	}
 
 
 
-
-
-
-
-// Check tuple of three values from at expression 
-	@Test
-	def void testTupleThreeValues() {
-		assertParsingTrue('''
-			class company { name; address : name; type : integer; }
-			class user { name; company; }
-			operation op() {
-			    val u = user @ { .name == 'Bob' } ( .company.name, .company.address, .company.type );
-			}
-		''')
-	}
 
 
 
