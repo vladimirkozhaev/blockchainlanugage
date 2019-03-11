@@ -37,9 +37,7 @@ class RellAstChecker {
 			val a = alf.attributeList.get(0).value.get(i)		
 			val name = a.name.name
 			val type = a.name.type
-			val typename = if (type !== null) {
-					new S_NameType(getName(type, getTypeName(type)))
-			}
+			val typename = getTypeName(type)
 			val attr = new S_NameTypePair(
 				getName(a.name, name),
 				typename			
@@ -52,14 +50,27 @@ class RellAstChecker {
 	}
 	
 	private def getTypeName(TypeReference type) {
-		if(type.list != null) {
-			return type.list.list.listType.type;
-		} else if(type.map != null) {
-			return type.map.map.keySpec.type;
-		} else if(type.set != null) {
-			return type.set.set.listType.type;
-		} else return type.type;
+		if (type !== null) {
+			if(type.list != null) {
+				return new S_ListType(getPos(type), new S_NameType(new S_Name(getPos(type), type.list.list.listType.type)));
+			} else if(type.map != null) {
+				return new S_MapType(getPos(type), new S_NameType(new S_Name(getPos(type), type.map.map.keySpec.type)), new S_NameType(new S_Name(getPos(type), type.map.map.valSpec.type)));
+			} else if(type.set != null) {
+				return new S_SetType(getPos(type), new S_NameType(new S_Name(getPos(type), type.set.set.listType.type)));
+			} else return new S_NameType(new S_Name(getPos(type), type.type));
+		//			new S_NameType(getName(type, getTypeName(type)))
+		} else return null
 	}
+	
+//	private def getTypeName(TypeReference type) {
+//		if(type.list != null) {
+//			return new S_ListType(type.list.list.listType.type);
+//		} else if(type.map != null) {
+//			return type.map.map.keySpec.type;
+//		} else if(type.set != null) {
+//			return type.set.set.listType.type;
+//		} else return type.type;
+//	}
 
 	def S_ClassDefinition make_S_ClassDefinition(ClassDefinition cd) {
 		val List<S_AttributeClause> clauses = cd.attributeListField.map[
@@ -86,9 +97,7 @@ class RellAstChecker {
 				val a = operation.parameters.value.get(i)
 				val name = a.name.name
 				val type = a.name.type
-				val typename = if (type !== null) {
-						new S_NameType(getName(a.name.type, getTypeName(type)))
-				}
+				val typename = getTypeName(type)
 				val attr = new S_NameTypePair(
 					getName(a.name, name),
 					typename

@@ -93,13 +93,13 @@ class RellValidatorTest {
 		Assert.assertTrue(response.isEmpty())
 	}
 	
-//	@Test
-//	def void classWithInitializedListFieldTest() {
-//		val response = '''class X {
-//			test: list <integer> = [1,2];
-//		}'''.parse.validate();
-//		Assert.assertTrue(response.isEmpty())
-//	}
+	@Test
+	def void classWithInitializedListFieldTest() {
+		val response = '''class X {
+			test: list <integer> = [1,2];
+		}'''.parse.validate();
+		Assert.assertTrue(response.isEmpty())
+	}
 	
 	@Test
 	def void keyFieldTest() {
