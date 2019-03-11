@@ -134,49 +134,8 @@ class RellParsingTest {
 		''')
 	}
 
-// Create statement
-	@Test
-	def void testCreate1() {
-		assertParsingTrue('''
-			class country { name: text; }
-			class city { name: text; country; }
-			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
-			operation o() { create city('London', country @ { 'England' }); }
-		''')
-	}
 
-// Create statement
-	@Test
-	def void testCreateCase1() {
-		assertParsingTrue('''
-			class country { name: text; }
-			class city { name: text; country; }
-			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
-			operation o() { create person('John', homeCity = city @ { 'New York' }, workCity = city @ { 'London' }, score = 100); }
-		''')
 
-	}
-
-// Create statement
-	@Test
-	def void testCreateCase2() {
-		assertParsingTrue('''
-			class country { name: text; }
-			class city { name: text; country; }
-			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
-			operation o() { create person('John', homeCity = city @ { 'New York' }, workCity = city @ { 'London' }, score = 100); }
-		''')
-
-	}
-
-// Create statement
-	@Test
-	def void testCreateCase3() {
-		assertParsingTrue('''
-			class default_score { mutable value: integer; }
-			class person { name: text; score: integer = default_score@{}.value; }
-		''')
-	}
 
 // Check initialization byte_array
 //	@Test
@@ -672,16 +631,7 @@ class RellParsingTest {
 		''')
 	}
 
-// check simple update operation (short expression to access to class members)
-	@Test
-	def void testUpdateOperationShortAccess() {
-		assertParsingTrue('''
-			class foo { key k: integer; mutable name; }
-			operation op() {
-			    update foo @{.k == 122}(name = "new_name");    
-			}
-		''')
-	}
+
 
 // check simple update operation (full expression to access to class members)
 	@Test

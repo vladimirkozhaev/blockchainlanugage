@@ -19,6 +19,7 @@ import org.blockchain.rell.rell.Delete
 import org.blockchain.rell.rell.DotValue
 import org.blockchain.rell.rell.Expression
 import org.blockchain.rell.rell.JustNameDecl
+import org.blockchain.rell.rell.Operation
 import org.blockchain.rell.rell.SelectOp
 import org.blockchain.rell.rell.TableNameWithAlias
 import org.blockchain.rell.rell.TupleValue
@@ -27,10 +28,12 @@ import org.blockchain.rell.rell.Update
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableDeclarationRef
 import org.blockchain.rell.typing.RellClassType
+import org.blockchain.rell.typing.RellModelUtil
 import org.blockchain.rell.typing.RellTypeProvider
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.mwe.ResourceDescriptionsProvider
 import org.eclipse.xtext.resource.IContainer
 import org.eclipse.xtext.scoping.IScope
@@ -92,8 +95,9 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 						}
 						case (parent.eContainer instanceof CreateWhatPart): {
-							val scope = makeWhatPartScope(parent.eContainer)
-							return scope
+							val scope = makeWhatPartVariableDeclarations(parent.eContainer)
+									
+							return Scopes::scopeFor(scope)
 						}
 					}
 				}
@@ -112,13 +116,15 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 						case (relContainer instanceof AtOperator): {
 							return (relContainer as AtOperator).getVariableDeclarationRefScope
 						}
+						case (relContainer instanceof Update): {
+							return (relContainer as Update).getVariableDeclarationRefScope
+						}
 					}
 				}
 
 			}
 			case (container instanceof CreateWhatPart): {
-				val scope = makeWhatPartScope(container)
-				return scope
+				return Scopes::scopeFor(makeWhatPartVariableDeclarations(container))
 			}
 			case (container instanceof DotValue): {
 
@@ -153,6 +159,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				}
 			}
 		}
+		
 		return super.getScope(variableDeclarationRef, ref)
 
 	}
@@ -219,7 +226,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				return Scopes::scopeFor(update.entity.attributeListField.makeVariableDeclarationList)
 			}
 			case (container instanceof CreateWhatPart): {
-				return container.makeWhatPartScope
+				return Scopes::scopeFor(container.makeWhatPartVariableDeclarations)
 
 			}
 			case (container instanceof TupleValueMember): {
@@ -239,7 +246,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		return scope;
 	}
 
-	protected def IScope makeWhatPartScope(EObject container) {
+	protected def List<VariableDeclaration> makeWhatPartVariableDeclarations(EObject container) {
 		var ClassDefinition en;
 		switch (container.eContainer) {
 			case container.eContainer instanceof Create: {
@@ -253,8 +260,8 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			}
 		}
 
-		val scope = Scopes::scopeFor(en.attributeListField.makeVariableDeclarationList)
-		scope
+		return en.attributeListField.makeVariableDeclarationList
+		
 	}
 
 //	def getVariableAsDBOperationMemberScope(EObject notExprContainer, VariableDeclarationRef variableDeclarationRef,
@@ -366,6 +373,25 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	 */
 	def getVariableDeclarationRefScope(AtOperator atOperator) {
 		val List<VariableDeclaration> classDefList = atOperator.tableNameWithAlias.flatMap[x|x.getVarDeclList].toList
+
+		return Scopes::scopeFor(classDefList);
+	}
+
+	/**
+	 * Return the variable declaration names scope for Update
+	 */
+	def getVariableDeclarationRefScope(Update update) {
+		val List<VariableDeclaration> classDefList = makeVariableDeclarationList(update.entity.attributeListField)
+		val scope=Scopes::scopeFor(classDefList)
+		
+		return scope;
+	}
+	
+	/**
+	 * Return the variable declaration names scope for Update
+	 */
+	def getVariableDeclarationRefScope(Create create) {
+		val List<VariableDeclaration> classDefList = makeVariableDeclarationList(create.entity.attributeListField)
 
 		return Scopes::scopeFor(classDefList);
 	}

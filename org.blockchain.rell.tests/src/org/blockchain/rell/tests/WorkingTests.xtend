@@ -20,10 +20,82 @@ class WorkingTests {
 	@Inject extension ValidationTestHelper
 
 
-//class version { id : pubkey; value: integer; }
-//operation O(){
-//	val version : integer = version@{.id == x'0123abcd'}.value;
-//}
+// Check operation parameters
+	@Test
+	def void testOperationMustProvideParameters() {
+		assertParsingTrue('''
+			class test {a: text; b: text; c : text; key a; index b; }
+			operation createTest(aParameter : text, bParameter : text, cParameter : text) {
+			    create test(a=aParameter, b=bParameter, c=cParameter);
+			}
+		''')
+	}
+// Create statement
+	@Test
+	def void testCreate1() {
+		assertParsingTrue('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { create city('London', country @ { 'England' }); }
+		''')
+	}
+
+// check simple update operation (short expression to access to class members)
+	@Test
+	def void testUpdateOperationShortAccess() {
+		assertParsingTrue('''
+			class foo { key k: integer; mutable name; }
+			operation op() {
+			    update foo @{.k == 122 }(name = "new_name");    
+			}
+		''')
+	}
+	
+	// check pass val variable to where part of at expression 
+	@Test
+	def void testUpdateOperationValInWherePart() {
+		assertParsingTrue('''
+			class foo { key k: integer; mutable name; }
+			operation op() {
+			 val k = 122;
+			  update foo @{.k == 122}(name = "new_name");    
+			}
+		''')
+	}
+
+// Create statement
+	@Test
+	def void testCreateCase1() {
+		assertParsingTrue('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { create person('John', homeCity = city @ { 'New York' }, workCity = city @ { 'London' }, score = 100); }
+		''')
+
+	}
+
+// Create statement
+	@Test
+	def void testCreateCase2() {
+		assertParsingTrue('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { create person('John', homeCity = city @ { 'New York' }, workCity = city @ { 'London' }, score = 100); }
+		''')
+
+	}
+
+// Create statement
+	@Test
+	def void testCreateCase3() {
+		assertParsingTrue('''
+			class default_score { mutable value: integer; }
+			class person { name: text; score: integer = default_score@{}.value; }
+		''')
+	}
 
 
 // check map empty() function
@@ -463,17 +535,7 @@ class WorkingTests {
 		''')
 	}
 
-	// check pass val variable to where part of at expression 
-	@Test
-	def void testUpdateOperationValInWherePart() {
-		assertParsingTrue('''
-			class foo { key k: integer; mutable name; }
-			operation op() {
-			  val k = 122;
-			  update foo @{.k == k}(name = "new_name");    
-			}
-		''')
-	}
+	
 
 	// check query short form
 	@Test
