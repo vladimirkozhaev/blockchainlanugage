@@ -173,7 +173,7 @@ class RellAstChecker {
 				new S_ListExpr(getPos(e), null, e.value.getArguments().listPart.map[it| convertToS_Expr(it)])
 			}
 			DotValue: {
-				throw new RuntimeException("Unknown expression")
+				convertToS_Expr(e.atom)
 			}
 			ByteArrayConstant: {
 				new S_ByteArrayLiteralExpr(getPos(e), hexStringToByteArray(e.value.substring(1)))
