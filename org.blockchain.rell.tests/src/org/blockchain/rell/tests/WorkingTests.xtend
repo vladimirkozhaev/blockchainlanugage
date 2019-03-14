@@ -19,6 +19,16 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 
+@Test
+	def void testUpdateOperationFullAccess() {
+		assertParsingTrue('''
+			class foo { key k: integer; mutable name; }
+			operation op() {
+			    update foo @{foo.k == 122}(name = "new_name");    
+			}
+		''')
+	}
+
 
 // Check tuple of three values from at expression 
 	@Test

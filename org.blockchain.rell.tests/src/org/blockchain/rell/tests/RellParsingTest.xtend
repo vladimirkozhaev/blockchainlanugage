@@ -106,15 +106,7 @@ class RellParsingTest {
 
 
 // check simple update operation (full expression to access to class members)
-	@Test
-	def void testUpdateOperationFullAccess() {
-		assertParsingTrue('''
-			class foo { key k: integer; mutable name; }
-			operation op() {
-			    update foo @{foo.k == 122}(name = "new_name");    
-			}
-		''')
-	}
+	
 
 
 
