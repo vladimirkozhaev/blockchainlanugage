@@ -23,7 +23,7 @@ Query:
 	((ASSIGNMENT returnExr=Expression ';') |
 	('{'
 	statements+=Statement*
-	'return' returnExr=Expression ';'
+	(('return' returnExr=Expression ';')?)
 	'}'));
 
 Statement:

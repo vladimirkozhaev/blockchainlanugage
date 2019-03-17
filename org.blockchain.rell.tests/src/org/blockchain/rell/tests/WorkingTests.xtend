@@ -19,6 +19,14 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 
+// check list addAll, removeAll, containsAll
+	@Test
+	def void testSimpleListMethod() {
+		assertParsingTrue('''
+			query q1() { val x = list<integer?>(); val y=x.add(1);  }
+		''')
+	}
+
 @Test
 	def void testUpdateOperationFullAccess() {
 		assertParsingTrue('''

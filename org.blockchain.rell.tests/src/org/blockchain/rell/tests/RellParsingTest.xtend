@@ -207,13 +207,7 @@ class RellParsingTest {
 		''')
 	}
 
-// check list addAll, removeAll, containsAll
-	@Test
-	def void testSimpleListMethod() {
-		assertParsingTrue('''
-			query q1() { val x = list<integer?>(); val y=x.add(1);  }
-		''')
-	}
+
 
 // check list calculate
 //	@Test
