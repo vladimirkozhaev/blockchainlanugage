@@ -3,9 +3,13 @@
  */
 package org.blockchain.rell
 
+import org.blockchain.rell.scoping.RellNameProvider
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
 class RellRuntimeModule extends AbstractRellRuntimeModule {
+	override bindIQualifiedNameProvider() {
+		RellNameProvider
+	}
 }
