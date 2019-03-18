@@ -91,42 +91,8 @@ class RellParsingTest {
 
 
 
-// Check creating the object of a class within 'operation' 	
-//	@Test
-	def void testCreateObjectWithinOperation() {
-		assertParsingTrue('''
-			class test {a: text; b: text; c : text; key a; index b; }
-			operation createTest() {
-			    create test(a = 'akey', b = 'btext', c = 'ctext');
-			}	
-		''')
-	}
 
 
-
-
-// check simple update operation (full expression to access to class members)
-	
-
-
-
-// check update operation with alias !ERROR (5:24) Syntax error
-	@Test
-	def void testUpdateOperationWithAlias() {
-		assertParsingTrue('''
-			class country { name: text; }
-			class city { name: text; country; }
-			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
-			operation o() { 
-			            update (p: person, c1: city, c2: city) @ {
-			                p.homeCity.name == c1.name,
-			                p.workCity.name == c2.name,
-			                c1.country.name == 'Germany',
-			                c2.country.name == 'USA'
-			            } ( score = 999 );
-			         }
-		''')
-	}
 
 // check alias in at-expression in update statement !ERROR (4:29) Syntax error
 	@Test

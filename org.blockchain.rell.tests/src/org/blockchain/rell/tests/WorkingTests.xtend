@@ -19,6 +19,24 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 
+// check update operation with alias !ERROR (5:24) Syntax error
+	@Test
+	def void testUpdateOperationWithAlias() {
+		assertParsingTrue('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { 
+			            update (p: person, c1: city, c2: city) @ {
+			                p.homeCity.name == c1.name,
+			                p.workCity.name == c2.name,
+			                c1.country.name == 'Germany',
+			                c2.country.name == 'USA'
+			            } ( score = 999 );
+			         }
+		''')
+	}
+
 // check list addAll, removeAll, containsAll
 	@Test
 	def void testSimpleListMethod() {
@@ -828,6 +846,8 @@ class WorkingTests {
 			query q3() { var s = set([foo4(123)]); return s; }
 		''')
 	}
+	
+	
 
 	@Test
 	def void testMethodCall() {

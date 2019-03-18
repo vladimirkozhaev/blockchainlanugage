@@ -212,16 +212,16 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			}
 			case (container instanceof Update): {
 				val update = container as Update
-				return Scopes::scopeFor(update.entity.makeVariableDeclarationList)
+				return Scopes::scopeFor(update.tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList])
 			}
 			case (container instanceof Delete): {
 				val delete = container as Delete
-				val List<VariableDeclaration> variableDeclarationList = delete.entity.makeVariableDeclarationList
-				return Scopes::scopeFor(variableDeclarationList)
+
+				return Scopes::scopeFor(delete.tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList])
 			}
 			case (container instanceof Create): {
 				val update = container as Create
-				return Scopes::scopeFor(update.entity.makeVariableDeclarationList)
+				return Scopes::scopeFor(update.tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList])
 			}
 			case (container instanceof CreateWhatPart): {
 				return Scopes::scopeFor(container.makeWhatPartVariableDeclarations)
@@ -245,20 +245,24 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	}
 
 	protected def List<VariableDeclaration> makeWhatPartVariableDeclarations(EObject container) {
-		var ClassDefinition en;
+
 		switch (container.eContainer) {
 			case container.eContainer instanceof Create: {
-				en = (container.eContainer as Create).entity.getClassDefinitionByTableNameWithAlias
+				return (container.eContainer as Create).tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList].
+					toList
 			}
 			case container.eContainer instanceof Update: {
-				en = (container.eContainer as Update).entity.getClassDefinitionByTableNameWithAlias
+				return (container.eContainer as Update).tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList].
+					toList
+			}
+			case (container.eContainer instanceof Delete): {
+				return (container.eContainer as Delete).tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList].
+					toList
 			}
 			case container.eContainer instanceof CreateClassPart: {
-				en = (container.eContainer as CreateClassPart).entity
+				return (container.eContainer as CreateClassPart).entity.attributeListField.makeVariableDeclarationList
 			}
 		}
-
-		return en.attributeListField.makeVariableDeclarationList
 
 	}
 
@@ -296,35 +300,14 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	protected def List<VariableDeclaration> makeVariableDeclarationList(TableNameWithAlias tableNameWithAlias) {
 		val attributeListField = tableNameWithAlias.getClassDefinitionByTableNameWithAlias.attributeListField
 
-		val List<VariableDeclaration> variableDeclarationList = newArrayList;
-		attributeListField.forEach [ x |
-			if (x.attributeList !== null) {
-				x.attributeList.forEach [ attrList |
-					if (attrList !== null && attrList.value !== null) {
-						attrList.value.forEach [ variable |
-							{
-								if (variable !== null) {
-									variableDeclarationList.add(variable.name)
-								}
-							}
-						]
-					}
-				]
-			}
-		]
-		variableDeclarationList
+		
+		return attributeListField.makeVariableDeclarationList
+		
 	}
+	
+	
 
-//	def IScope getClassRefScope(ClassRef classRef, EReference ref) {
-//
-//		val container = classRef.eContainer.notExressionContainer;
-//		if (container instanceof ClassMemberDefinition) {
-//
-//			return getClassMemberDefinition(container as ClassMemberDefinition, classRef, ref)
-//		}
-//		return super.getScope(classRef, ref);
-//
-//	}
+
 	def IScope getClassMemberDefinition(ClassMemberDefinition classMemberDefinition, EObject processedObject,
 		EReference ref) {
 		val notExprConst = classMemberDefinition.eContainer.notExressionContainer
@@ -352,7 +335,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 	def getClassMemberDefScope(Update update) {
 		val List<TableNameWithAlias> classDefList = newArrayList
-		classDefList.add(update.entity)
+		update.tableNameWithAlias.forEach[x|classDefList.add(x)]
 		return Scopes::scopeFor(classDefList);
 	}
 
@@ -369,8 +352,9 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	 * Return the variable declaration names scope for Update
 	 */
 	def getVariableDeclarationRefScope(Update update) {
-		val List<VariableDeclaration> classDefList = makeVariableDeclarationList(
-			update.entity.getClassDefinitionByTableNameWithAlias.attributeListField)
+		val List<VariableDeclaration> classDefList = update.tableNameWithAlias.flatMap [ x |
+			x.getClassDefinitionByTableNameWithAlias.attributeListField.makeVariableDeclarationList
+		].toList
 		val scope = Scopes::scopeFor(classDefList)
 
 		return scope;
@@ -380,8 +364,9 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	 * Return the variable declaration names scope for Update
 	 */
 	def getVariableDeclarationRefScope(Create create) {
-		val List<VariableDeclaration> classDefList = makeVariableDeclarationList(
-			create.entity.getClassDefinitionByTableNameWithAlias.attributeListField)
+		val List<VariableDeclaration> classDefList = create.tableNameWithAlias.flatMap [ x |
+			x.getClassDefinitionByTableNameWithAlias.attributeListField.makeVariableDeclarationList
+		].toList
 
 		return Scopes::scopeFor(classDefList);
 	}

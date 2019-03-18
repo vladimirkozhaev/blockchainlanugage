@@ -1,6 +1,6 @@
 grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
 
-generate rell "http://www.blockchain.org/rell/Rell"
+generate rell "http://www.blockchain.org/rell/Rell" 
 
 Model:
 	entities+=ClassDefinition*
@@ -42,16 +42,19 @@ Relational:
 	Update | Delete | Create | AtOperator;
 
 Update:
-	'update' entity=TableNameWithAlias ((Ampersand '{' ((conditions+=Expression (',' conditions+=Expression)*)?) '}')?) '('
+	'update' (tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
+	tableNameWithAlias+=TableNameWithAlias)* ')') ((Ampersand '{' ((conditions+=Expression (',' conditions+=Expression)*)?) '}')?) '('
 	createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*
 	')';
 
 Delete:
-	'delete' entity=TableNameWithAlias Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}';
+	'delete' (tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
+	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}';
 
 Create:
-	'create' (entity=TableNameWithAlias) '(' (createWhatPart+=CreateWhatPart (','
+	'create' (tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
+	tableNameWithAlias+=TableNameWithAlias)* ')') '(' (createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*)? ')';
 
 	//There are problem with record part. So will check it in the validatiie
