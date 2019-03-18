@@ -1,13 +1,13 @@
 grammar org.blockchain.rell.Rell with org.eclipse.xtext.common.Terminals
 
-generate rell "http://www.blockchain.org/rell/Rell" 
+generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
 	entities+=ClassDefinition*
 	operations+=(Operation | Query)*;
 
 ClassDefinition:
-	('class' | 'record') name=ID ('extends' superType=[ClassDefinition])? '{'
+	('class' | 'record' | 'object') name=ID ('extends' superType=[ClassDefinition])? '{'
 	attributeListField+=AttributeListField*
 	'}';
 
@@ -27,10 +27,10 @@ Query:
 	'}'));
 
 Statement:
-	(methodCall=DotValue|relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
+	(methodCall=DotValue | relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
 
 VarInitiation:
-	name=VariableDeclarationRef (('[' expr=Expression']')?) (ASSIGNMENT expression=Expression)?;
+	name=VariableDeclarationRef (('[' expr=Expression ']')?) (ASSIGNMENT expression=Expression)?;
 
 OperationVariable:
 	assessModificator=(Var | Val) variable=Variable;
@@ -43,7 +43,8 @@ Relational:
 
 Update:
 	'update' (tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
-	tableNameWithAlias+=TableNameWithAlias)* ')') ((Ampersand '{' ((conditions+=Expression (',' conditions+=Expression)*)?) '}')?) '('
+	tableNameWithAlias+=TableNameWithAlias)* ')') ((Ampersand '{' ((conditions+=Expression (','
+	conditions+=Expression)*)?) '}')?) '('
 	createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*
 	')';
@@ -63,14 +64,14 @@ CreateClassPart:
 	createWhatPart+=CreateWhatPart)*)? ')';
 
 CreateWhatPart:
-	 (DOT? varDeclRef=VariableDeclarationRef (ASSIGNMENT|PLUS_ASSGIN|MINUS_ASSGIN|DIV_ASSGIN|MUL_ASSGIN))?
+	(DOT? varDeclRef=VariableDeclarationRef (ASSIGNMENT | PLUS_ASSGIN | MINUS_ASSGIN | DIV_ASSGIN | MUL_ASSGIN))?
 	condition+=Expression;
 
 AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand (ampersandModificator=AmpersandModificator?) '{'
 	(conditions+=Expression (',' conditions+=Expression)*)? '}'
-	(tupleValue=TupleValue | ('(' dotExpr+=DotValue (',' 
+	(tupleValue=TupleValue | ('(' dotExpr+=DotValue (','
 	dotExpr+=DotValue ')')*))?;
 
 TupleValue:
@@ -108,16 +109,15 @@ TupleValueMember:
 ClassMemberDefinition:
 	(classRef=[TableNameWithAlias])? DOT (variableDeclarationRef=VariableDeclarationRef);
 
-
-
 TableNameWithAlias:
 	classRefDecl=ClassRefDecl |
 	justNameDecl=JustNameDecl;
 
+ClassRefDecl:
+	name=ID DOUBLE_QUOTE classDef=[ClassDefinition];
 
-
-ClassRefDecl:name=ID DOUBLE_QUOTE classDef=[ClassDefinition];
-JustNameDecl:name=[ClassDefinition];
+JustNameDecl:
+	name=[ClassDefinition];
 
 VariableDeclarationRef:
 	name=[VariableDeclaration|ValuableID];
@@ -166,11 +166,10 @@ Primary returns Expression:
 	'(' Expression ')' |
 	{Not} "not" expression=Primary |
 	DotValue;
-	
 
 Atomic returns Expression:
-	{IntConstant} value=IntWithMinus 
-	|{StringConstant} value=STRING |
+	{IntConstant} value=IntWithMinus
+	| {StringConstant} value=STRING |
 	{ByteArrayConstant} value=BYTE_ARRAY_VALUE |
 	{BoolConstant} value=('true' | 'false') |
 	{SelectOp} value=AtOperator |
@@ -183,13 +182,12 @@ Atomic returns Expression:
 	| {NewMCreation} value=NewMapCreation
 	| {TheNull} value=NULL
 	| {CreateClassPart} value=CreateClassPart
-	|{ClassMemberDef} value=ClassMemberDefinition
+	| {ClassMemberDef} value=ClassMemberDefinition
 	| {VariableDeclarationRef} value=VariableDeclarationRef
-	|{MethodCall} value=MethodCall
-	;
+	| {MethodCall} value=MethodCall;
 
 DotValue:
-	atom=Atomic  ((accesToList=AccessToList?) DOT dotPart=DotValue)?;
+	atom=Atomic ((accesToList=AccessToList?) DOT dotPart=DotValue)?;
 
 MapCreationPart:
 	exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
@@ -312,12 +310,20 @@ LIST_METHOD:
 MAP_METHOD:
 	"empty" | "size" | "contains" | "get" | "str" | "clear" | "put" | "putAll" | "remove" | "keys" | "values";
 	//terminal SET_METHOD:LIST_METHOD;
-	
-terminal ASSIGNMENT:'=';
-terminal DIV_ASSGIN:'/=';
-terminal MUL_ASSGIN:'*=';
-terminal PLUS_ASSGIN:'+=';
-terminal MINUS_ASSGIN:'-=';
+terminal ASSIGNMENT:
+	'=';
+
+terminal DIV_ASSGIN:
+	'/=';
+
+terminal MUL_ASSGIN:
+	'*=';
+
+terminal PLUS_ASSGIN:
+	'+=';
+
+terminal MINUS_ASSGIN:
+	'-=';
 
 terminal EQUALS:
 	'==';
@@ -348,8 +354,9 @@ terminal DOUBLE_QUOTE:
 
 terminal NULL:
 	'null';
-	
-terminal DOT:'.';
+
+terminal DOT:
+	'.';
 
 terminal BYTE_ARRAY_CHAR:
 	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D'

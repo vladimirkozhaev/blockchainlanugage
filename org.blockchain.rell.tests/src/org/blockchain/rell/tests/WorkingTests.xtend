@@ -18,6 +18,30 @@ import org.junit.runner.RunWith
 class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
+	
+	// check alias in at-expression in update statement !ERROR (4:29) Syntax error
+	@Test
+	def void testUpdateOperationAliasWithAssignFromAt() {
+		assertParsingTrue('''
+			class country { name: text; }
+			class city { name: text; country; }
+			class person { name: text; homeCity: city; workCity: city; mutable score: integer; }
+			operation o() { update (p1: person, p2: person) @ { p1.homeCity == p2.workCity } ( score = p1.score * 3 + p2.score ); }
+		''')
+	}
+	// Update object
+	@Test
+	def void testObjectUpdateOperation() {
+		assertParsingTrue('''
+			object obj {
+			    k : pubkey = x'e04fd020ea3a6910a2d808002b30309d';
+			    mutable value : integer = 0;
+			    mutable text : text = 'text';
+			    mutable active : boolean = true; 
+			}
+			operation op_obj() { update obj (value *= 2, text = 'new text', active = false);}
+		''')
+	}
 
 // check update operation with alias !ERROR (5:24) Syntax error
 	@Test
