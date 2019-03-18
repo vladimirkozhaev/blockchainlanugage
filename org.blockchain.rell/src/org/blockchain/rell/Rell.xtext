@@ -4,7 +4,7 @@ generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
 	entities+=ClassDefinition*
-	operations+=(Operation | Query)*;
+	operations+=(Operation | Query|Function)*;
 
 ClassDefinition:
 	('class' | 'record' | 'object') name=ID ('extends' superType=[ClassDefinition])? '{'
@@ -25,6 +25,17 @@ Query:
 	statements+=Statement*
 	(('return' returnExr=Expression ';')?)
 	'}'));
+	
+Function:
+	"function" name=ID '(' parameters=RelAttrubutesList? ')'
+	(DOUBLE_QUOTE type=TypeReference)?
+	((ASSIGNMENT returnExr=Expression ';') |
+	('{'
+	statements+=Statement*
+	(('return' returnExr=Expression ';')?)
+	'}'));
+	
+	
 
 Statement:
 	(methodCall=DotValue | relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
@@ -122,8 +133,10 @@ JustNameDecl:
 VariableDeclarationRef:
 	name=[VariableDeclaration|ValuableID];
 
-MethodCall:
+ListMethodCall:
 	name=MethodName arguments=ArgumentsInBrackets;
+
+OperationQueryOFunctionCall:(name=[Query]|name=[Operation]|name=[Function]) arguments=ArgumentsInBrackets;
 
 Arguments:
 	listPart+=Expression (',' listPart+=Expression)*;
@@ -181,10 +194,11 @@ Atomic returns Expression:
 	| {NewSCreation} value=NewSetCreation
 	| {NewMCreation} value=NewMapCreation
 	| {TheNull} value=NULL
+	| {MethodCall} value=ListMethodCall
+	|{OperationQueryOFunctionCall} value=OperationQueryOFunctionCall
 	| {CreateClassPart} value=CreateClassPart
 	| {ClassMemberDef} value=ClassMemberDefinition
-	| {VariableDeclarationRef} value=VariableDeclarationRef
-	| {MethodCall} value=MethodCall;
+	| {VariableDeclarationRef} value=VariableDeclarationRef;
 
 DotValue:
 	atom=Atomic ((accesToList=AccessToList?) DOT dotPart=DotValue)?;

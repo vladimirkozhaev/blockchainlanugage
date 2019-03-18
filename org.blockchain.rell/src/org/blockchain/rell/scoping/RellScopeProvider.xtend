@@ -7,7 +7,6 @@ import java.util.List
 import javax.inject.Inject
 import org.blockchain.rell.rell.AtOperator
 import org.blockchain.rell.rell.AttributeListField
-import org.blockchain.rell.rell.ClassDefinition
 import org.blockchain.rell.rell.ClassMemberDef
 import org.blockchain.rell.rell.ClassMemberDefinition
 import org.blockchain.rell.rell.Create
@@ -16,7 +15,6 @@ import org.blockchain.rell.rell.CreateWhatPart
 import org.blockchain.rell.rell.Delete
 import org.blockchain.rell.rell.DotValue
 import org.blockchain.rell.rell.Expression
-import org.blockchain.rell.rell.JustNameDecl
 import org.blockchain.rell.rell.Operation
 import org.blockchain.rell.rell.SelectOp
 import org.blockchain.rell.rell.TableNameWithAlias
