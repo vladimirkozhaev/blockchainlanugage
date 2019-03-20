@@ -164,10 +164,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	protected def IScope variableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef, EObject container,
 		EReference ref) {
 		switch (container) {
-			case (container instanceof AtOperator): {
-
-				return (container as AtOperator).getVariableDeclarationRefScope
-			}
+			
 			case (container instanceof ClassMemberDefinition): {
 				val notNotExprContainer = (container as ClassMemberDefinition).notClassMemberDefinition
 				switch (notNotExprContainer) {
@@ -208,19 +205,10 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				}
 
 			}
-			case (container instanceof Update): {
-				val update = container as Update
-				return Scopes::scopeFor(update.tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList])
+			case (container.isEObjectCrudOperation):{
+				container.tableWithAlias.flatMap[x|x.makeVariableDeclarationList]
 			}
-			case (container instanceof Delete): {
-				val delete = container as Delete
-
-				return Scopes::scopeFor(delete.tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList])
-			}
-			case (container instanceof Create): {
-				val update = container as Create
-				return Scopes::scopeFor(update.tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList])
-			}
+			
 			case (container instanceof CreateWhatPart): {
 				return Scopes::scopeFor(container.makeWhatPartVariableDeclarations)
 
@@ -234,7 +222,6 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			}
 			default: {
 				val scope = super.getScope(variableDeclarationRef, ref)
-				// println("scope"+scope.allElements)
 				return scope;
 			}
 		}
@@ -242,6 +229,29 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		return scope;
 	}
 
+	def isEObjectCrudOperation(EObject container){
+		(container instanceof AtOperator)||(container instanceof Update)||(container instanceof Create)||(container instanceof Delete)
+	}
+	
+	def EList<TableNameWithAlias> getTableWithAlias(EObject container){
+		switch (container){
+			case (container instanceof AtOperator):{
+				(container as AtOperator).tableNameWithAlias
+			}
+			case (container instanceof Update):{
+				(container as Update).tableNameWithAlias
+			}
+			case (container instanceof Create):{
+				(container as Create).tableNameWithAlias
+			}
+			case (container instanceof Delete):{
+				(container as Delete).tableNameWithAlias
+			}
+			
+		}
+	}
+	
+	
 	protected def List<VariableDeclaration> makeWhatPartVariableDeclarations(EObject container) {
 
 		switch (container.eContainer) {
@@ -255,6 +265,10 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			}
 			case (container.eContainer instanceof Delete): {
 				return (container.eContainer as Delete).tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList].
+					toList
+			}
+			case (container.eContainer instanceof AtOperator): {
+				return (container.eContainer as AtOperator).tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList].
 					toList
 			}
 			case container.eContainer instanceof CreateClassPart: {

@@ -19,6 +19,27 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
+	// check update statement in function
+	@Test
+	def void testUpdateStatementInFunction() {
+		assertParsingTrue('''
+			class user { name: text; mutable score: integer; }
+			function f(name: text, s: integer): integer { update user @ { name } ( score += s ); return s; } query q() = f('Bob', 500) ;
+		''')
+	}
+	
+	// check list with records
+	@Test
+	def void testListWithRecords() {
+		assertParsingTrue('''
+			record foo { x: integer; b: list<bar>; } record bar { s: list<text>; q: boolean; }
+			query q1() { val f = foo(123, [bar(['Hello'], true)]); return f == foo(123, [bar(['Hello'], true)]); }
+			query q2() { val l = ['Hello']; val f = foo(123, [bar(l, true)]);
+			                l.add('Bye');
+			                return f == foo(123, [bar(['Hello'], true)]); }
+		''')
+	}
+	
 	// check simple declaration of function (short form)
 	@Test
 	def void testShortFunctionDeclaration() {
