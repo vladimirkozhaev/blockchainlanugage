@@ -255,22 +255,10 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	protected def List<VariableDeclaration> makeWhatPartVariableDeclarations(EObject container) {
 
 		switch (container.eContainer) {
-			case container.eContainer instanceof Create: {
-				return (container.eContainer as Create).tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList].
-					toList
+			case container.eContainer.isEObjectCrudOperation: {
+				return container.eContainer.tableWithAlias.flatMap[x|x.makeVariableDeclarationList].					toList
 			}
-			case container.eContainer instanceof Update: {
-				return (container.eContainer as Update).tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList].
-					toList
-			}
-			case (container.eContainer instanceof Delete): {
-				return (container.eContainer as Delete).tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList].
-					toList
-			}
-			case (container.eContainer instanceof AtOperator): {
-				return (container.eContainer as AtOperator).tableNameWithAlias.flatMap[x|x.makeVariableDeclarationList].
-					toList
-			}
+			
 			case container.eContainer instanceof CreateClassPart: {
 				return (container.eContainer as CreateClassPart).entity.attributeListField.makeVariableDeclarationList
 			}
