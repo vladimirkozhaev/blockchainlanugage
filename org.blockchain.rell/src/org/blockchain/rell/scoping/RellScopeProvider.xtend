@@ -86,7 +86,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 						}
 						case (parent.eContainer instanceof CreateWhatPart): {
-							val scope = makeWhatPartVariableDeclarations(parent.eContainer)
+							val scope = makeWhatPartVariableDeclarations(parent.eContainer.eContainer)
 							val operation = EcoreUtil2.getContainerOfType(variableDeclarationRef, Operation)
 							if (operation !== null) {
 								var operationVars = RellModelUtil.usedVariables(operation as Operation).filter [ variableInfo |
@@ -120,8 +120,8 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 				}
 
 			}
-			case (container instanceof CreateWhatPart): {
-				return Scopes::scopeFor(makeWhatPartVariableDeclarations(container))
+			case (container instanceof CreateWhatPart&&container.eContainer!==null): {
+				return Scopes::scopeFor(makeWhatPartVariableDeclarations(container.eContainer))
 			}
 			case (container instanceof DotValue): {
 
@@ -210,7 +210,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			}
 			
 			case (container instanceof CreateWhatPart): {
-				return Scopes::scopeFor(container.makeWhatPartVariableDeclarations)
+				return Scopes::scopeFor(container.eContainer.makeWhatPartVariableDeclarations)
 
 			}
 			case (container instanceof TupleValueMember): {
@@ -254,13 +254,13 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 	
 	protected def List<VariableDeclaration> makeWhatPartVariableDeclarations(EObject container) {
 
-		switch (container.eContainer) {
-			case container.eContainer.isEObjectCrudOperation: {
-				return container.eContainer.tableWithAlias.flatMap[x|x.makeVariableDeclarationList].					toList
+		switch (container) {
+			case container.isEObjectCrudOperation: {
+				return container.tableWithAlias.flatMap[x|x.makeVariableDeclarationList].					toList
 			}
 			
-			case container.eContainer instanceof CreateClassPart: {
-				return (container.eContainer as CreateClassPart).entity.attributeListField.makeVariableDeclarationList
+			case container instanceof CreateClassPart: {
+				return (container as CreateClassPart).entity.attributeListField.makeVariableDeclarationList
 			}
 		}
 
