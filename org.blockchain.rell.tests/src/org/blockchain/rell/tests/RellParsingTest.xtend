@@ -20,8 +20,6 @@ class RellParsingTest {
 	extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 
-	
-
 // Update object
 	@Test
 	def void testObjectUpdateOperation() {
@@ -54,43 +52,6 @@ class RellParsingTest {
 		''')
 	}
 
-	
-
-// Operations with Enum type
-	@Test
-	def void testEnumTypeOperation() {
-		assertParsingTrue('''
-			enum countryCode {
-			    AF, AD, BE, BR, CA, EE,
-			    DE, LT, MD, NL, GB, UA,
-			    US, SA, SK, VU, VN, ZW 
-			}
-			
-			enum currency {
-			USD, EUR, GBP
-			}
-			
-			operation op() {
-			    var ccode1 = countryCode.value('UA');
-			    var ccode2 = countryCode.value(5);
-			    
-			    var c: currency;
-			    c = currency.USD;
-			    val eurStr: text = currency.EUR.name;
-			    val eurValue: integer = currency.EUR.value;
-			    
-			    val countryCodes: list<countryCode> = countryCode.values();
-			    val currencies: list<currency> = currency.values();
-			}
-		''')
-	}
-
-
-
-
-
-
-
 // Check creating the object of a class within 'operation' 	
 //	@Test
 	def void testCreateObjectWithinOperation() {
@@ -102,14 +63,7 @@ class RellParsingTest {
 		''')
 	}
 
-
-
-
 // check simple update operation (full expression to access to class members)
-	
-
-
-
 // check update operation with alias !ERROR (5:24) Syntax error
 	@Test
 	def void testUpdateOperationWithAlias() {
@@ -138,10 +92,6 @@ class RellParsingTest {
 			operation o() { update (p1: person, p2: person) @ { p1.homeCity == p2.workCity } ( score = p1.score * 3 + p2.score ); }
 		''')
 	}
-
-
-
-
 
 // check query short form
 //	@Test
@@ -206,8 +156,6 @@ class RellParsingTest {
 			query q8() { val x = list<integer?>([123,456,null]); return x.containsAll(list<integer?>([123,null])); }
 		''')
 	}
-
-
 
 // check list calculate
 //	@Test
@@ -593,8 +541,6 @@ class RellParsingTest {
 		''')
 	}
 
-
-
 // check map keys() function
 	@Test
 	def void testMapKeys() {
@@ -853,6 +799,21 @@ class RellParsingTest {
 			query q78() = optest @ {} ( .ba1 >= .ba2 );
 		''')
 
+	}
+
+	@Test
+	def void testMiscellaneusExpInQueryReturnSt() {
+		assertParsingTrue('''
+			class user { id: integer; name1: text; name2: text; v1: integer; v2: integer; }
+			query q1() { return user @* {} (.id+0, (.name1 + .name2).size()); }
+			query q2() { return user @* {} (.id+0, (.name1 + .name2).upperCase().lowerCase().size()); }
+			query q3() { return user @* {} (.id+0, (.v1 * (.v2 + 101)).str()); }
+			query q4() { return user @* {} (.id+0, (.v1 * (.v2 + 101)).str().size()); }
+			query q5() { val str1 = 'Hello'; val k1 = 777; return user @* {} (.id+0, (str1 + .name2).size()); }
+			query q6() { val str1 = 'Hello'; val k1 = 777; return user @* {} (.id+0, (str1 + .name2).upperCase().lowerCase().size()); }
+			query q7() { val str1 = 'Hello'; val k1 = 777; return user @* {} (.id+0, (k1 * (.v2 + 101)).str()); }
+			query q8() { val str1 = 'Hello'; val k1 = 777; return user @* {} (.id+0, (k1 * (.v2 + 101)).str().size()); }
+		''')
 	}
 
 	def void assertParsingTrue(String codeSnippet) {
