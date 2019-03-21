@@ -21,19 +21,7 @@ class RellParsingTest {
 	@Inject extension ValidationTestHelper
 
 
-// Update object
-	@Test
-	def void testObjectUpdateOperation() {
-		assertParsingTrue('''
-			object obj {
-			    k : pubkey = x'e04fd020ea3a6910a2d808002b30309d';
-			    mutable value : integer = 0;
-			    mutable text : text = 'text';
-			    mutable active : boolean = true; 
-			}
-			operation op_obj() { update obj (value *= 2, text = 'new text', active = false);}
-		''')
-	}
+
 
 
 // Read object attributes

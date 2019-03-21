@@ -20,6 +20,20 @@ class WorkingTests {
 	@Inject extension ValidationTestHelper
 	
 	
+	/*Object type (from Rell v7). Attributes of an object must have default values, 
+	 * cannot to be applied to object attributes 'key' and 'index'
+	 */
+	@Test
+	def void testObjectType() {
+		assertParsingTrue('''
+			object obj {
+			    k : pubkey = x'e04fd020ea3a6910a2d808002b30309d';
+			    mutable value : integer = 0;
+			    mutable text : text = 'text';
+			    mutable active : boolean = true; 
+			}
+		''')
+	}
 	
 	// check update statement in function
 	@Test
