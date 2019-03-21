@@ -15,17 +15,21 @@ import org.blockchain.rell.rell.CreateWhatPart
 import org.blockchain.rell.rell.Delete
 import org.blockchain.rell.rell.DotValue
 import org.blockchain.rell.rell.Expression
+import org.blockchain.rell.rell.Function
 import org.blockchain.rell.rell.Operation
+import org.blockchain.rell.rell.Query
 import org.blockchain.rell.rell.SelectOp
 import org.blockchain.rell.rell.TableNameWithAlias
 import org.blockchain.rell.rell.TupleValue
 import org.blockchain.rell.rell.TupleValueMember
 import org.blockchain.rell.rell.Update
+import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableDeclarationRef
 import org.blockchain.rell.typing.RellClassType
 import org.blockchain.rell.typing.RellModelUtil
 import org.blockchain.rell.typing.RellTypeProvider
+import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
@@ -59,7 +63,8 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		}
 	}
 
-	def List<VariableDeclaration> getVariableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef, EReference ref) {
+	def List<VariableDeclaration> getVariableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef,
+		EReference ref) {
 
 		val container = variableDeclarationRef.eContainer;
 
@@ -152,7 +157,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 			}
 		}
 
-		return null
+		return newArrayList
 
 	}
 
@@ -390,20 +395,80 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		return privateContainer;
 	}
 
+	private def getMethodContainerParameterList(EObject context) {
+		val operationContainer = EcoreUtil2.getContainerOfType(context, Operation)
+		val queryContainer = EcoreUtil2.getContainerOfType(context, Query)
+		val functionContainer = EcoreUtil2.getContainerOfType(context, Function)
+		val List<VariableDeclaration> parametersList = newArrayList
+
+		if (operationContainer !== null) {
+			val operation = operationContainer as Operation
+			if (operation.parameters !== null) {
+				val List<VariableDeclaration> parameters = operation.parameters.value.map [ parameter |
+					parameter.name
+				].toList
+
+				parametersList.addAll(parameters)
+
+			}
+		}
+		if (operationContainer !== null) {
+			val method = operationContainer as Operation
+			if (method.parameters !== null) {
+				val List<VariableDeclaration> parameters = method.parameters.value.map [ parameter |
+					parameter.name
+				].toList
+
+				parametersList.addAll(parameters)
+
+			}
+		}
+
+		if (queryContainer !== null) {
+			val operation = queryContainer as Query
+			if (operation.parameters !== null) {
+				val List<VariableDeclaration> parameters = operation.parameters.value.map [ parameter |
+					parameter.name
+				].toList
+
+				parametersList.addAll(parameters)
+
+			}
+		}
+
+		if (functionContainer !== null) {
+			val operation = functionContainer as Function
+			if (operation.parameters !== null) {
+				val List<VariableDeclaration> parameters = operation.parameters.value.map [ parameter |
+					parameter.name
+				].toList
+
+				parametersList.addAll(parameters)
+
+			}
+		}
+
+		return parametersList
+
+	}
+
 	override IScope getScope(EObject context, EReference reference) {
 		switch (context) {
 			case (context === null):
 				return IScope.NULLSCOPE
 			case (context instanceof VariableDeclarationRef): {
+
+				val List<VariableDeclaration> varDeclList = getVariableDeclarationRefScope(
+					context as VariableDeclarationRef, reference);
+					
 				
-				val varDeclList=getVariableDeclarationRefScope(context as VariableDeclarationRef, reference);
-				if (varDeclList===null||varDeclList.length==0){
+				varDeclList.addAll(getMethodContainerParameterList(context))
+				if (varDeclList === null || varDeclList.length == 0) {
 					super.getScope(context, reference);
-				}else{
+				} else {
 					return Scopes::scopeFor(varDeclList)
 				}
 			}
-
 		}
 		return super.getScope(context, reference);
 
