@@ -19,6 +19,8 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
+	
+	
 	// check update statement in function
 	@Test
 	def void testUpdateStatementInFunction() {
