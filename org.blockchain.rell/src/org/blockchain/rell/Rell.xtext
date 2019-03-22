@@ -172,12 +172,14 @@ PlusOrMinus returns Expression:
 	right=MulOrDiv)*;
 
 MulOrDiv returns Expression:
-	Primary ({MulOrDiv.left=current} op=(MulChar | DivChar)
+	Primary ({MulOrDiv.left=current} op=(MulChar | DivChar|Percent)
 	right=Primary)*;
+
 
 Primary returns Expression:
 	'(' Expression ')' |
 	{Not} "not" expression=Primary |
+	prefixChar=(PlusChar|MinusChar|MulChar|DivChar) expression=Primary|
 	DotValue;
 
 Atomic returns Expression:
@@ -194,6 +196,9 @@ Atomic returns Expression:
 	| {NewSCreation} value=NewSetCreation
 	| {NewMCreation} value=NewMapCreation
 	| {TheNull} value=NULL
+	| {OneParamMethodCall} value=OneParamMethodCall
+	| {TwoParamsMethodCall} value=TwoParamsMethodCall
+	| {MultiParamsMethodCall} value=MultiParamsMethodCall
 	| {MethodCall} value=ListMethodCall
 	|{OperationQueryOFunctionCall} value=OperationQueryOFunctionCall
 	| {CreateClassPart} value=CreateClassPart
@@ -235,6 +240,10 @@ MapSpecification:
 
 TupleType:
 	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
+
+OneParamMethodCall:methodName=ONE_PARAM_METHOD '(' arg=Expression ')';
+TwoParamsMethodCall:methodName=TWO_PARAMS_METHOD '(' arg1=Expression ',' arg2=Expression  ')';
+MultiParamsMethodCall:methodName=MULTI_PARAMS_METHOD args=ArgumentsInBrackets;
 
 PrimitiveType:
 	Text | Tuid | Pubkey | Name | Timestamp | Integer | Json | ByteArray | Boolean;
@@ -316,6 +325,10 @@ MulChar:
 
 DivChar:
 	'/';
+	
+Percent:
+	'%'
+;
 
 LIST_METHOD:
 	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" | "str" | "remove" |
@@ -323,7 +336,11 @@ LIST_METHOD:
 
 MAP_METHOD:
 	"empty" | "size" | "contains" | "get" | "str" | "clear" | "put" | "putAll" | "remove" | "keys" | "values";
-	//terminal SET_METHOD:LIST_METHOD;
+	
+ONE_PARAM_METHOD:'abs'|'is_signer'|'json';
+TWO_PARAMS_METHOD:'max'|'min';
+MULTI_PARAMS_METHOD:'log'|'print';
+	
 terminal ASSIGNMENT:
 	'=';
 
