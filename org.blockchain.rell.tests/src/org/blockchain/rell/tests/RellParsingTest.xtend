@@ -74,46 +74,6 @@ class RellParsingTest {
 	}
 
 
-// Check creating the object of a class within 'operation' 	
-//	@Test
-	def void testCreateObjectWithinOperation() {
-		assertParsingTrue('''
-			class test {a: text; b: text; c : text; key a; index b; }
-			operation createTest() {
-			    create test(a = 'akey', b = 'btext', c = 'ctext');
-			}	
-		''')
-	}
-
-
-
-
-
-
-// check query short form
-//	@Test
-	def void testQueryShortForm() {
-		assertParsingTrue('''
-			query q(x: integer): integer = x * x;
-		''')
-	}
-
-// check query full from
-//	@Test
-	def void testQueryFullForm() {
-		assertParsingTrue('''
-			query q(x: integer): integer { return x * x; }
-		''')
-	}
-
-// check return record from query
-//	@Test
-	def void testReturnRecordWithinQuery() {
-		assertParsingTrue('''
-			record foo { i: integer; s: text; q: text = 'test'; }
-			query q() { val s = 'Hello'; val q = 'Bye'; return foo(i = 123, q, s); }
-		''')
-	}
 
 // check list equal operators ===, !==, ==, !=
 	@Test
@@ -139,124 +99,8 @@ class RellParsingTest {
 		''')
 	}
 
-// check list addAll, removeAll, containsAll
-//	@Test
-	def void testListaddAllremoveAllcontainsAll() {
-		assertParsingTrue('''
-			query q1() { val x = list<integer?>(); x.addAll(list<integer>([123])); return ''+x; }
-			query q2() { val x = list<integer?>(); x.addAll(list<integer?>([123,null])); return ''+x; }
-			query q3() { val x = list<integer>([123,456]); x.removeAll(list<integer>([123])); return ''+x; }
-			query q4() { val x = list<integer?>([123,456,null]); x.removeAll(list<integer>([123])); return ''+x; }
-			query q5() { val x = list<integer?>([123,456,null]); x.removeAll(list<integer?>([123,null])); return ''+x; }
-			query q6() { val x = list<integer>([123,456]); return x.containsAll(list<integer>([123])); }
-			query q7() { val x = list<integer?>([123,456,null]); return x.containsAll(list<integer>([123])); }
-			query q8() { val x = list<integer?>([123,456,null]); return x.containsAll(list<integer?>([123,null])); }
-		''')
-	}
-
-// check list calculate
-//	@Test
-	def void testListCalculate() {
-		assertParsingTrue('''
-			query q1() = list([1, 2, 3, 4, 5]).calculate(0) ;
-			query q2() = list([1, 2, 3, 4, 5]).calculate(4) ;
-			query q3() = list([1, 2, 3, 4, 5]).calculate(-1) ;
-			query q4() = list([1, 2, 3, 4, 5]).calculate(5) ;
-			query q5() = [1, 2, 3, 4, 5].calculate(0) ;
-			query q6() = [1, 2, 3, 4, 5].calculate(4) ;
-			query q7() = [1, 2, 3, 4, 5].calculate(-1) ;
-			query q8() = [1, 2, 3, 4, 5].calculate(5) ;
-		''')
-	}
-
-// check list clear, empty
-//	@Test
-	def void testListClearEmpty() {
-		assertParsingTrue('''
-			query q1() { val x = [1, 2, 3]; x.clear(); return x; }
-			query q2() = list<integer>().empty() ;
-			query q3() = list<integer>([1]).empty() ;
-			query q4() = list<integer>([1, 2, 3, 4, 5]).empty() ;
-		''')
-	}
-
-//	@Test
-	def void testListSizeLen() {
-		assertParsingTrue('''
-			query q1() = list<integer>().size() ;
-			query q2() = list([1]).size() ;
-			query q3() = list([1, 2, 3, 4, 5]).size() ;
-			query q4() = list<integer>().size() ;
-			query q5() = list([1]).size() ;
-			query q6() = list([1, 2, 3, 4, 5]).size() ;
-		''')
-	}
-
-// check list from set
-//	@Test
-	def void testListFromSet() {
-		assertParsingTrue('''
-			query q1() = list<integer>(list<integer>()) ;
-			query q2() = list<integer>(set<integer>()) ;
-			query q3() = list<integer?>(list<integer>()) ;
-			query q4() = list<integer?>(list<integer?>()) ;
-			query q5() = list<integer?>(set<integer>()) ;
-			query q6() = list<integer?>(set<integer?>()) ;
-		''')
-	}
 
 
-
-// check simple create of set
-//	@Test
-	def void testCreateSet() {
-		assertParsingTrue('''
-			query q1() = set<integer>() ;
-			query q2() = set([123]) ;
-			query q3() = set([123, 456, 789]) ;
-			query q4() = set([1, 2, 3, 2, 3, 4, 5]) ;
-			query q5() = set(list([123, 456, 789])) ;
-		''')
-	}
-
-// check create set from list, set
-//	@Test
-	def void testCreateSetFromListSet() {
-		assertParsingTrue('''
-			query q1() = set<integer>(list<integer>());
-			query q2() = set<integer>(set<integer>());
-			query q3() = set<integer?>(list<integer>());
-			query q4() = set<integer?>(list<integer?>());
-			query q5() = set<integer?>(set<integer>());
-			query q6() = set<integer?>(set<integer?>());
-		''')
-	}
-
-// check equals of set 
-//	@Test
-	def void testSetEqualsOperator() {
-		assertParsingTrue('''
-			query q1() { val a = set([1, 2, 3]); val b = set([1, 2, 3]); return a == b; }
-			query q2() { val a = set([1, 2, 3]); val b = set([1, 2, 3]); return a != b; }
-			query q3() { val a = set([1, 2, 3]); val b = set([1, 2, 3]); return a === b; }
-			query q4() { val a = set([1, 2, 3]); val b = set([1, 2, 3]); return a !== b; }
-			query q5() { val a = set([1, 2, 3]); val b = a; return a === b; }
-			query q6() { val a = set([1, 2, 3]); val b = a; return a !== b; }
-		''')
-	}
-
-// check 'in' set 
-//	@Test
-	def void testSetMethods() {
-		assertParsingTrue('''
-			query q1() = set<integer>().str() ;
-			query q2() = set<integer>([1]).str() ;
-			query q3() = set<integer>([1, 2, 3, 4, 5]).str() ;
-			query q4() { val x = set<integer?>(); x.add(null); return ''+x; }
-			query q5() { val x = set<integer?>(); x.add(123); return ''+x; } 
-			query q6() { val x = set<integer?>([123,456,null]); x.removeAll(set<integer>([123])); return ''+x; }
-		''')
-	}
 
 	@Test
 	def void testInSet() {
@@ -268,34 +112,6 @@ class RellParsingTest {
 		''')
 	}
 
-// check contains, containsAll set 
-//	@Test
-	def void testSetContains() {
-		assertParsingTrue('''
-			query q1() { val x = set<integer>([123]); return x.contains(123); }
-			query q2() { val x = set<integer?>([123]); return x.contains(null); }
-			query q3() { val x = set<integer?>([123]); x.add(null); return x.contains(null); }
-			query q4() = set([1, 2, 3]).contains(1) ;
-			query q5() = set([1, 2, 3]).contains(3) ;
-			query q6() = set([1, 2, 3]).contains(5) ;
-			query q7() { val x = set<integer?>([123]); return x.contains(123); }
-			query q8() = list<integer>().containsAll(set<integer>()) ;
-			query q9() = [1, 2, 3].containsAll(set([1, 2, 3])) ;
-			query q10() = [1, 2, 3].containsAll(set([0])) ;
-			query q11() = [1, 2, 3].containsAll(set([2])) ;
-			query q12() = set<integer>().containsAll(list<integer>()) ;
-			query q13() = set<integer>().containsAll(set<integer>()) ;
-			query q14() = set<integer>([1, 2, 3]).containsAll([1, 2, 3]) ;
-			query q15() = set<integer>([1, 2, 3]).containsAll(set([1, 2, 3])) ;
-			query q16() = set<integer>([1, 2, 3]).containsAll([0]) ;
-			query q17() = set<integer>([1, 2, 3]).containsAll([2]) ;
-			query q18() = set<integer>([1, 2, 3]).containsAll(set([0])) ;
-			query q19() = set<integer>([1, 2, 3]).containsAll(set([2])) ;
-			query q20() = set<integer>([1, 2, 3]).containsAll([1, 3]) ;
-			query q21() = set<integer>([1, 2, 3]).containsAll([0, 1]) ;
-			query q22() = set<integer>([1, 2, 3]).containsAll([1, 2, 3, 4]) ;
-		''')
-	}
 
 // check add, addAll set 
 //	@Test
@@ -314,24 +130,6 @@ class RellParsingTest {
 		''')
 	}
 
-// check remove, removeAll set 
-//	@Test
-	def void testSetRemove() {
-		assertParsingTrue('''
-			query q1() { val x = set([1, 2, 3]); val r = x.remove(1); return ''+r+' '+x; }
-			query q2() { val x = set([1, 2, 3]); val r = x.remove(2); return ''+r+' '+x; }
-			query q3() { val x = set([1, 2, 3]); val r = x.remove(3); return ''+r+' '+x; }
-			query q4() { val x = set([1, 2, 3]); val r = x.remove(0); return ''+r+' '+x; }
-			query q5() { val x = set([1, 2, 3]); val r = x.removeAll(set([0])); return ''+r+' '+x; }
-			query q6() { val x = set([1, 2, 3]); val r = x.removeAll(set([1])); return ''+r+' '+x; }
-			query q7() { val x = set([1, 2, 3]); val r = x.removeAll(set([2])); return ''+r+' '+x; }
-			query q8() { val x = set([1, 2, 3]); val r = x.removeAll(set([3])); return ''+r+' '+x; }
-			query q9() { val x = set([1, 2, 3]); val r = x.removeAll([0]); return ''+r+' '+x; }
-			query q10() { val x = set([1, 2, 3]); val r = x.removeAll([2]); return ''+r+' '+x; }
-			query q11() { val x = set([1, 2, 3]); val r = x.removeAll([1, 2, 3]); return ''+r+' '+x; }
-			query q12() { val x = set([1, 2, 3]); val r = x.removeAll([1, 3]); return ''+r+' '+x; }
-		''')
-	}
 
 // check map methods
 	@Test
@@ -345,20 +143,6 @@ class RellParsingTest {
 		''')
 	}
 
-//	@Test
-	def void testListCreation() {
-		assertParsingTrue(
-			'''
-				class TestClass{
-					test:integer;
-				}
-				
-				operation t1(){
-					val t:list<integer> = [1,2,3];
-				}
-			'''
-		)
-	}
 
 	@Test
 	def void testSetToListToSet() {
@@ -372,52 +156,6 @@ class RellParsingTest {
 		''')
 	}
 
-// check set with records
-//	@Test
-	def void testSetWithRecords() {
-		assertParsingTrue('''
-			record foo1 { x: list<set<(a: text, b: integer)>>; }
-			record foo2 { x: list<set<(q: text, integer)>>; }
-			record bar { p: integer; q: integer; }
-			record foo3 { x: text; b: bar; } 
-			record foo4 { x: integer; }
-			query q1() { var s = set([foo3('ABC', bar(p=123,q=456))]); return s; }
-			query q2() { var s = set([foo3('ABC', bar(p=123,q=456))]); return s.contains(foo3('ABC',bar(p=123,q=456))); } 
-			query q3() { var s = set([foo4(123)]); return s; }
-		''')
-	}
-
-//	@Test
-	def void testMethodCall() {
-		assertParsingTrue('''operation o(){
-			val s=set<integer>([123]);
-			val isContains=s.contains(1);
-		}
-		''')
-	}
-
-	// check set with records
-	// @Test
-	def void testSetMethodsCall() {
-		assertParsingTrue('''
-			record foo1 { x: list<set<(a: text, b: integer)>>; }
-			record foo2 { x: list<set<(q: text, integer)>>; }
-			record bar { p: integer; q: integer; }
-			record foo3 { x: text; b: bar; } 
-			record foo4 { x: integer; }
-			query q1() { var s = set([foo3('ABC', bar(p=123,q=456))]); return s; }
-			query q2() { var s = set([foo3('ABC', bar(p=123,q=456))]); return s.contains(foo3('ABC',bar(p=123,q=456))); } 
-			query q3() { var s = set([foo4(123)]); return s; }
-		''')
-	}
-
-//	@Test
-	def void testTheRecordType() {
-		assertParsingTrue('''		
-			record bar { p: integer; q: integer; }
-			query q1() { var s:bar; return s; }
-		''')
-	}
 
 // check changing value by position in a set 
 	@Test
@@ -452,17 +190,6 @@ class RellParsingTest {
 		''')
 	}
 
-// check set requireNotEmpty
-//	@Test
-	def void testSetRequireNotEmpty() {
-		assertParsingTrue('''
-			query q1() { val x = set<integer>(); return requireNotEmpty(x); }
-			query q2() { val x = set([123]); return requireNotEmpty(x); }
-			query q3() { val x: set<integer>? = null; return requireNotEmpty(x); }
-			query q4() { val x: set<integer>? = set<integer>(); return requireNotEmpty(x); }
-			query q5() { val x: set<integer>? = set([123]); return requireNotEmpty(x); }
-		''')
-	}
 
 // check map type/sub-type
 	@Test
@@ -520,14 +247,6 @@ class RellParsingTest {
 		''')
 	}
 
-// check map clear() function
-//	@Test
-	def void testMapClear() {
-		assertParsingTrue('''
-			query q() { val x = ['Bob':123,'Alice':567,'Trudy':789]; x.clear(); return x; }
-		''')
-	}
-
 // check map keys() function
 	@Test
 	def void testMapKeys() {
@@ -562,30 +281,6 @@ class RellParsingTest {
 			query q4() = 'Bob' in ['Bob':123,'Alice':456] ;
 			query q5() = 'Alice' in ['Bob':123,'Alice':456] ;
 			query q6() = 'Trudy' in ['Bob':123,'Alice':456] ;
-		''')
-	}
-
-// check map contains() function
-//	@Test
-	def void testMapContains() {
-		assertParsingTrue('''
-			query q1() = ['Bob':123].contains('Bob') ;
-			query q2() = ['Bob':123].contains('Alice') ;
-			query q3() = ['Bob':123,'Alice':456].contains('Bob') ;
-			query q4() = ['Bob':123,'Alice':456].contains('Alice') ;
-			query q5() = ['Bob':123,'Alice':456].contains('Trudy') ;
-		''')
-	}
-
-// check '==' map
-//	@Test
-	def void testMapEquals() {
-		assertParsingTrue('''
-			query q1() = ['Bob':123,'Alice':456,'Trudy':789] == ['Bob':123,'Alice':456,'Trudy':789] ;
-			query q2() = ['Bob':123,'Alice':456,'Trudy':789] == ['Bob':321,'Alice':654,'Trudy':987] ;
-			query q3() = ['Bob':123,'Alice':456,'Trudy':789] == ['Bob':123,'Alice':456] ;
-			query q4() = ['Bob':123,'Alice':456,'Trudy':789] == ['Bob':123,'Alice':456,'Trudy':789,'Satoshi':555] ;
-			query q5() = ['Bob':123,'Alice':456,'Trudy':789] == map<text,integer>() ;		
 		''')
 	}
 
@@ -643,16 +338,6 @@ class RellParsingTest {
 
 
 
-
-//	@Test
-	def void testCreateInOperation() {
-		assertParsingTrue('''
-			class user { key pubkey; index username: text; firstName: text; lastName: text; email: text; }
-			    operation add_user (admin_pubkey: integer, pubkey, username: text, firstName: text, lastName: text, email: text) {
-			           create user (pubkey, username, firstName, lastName, email);
-			    }
-		''')
-	}
 
 
 	@Test
