@@ -12,7 +12,6 @@ import org.blockchain.rell.rell.IntConstant
 import org.blockchain.rell.rell.Minus
 import org.blockchain.rell.rell.Model
 import org.blockchain.rell.rell.MulOrDiv
-import org.blockchain.rell.rell.Not
 import org.blockchain.rell.rell.Or
 import org.blockchain.rell.rell.Plus
 import org.blockchain.rell.rell.StringConstant
@@ -43,8 +42,6 @@ class RellTypeProvider {
 				RellTypeProvider.BOOL_TYPE
 			IntConstant:
 				RellTypeProvider.INT_TYPE
-			Not:
-				RellTypeProvider.BOOL_TYPE
 			MulOrDiv:
 				RellTypeProvider.INT_TYPE
 			Minus:

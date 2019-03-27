@@ -25,7 +25,7 @@ class RellParsingTest {
 
 
 // Read object attributes
-	@Test
+	@Test	
 	def void testReadObjectAtributes() {
 		assertParsingTrue('''
 			object obj {
