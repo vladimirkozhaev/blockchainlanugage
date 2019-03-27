@@ -19,6 +19,29 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
+	@Test
+	def void testTheEmptyWherePart() {
+		assertParsingTrue('''
+			class user { id: integer;}
+			operation q1() { return user @ {} (.id.size()); }
+		''')
+	}
+	
+	@Test
+	def void testMiscellaneusExpInQueryReturnSt() {
+		assertParsingTrue('''
+			class user { id: integer; name1: text; name2: text; v1: integer; v2: integer; }
+			query q1() { return user @* {} (.id+0, (.name1 + .name2).size()); }
+			query q2() { return user @* {} (.id+0, (.name1 + .name2).upperCase().lowerCase().size()); }
+			query q3() { return user @* {} (.id+0, (.v1 * (.v2 + 101)).str()); }
+			query q4() { return user @* {} (.id+0, (.v1 * (.v2 + 101)).str().size()); }
+			query q5() { val str1 = 'Hello'; val k1 = 777; return user @* {} (.id+0, (str1 + .name2).size()); }
+			query q6() { val str1 = 'Hello'; val k1 = 777; return user @* {} (.id+0, (str1 + .name2).upperCase().lowerCase().size()); }
+			query q7() { val str1 = 'Hello'; val k1 = 777; return user @* {} (.id+0, (k1 * (.v2 + 101)).str()); }
+			query q8() { val str1 = 'Hello'; val k1 = 777; return user @* {} (.id+0, (k1 * (.v2 + 101)).str().size()); }
+		''')
+	}
+	
 	// check logical, arithmetical, comparison operators
 	@Test
 	def void testDefaultVariableName() {

@@ -4,7 +4,7 @@ generate rell "http://www.blockchain.org/rell/Rell"
 
 Model:
 	entities+=ClassDefinition*
-	operations+=(Operation | Query|Function)*;
+	operations+=(Operation | Query | Function)*;
 
 ClassDefinition:
 	('class' | 'record' | 'object') name=ID ('extends' superType=[ClassDefinition])? '{'
@@ -15,7 +15,7 @@ AttributeListField:
 	mutable=Mutable? key=Key? index=Index? attributeList+=RelAttrubutesList ';';
 
 Operation:
-	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement* "}";
+	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement*  ('return' returnExr=Expression ';')? "}";
 
 Query:
 	"query" name=ID '(' parameters=RelAttrubutesList? ')'
@@ -25,7 +25,7 @@ Query:
 	statements+=Statement*
 	(('return' returnExr=Expression ';')?)
 	'}'));
-	
+
 Function:
 	"function" name=ID '(' parameters=RelAttrubutesList? ')'
 	(DOUBLE_QUOTE type=TypeReference)?
@@ -34,8 +34,6 @@ Function:
 	statements+=Statement*
 	(('return' returnExr=Expression ';')?)
 	'}'));
-	
-	
 
 Statement:
 	(methodCall=DotValue | relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
@@ -82,8 +80,7 @@ AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand (ampersandModificator=AmpersandModificator?) '{'
 	(conditions+=Expression (',' conditions+=Expression)*)? '}'
-	(tupleValue=TupleValue | ('(' dotExpr+=DotValue (','
-	dotExpr+=DotValue ')')*))?;
+	tupleValue=TupleValue?;
 
 TupleValue:
 	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
@@ -136,7 +133,8 @@ VariableDeclarationRef:
 ListMethodCall:
 	name=MethodName arguments=ArgumentsInBrackets;
 
-OperationQueryOFunctionCall:(name=[Query]|name=[Operation]|name=[Function]) arguments=ArgumentsInBrackets;
+OperationQueryOFunctionCall:
+	(name=[Query] | name=[Operation] | name=[Function]) arguments=ArgumentsInBrackets;
 
 Arguments:
 	listPart+=Expression (',' listPart+=Expression)*;
@@ -172,15 +170,15 @@ PlusOrMinus returns Expression:
 	right=MulOrDiv)*;
 
 MulOrDiv returns Expression:
-	Primary ({MulOrDiv.left=current} op=(MulChar | DivChar|Percent)
+	Primary ({MulOrDiv.left=current} op=(MulChar | DivChar | Percent)
 	right=Primary)*;
 
-
 Primary returns Expression:
-	'(' Expression ')' |
-	{Not} "not" expression=Primary |
-	prefixChar=(PlusChar|MinusChar|MulChar|DivChar) expression=Primary|
+	prefixChar=(PlusChar | MinusChar | MulChar | DivChar | Not) expression=Primary |
 	DotValue;
+
+DotValue:
+	'(' DotValue ')' | (atom=Atomic ((accesToList=AccessToList?) DOT dotPart=DotValue)?);
 
 Atomic returns Expression:
 	{IntConstant} value=IntWithMinus
@@ -200,13 +198,10 @@ Atomic returns Expression:
 	| {TwoParamsMethodCall} value=TwoParamsMethodCall
 	| {MultiParamsMethodCall} value=MultiParamsMethodCall
 	| {MethodCall} value=ListMethodCall
-	|{OperationQueryOFunctionCall} value=OperationQueryOFunctionCall
+	| {OperationQueryOFunctionCall} value=OperationQueryOFunctionCall
 	| {CreateClassPart} value=CreateClassPart
 	| {ClassMemberDef} value=ClassMemberDefinition
 	| {VariableDeclarationRef} value=VariableDeclarationRef;
-
-DotValue:
-	atom=Atomic ((accesToList=AccessToList?) DOT dotPart=DotValue)?;
 
 MapCreationPart:
 	exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
@@ -241,9 +236,14 @@ MapSpecification:
 TupleType:
 	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
 
-OneParamMethodCall:methodName=ONE_PARAM_METHOD '(' arg=Expression ')';
-TwoParamsMethodCall:methodName=TWO_PARAMS_METHOD '(' arg1=Expression ',' arg2=Expression  ')';
-MultiParamsMethodCall:methodName=MULTI_PARAMS_METHOD args=ArgumentsInBrackets;
+OneParamMethodCall:
+	methodName=ONE_PARAM_METHOD '(' arg=Expression ')';
+
+TwoParamsMethodCall:
+	methodName=TWO_PARAMS_METHOD '(' arg1=Expression ',' arg2=Expression ')';
+
+MultiParamsMethodCall:
+	methodName=MULTI_PARAMS_METHOD args=ArgumentsInBrackets;
 
 PrimitiveType:
 	Text | Tuid | Pubkey | Name | Timestamp | Integer | Json | ByteArray | Boolean;
@@ -325,10 +325,9 @@ MulChar:
 
 DivChar:
 	'/';
-	
+
 Percent:
-	'%'
-;
+	'%';
 
 LIST_METHOD:
 	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" | "str" | "remove" |
@@ -336,11 +335,19 @@ LIST_METHOD:
 
 MAP_METHOD:
 	"empty" | "size" | "contains" | "get" | "str" | "clear" | "put" | "putAll" | "remove" | "keys" | "values";
-	
-ONE_PARAM_METHOD:'abs'|'is_signer'|'json';
-TWO_PARAMS_METHOD:'max'|'min';
-MULTI_PARAMS_METHOD:'log'|'print';
-	
+
+ONE_PARAM_METHOD:
+	'abs' | 'is_signer' | 'json';
+
+TWO_PARAMS_METHOD:
+	'max' | 'min';
+
+MULTI_PARAMS_METHOD:
+	'log' | 'print';
+
+terminal Not:
+	'not';
+
 terminal ASSIGNMENT:
 	'=';
 
