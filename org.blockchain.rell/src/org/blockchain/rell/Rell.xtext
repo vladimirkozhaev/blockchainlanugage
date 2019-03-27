@@ -331,7 +331,7 @@ Percent:
 
 LIST_METHOD:
 	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" | "str" | "remove" |
-	"removeAt" | "clear" | "empty" | "requireNotEmpty";
+	"removeAt" | "clear" | "empty" | "requireNotEmpty"|"upperCase"|"lowerCase";
 
 MAP_METHOD:
 	"empty" | "size" | "contains" | "get" | "str" | "clear" | "put" | "putAll" | "remove" | "keys" | "values";
