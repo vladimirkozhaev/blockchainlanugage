@@ -284,22 +284,7 @@ class RellParsingTest {
 		''')
 	}
 
-// check map
-	@Test
-	def void testMap() {
-		assertParsingTrue('''
-			query q1() = ['Bob':123]['Bob'] ;
-			query q2() = ['Bob':123]['Alice'] ;
-			query q3() = ['Bob':123,'Alice':456]['Bob'] ;
-			query q4() = ['Bob':123,'Alice':456]['Alice'] ;
-			query q5() = ['Bob':123,'Alice':456]['Trudy'] ;
-			query q6() = map(['Bob':123])['Bob'] ;
-			query q7() = map(['Bob':123])['Alice'] ;
-			query q8() = map(['Bob':123,'Alice':456])['Bob'] ;
-			query q9() = map(['Bob':123,'Alice':456])['Alice'] ;
-			query q10() = map(['Bob':123,'Alice':456])['Trudy'] ;
-		''')
-	}
+
 
 // check map with class
 	@Test

@@ -7,39 +7,42 @@ Model:
 	operations+=(Operation | Query | Function)*;
 
 ClassDefinition:
-	('class' | 'record' | 'object') name=ID ('extends' superType=[ClassDefinition])? '{'
+	('class' | 'record' | 'object') name=ID ('extends' superType=[ClassDefinition])? LEFT_BRACE
 	attributeListField+=AttributeListField*
-	'}';
+	RIGHT_BRACE;
 
 AttributeListField:
 	mutable=Mutable? key=Key? index=Index? attributeList+=RelAttrubutesList ';';
 
 Operation:
-	"operation" name=ID "(" parameters=RelAttrubutesList? ")" "{" statements+=Statement*  ('return' returnExr=Expression ';')? "}";
+	"operation" name=ID LEFT_BRACKET parameters=RelAttrubutesList? RIGHT_BRACKET LEFT_BRACE statements+=Statement*
+	('return'
+	returnExr=Expression ';')? RIGHT_BRACE;
 
 Query:
-	"query" name=ID '(' parameters=RelAttrubutesList? ')'
+	"query" name=ID LEFT_BRACKET parameters=RelAttrubutesList? RIGHT_BRACKET
 	(DOUBLE_QUOTE type=TypeReference)?
 	((ASSIGNMENT returnExr=Expression ';') |
-	('{'
+	(LEFT_BRACE
 	statements+=Statement*
 	(('return' returnExr=Expression ';')?)
-	'}'));
+	RIGHT_BRACE));
 
 Function:
-	"function" name=ID '(' parameters=RelAttrubutesList? ')'
+	"function" name=ID LEFT_BRACKET parameters=RelAttrubutesList? RIGHT_BRACKET
 	(DOUBLE_QUOTE type=TypeReference)?
 	((ASSIGNMENT returnExr=Expression ';') |
-	('{'
+	(LEFT_BRACE
 	statements+=Statement*
 	(('return' returnExr=Expression ';')?)
-	'}'));
+	RIGHT_BRACE));
 
 Statement:
 	(methodCall=DotValue | relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
 
 VarInitiation:
-	name=VariableDeclarationRef (('[' expr=Expression ']')?) (ASSIGNMENT expression=Expression)?;
+	name=VariableDeclarationRef ((LEFT_SQUARE_BRACE expr=Expression RIGHT_SQUARE_BRACE)?) (ASSIGNMENT
+	expression=Expression)?;
 
 OperationVariable:
 	assessModificator=(Var | Val) variable=Variable;
@@ -51,65 +54,64 @@ Relational:
 	Update | Delete | Create | AtOperator;
 
 Update:
-	'update' (tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
-	tableNameWithAlias+=TableNameWithAlias)* ')') ((Ampersand '{' ((conditions+=Expression (','
-	conditions+=Expression)*)?) '}')?) '('
+	'update' (tableNameWithAlias+=TableNameWithAlias | LEFT_BRACKET tableNameWithAlias+=TableNameWithAlias (','
+	tableNameWithAlias+=TableNameWithAlias)* RIGHT_BRACKET) ((Ampersand LEFT_BRACE ((conditions+=Expression (','
+	conditions+=Expression)*)?) RIGHT_BRACE)?) LEFT_BRACKET
 	createWhatPart+=CreateWhatPart (','
 	createWhatPart+=CreateWhatPart)*
-	')';
+	RIGHT_BRACKET;
 
 Delete:
-	'delete' (tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
-	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand '{' conditions+=Expression (',' conditions+=Expression)* '}';
+	'delete' (tableNameWithAlias+=TableNameWithAlias | LEFT_BRACKET tableNameWithAlias+=TableNameWithAlias (','
+	tableNameWithAlias+=TableNameWithAlias)* RIGHT_BRACKET) Ampersand LEFT_BRACE conditions+=Expression (','
+	conditions+=Expression)* RIGHT_BRACE;
 
 Create:
-	'create' (tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
-	tableNameWithAlias+=TableNameWithAlias)* ')') '(' (createWhatPart+=CreateWhatPart (','
-	createWhatPart+=CreateWhatPart)*)? ')';
+	'create' (tableNameWithAlias+=TableNameWithAlias | LEFT_BRACKET tableNameWithAlias+=TableNameWithAlias (','
+	tableNameWithAlias+=TableNameWithAlias)* RIGHT_BRACKET) LEFT_BRACKET (createWhatPart+=CreateWhatPart (','
+	createWhatPart+=CreateWhatPart)*)? RIGHT_BRACKET;
 
 	//There are problem with record part. So will check it in the validatiie
 CreateClassPart:
-	(entity=[ClassDefinition]) '(' (createWhatPart+=CreateWhatPart (','
-	createWhatPart+=CreateWhatPart)*)? ')';
+	(entity=[ClassDefinition]) LEFT_BRACKET (createWhatPart+=CreateWhatPart (','
+	createWhatPart+=CreateWhatPart)*)? RIGHT_BRACKET;
 
 CreateWhatPart:
 	(DOT? varDeclRef=VariableDeclarationRef (ASSIGNMENT | PLUS_ASSGIN | MINUS_ASSGIN | DIV_ASSGIN | MUL_ASSGIN))?
 	condition+=Expression;
 
 AtOperator:
-	(tableNameWithAlias+=TableNameWithAlias | '(' tableNameWithAlias+=TableNameWithAlias (','
-	tableNameWithAlias+=TableNameWithAlias)* ')') Ampersand (ampersandModificator=AmpersandModificator?) '{'
-	(conditions+=Expression (',' conditions+=Expression)*)? '}'
+	(tableNameWithAlias+=TableNameWithAlias | LEFT_BRACKET tableNameWithAlias+=TableNameWithAlias (','
+	tableNameWithAlias+=TableNameWithAlias)* RIGHT_BRACKET) Ampersand (ampersandModificator=AmpersandModificator?)
+	LEFT_BRACE
+	(conditions+=Expression (',' conditions+=Expression)*)? RIGHT_BRACE
 	tupleValue=TupleValue?;
 
 TupleValue:
-	'(' members+=TupleValueMember (',' tuplePart+=TupleValueMember)* ')';
+	LEFT_BRACKET members+=TupleValueMember (',' tuplePart+=TupleValueMember)* RIGHT_BRACKET;
 
 ListCreation:
-	'[' arguments=Arguments ']' (DOT LIST_METHOD listMethodArguments+=ArgumentsInBrackets)*;
+	LEFT_SQUARE_BRACE arguments=Arguments RIGHT_SQUARE_BRACE (DOT EMBEDDED_METHOD listMethodArguments+=ArgumentsInBrackets)*;
 
 MapCreation:
-	'[' mapPart+=MapCreationPart (',' mapPart+=MapCreationPart)* ']' (DOT MAP_METHOD
-	listMethodArguments+=ArgumentsInBrackets)*;
+	LEFT_SQUARE_BRACE mapPart+=MapCreationPart (',' mapPart+=MapCreationPart)* RIGHT_SQUARE_BRACE;
 
 NewListCreation:
 	List {NewListCreation} (specification=ListSpecification?)
-	'('
+	LEFT_BRACKET
 	((listCreation=ListCreation |
 	newListCreation=NewListCreation |
 	newSetCreation=NewSetCreation)?)
-	')' (DOT LIST_METHOD arguments+=ArgumentsInBrackets)*;
+	RIGHT_BRACKET (DOT EMBEDDED_METHOD arguments+=ArgumentsInBrackets)*;
 
-NewMapCreation:
-	Map {NewMapCreation} specification=MapSpecification? '(' (creation=ListCreation?) ')' (DOT MAP_METHOD
-	arguments+=Arguments)*;
+
 
 NewSetCreation:
 	Set {NewSetCreation} (specification=ListSpecification?)
-	'('
+	LEFT_BRACKET
 	((listCreation=ListCreation | newListCreation=NewListCreation | newSetCreation=NewSetCreation)?)
-	')'
-	(DOT LIST_METHOD arguments+=ArgumentsInBrackets)*;
+	RIGHT_BRACKET
+	(DOT EMBEDDED_METHOD arguments+=ArgumentsInBrackets)*;
 
 TupleValueMember:
 	(name=ValuableID ASSIGNMENT)? value=Expression;
@@ -130,8 +132,8 @@ JustNameDecl:
 VariableDeclarationRef:
 	name=[VariableDeclaration|ValuableID];
 
-ListMethodCall:
-	name=MethodName arguments=ArgumentsInBrackets;
+MethodCall:
+	name=MethodName ((listSpec=ListSpecification|mapSpec=MapSpecification)?) arguments=ArgumentsInBrackets;
 
 OperationQueryOFunctionCall:
 	(name=[Query] | name=[Operation] | name=[Function]) arguments=ArgumentsInBrackets;
@@ -140,13 +142,13 @@ Arguments:
 	listPart+=Expression (',' listPart+=Expression)*;
 
 ArgumentsInBrackets:
-	'(' arguments=Arguments? ')';
+	LEFT_BRACKET arguments=Arguments? RIGHT_BRACKET;
 
 MethodName:
-	LIST_METHOD;
+	EMBEDDED_METHOD;
 
 AccessToList:
-	'[' expr=Expression ']';
+	LEFT_SQUARE_BRACE expr=Expression RIGHT_SQUARE_BRACE;
 
 Expression:
 	or=Or;
@@ -174,11 +176,11 @@ MulOrDiv returns Expression:
 	right=Primary)*;
 
 Primary returns Expression:
-	prefixChar=(PlusChar | MinusChar | MulChar | DivChar | Not) expression=Primary |
+	prefixChar=(PlusChar | MinusChar | MulChar | DivChar | NOT) expression=Primary |
 	DotValue;
 
 DotValue:
-	'(' DotValue ')' | (atom=Atomic ((accesToList=AccessToList?) DOT dotPart=DotValue)?);
+	(LEFT_BRACKET DotValue RIGHT_BRACKET) | ((atom=Atomic (accesToList=AccessToList?) (DOT dotPart=DotValue)?));
 
 Atomic returns Expression:
 	{IntConstant} value=IntWithMinus
@@ -190,14 +192,11 @@ Atomic returns Expression:
 	| {TupleRes} value=TupleValue
 	| {ListCreation} value=ListCreation
 	| {MapCreation} value=MapCreation
-	| {NewLCreation} value=NewListCreation
-	| {NewSCreation} value=NewSetCreation
-	| {NewMCreation} value=NewMapCreation
 	| {TheNull} value=NULL
 	| {OneParamMethodCall} value=OneParamMethodCall
 	| {TwoParamsMethodCall} value=TwoParamsMethodCall
 	| {MultiParamsMethodCall} value=MultiParamsMethodCall
-	| {MethodCall} value=ListMethodCall
+	| {MethodCall} value=MethodCall
 	| {OperationQueryOFunctionCall} value=OperationQueryOFunctionCall
 	| {CreateClassPart} value=CreateClassPart
 	| {ClassMemberDef} value=ClassMemberDefinition
@@ -234,13 +233,13 @@ MapSpecification:
 	LESS keySpec=TypeReference (QuestionChar?) ',' valSpec=TypeReference (QuestionChar?) MORE;
 
 TupleType:
-	'(' varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* ')';
+	LEFT_BRACKET varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* RIGHT_BRACKET;
 
 OneParamMethodCall:
-	methodName=ONE_PARAM_METHOD '(' arg=Expression ')';
+	methodName=ONE_PARAM_METHOD LEFT_BRACKET arg=Expression RIGHT_BRACKET;
 
 TwoParamsMethodCall:
-	methodName=TWO_PARAMS_METHOD '(' arg1=Expression ',' arg2=Expression ')';
+	methodName=TWO_PARAMS_METHOD LEFT_BRACKET arg1=Expression ',' arg2=Expression RIGHT_BRACKET;
 
 MultiParamsMethodCall:
 	methodName=MULTI_PARAMS_METHOD args=ArgumentsInBrackets;
@@ -329,12 +328,11 @@ DivChar:
 Percent:
 	'%';
 
-LIST_METHOD:
-	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" | "str" | "remove" |
-	"removeAt" | "clear" | "empty" | "requireNotEmpty"|"upperCase"|"lowerCase";
+EMBEDDED_METHOD:
+	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" | 
+	"removeAt" | "clear" |  "requireNotEmpty" | "upperCase" | "lowerCase"|"map"|"list"|"set"|"empty"  |  "get" | "str" |  "put" | "putAll" | "remove" | "keys" | "values";
 
-MAP_METHOD:
-	"empty" | "size" | "contains" | "get" | "str" | "clear" | "put" | "putAll" | "remove" | "keys" | "values";
+
 
 ONE_PARAM_METHOD:
 	'abs' | 'is_signer' | 'json';
@@ -345,7 +343,25 @@ TWO_PARAMS_METHOD:
 MULTI_PARAMS_METHOD:
 	'log' | 'print';
 
-terminal Not:
+terminal RIGHT_SQUARE_BRACE:
+	']';
+
+terminal LEFT_SQUARE_BRACE:
+	'[';
+
+terminal RIGHT_BRACE:
+	'}';
+
+terminal LEFT_BRACE:
+	'{';
+
+terminal RIGHT_BRACKET:
+	')';
+
+terminal LEFT_BRACKET:
+	'(';
+
+terminal NOT:
 	'not';
 
 terminal ASSIGNMENT:
