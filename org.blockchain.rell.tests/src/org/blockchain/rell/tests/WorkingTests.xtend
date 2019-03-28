@@ -19,6 +19,27 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
+	// check empty, len, size of set 
+	@Test
+	def void testSetEmptylenSize() {
+		assertParsingTrue('''
+			query q1() = set<integer>().empty() ;
+			query q2() = set<integer>([1]).empty() ;
+			query q3() = set<integer>([1, 2, 3, 4, 5]).empty() ;
+			query q4() = set<integer>().size() ;
+			query q5() = set([1]).size() ;
+			query q6() = set([1, 2, 3, 4, 5]).size() ;
+			query q7() = set([1, 2, 3, 2, 3, 4, 5]).size() ;
+			query q8() = set<integer>().size() ;
+			query q9() = set([1]).size() ;
+			query q10() = set([1, 2, 3, 4, 5]).size() ;
+			query q11() = set([1, 2, 3, 2, 3, 4, 5]).size() ;
+			query q12() = 1 in set([1, 2, 3]) ;
+			query q13() = 3 in set([1, 2, 3]) ;
+			query q14() = 5 in set([1, 2, 3]) ;
+		''')
+	}
+	
 	@Test
 	def void testInSet() {
 		assertParsingTrue('''
