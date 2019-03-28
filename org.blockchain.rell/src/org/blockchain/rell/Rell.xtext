@@ -30,7 +30,7 @@ Query:
 
 Function:
 	"function" name=ID LEFT_BRACKET parameters=RelAttrubutesList? RIGHT_BRACKET
-	(DOUBLE_QUOTE type=TypeReference QuestionChar? )?
+	(DOUBLE_QUOTE type=TypeReference QuestionChar?)?
 	((ASSIGNMENT returnExr=Expression ';') |
 	(LEFT_BRACE
 	statements+=Statement*
@@ -38,7 +38,7 @@ Function:
 	RIGHT_BRACE));
 
 Statement:
-	( relation=Relational | variable=OperationVariable | varInitiation=VarInitiation|methodCall=DotValue ) ';';
+	(relation=Relational | variable=OperationVariable | varInitiation=VarInitiation | methodCall=DotValue) ';';
 
 VarInitiation:
 	name=Expression ASSIGNMENT
@@ -77,7 +77,8 @@ CreateClassPart:
 	createWhatPart+=CreateWhatPart)*)? RIGHT_BRACKET;
 
 CreateWhatPart:
-	(ASSIGNMENT? DOT? varDeclRef=VariableDeclarationRef (ASSIGNMENT | PLUS_ASSGIN | MINUS_ASSGIN | DIV_ASSGIN | MUL_ASSGIN))?
+	(ASSIGNMENT? DOT? varDeclRef=VariableDeclarationRef (ASSIGNMENT | PLUS_ASSGIN | MINUS_ASSGIN | DIV_ASSGIN |
+	MUL_ASSGIN))?
 	condition+=Expression;
 
 AtOperator:
@@ -85,14 +86,14 @@ AtOperator:
 	tableNameWithAlias+=TableNameWithAlias)* RIGHT_BRACKET) Ampersand (ampersandModificator=AmpersandModificator?)
 	LEFT_BRACE
 	(ASSIGNMENT? conditions+=Expression (',' ASSIGNMENT? conditions+=Expression)*)? RIGHT_BRACE
-	tupleValue=TupleValue?
-	;
+	tupleValue=TupleValue?;
 
 TupleValue:
 	LEFT_BRACKET members+=TupleValueMember (',' tuplePart+=TupleValueMember)* RIGHT_BRACKET;
 
 ListCreation:
-	LEFT_SQUARE_BRACE arguments=Arguments RIGHT_SQUARE_BRACE (DOT EMBEDDED_METHOD listMethodArguments+=ArgumentsInBrackets)*;
+	LEFT_SQUARE_BRACE arguments=Arguments RIGHT_SQUARE_BRACE (DOT EMBEDDED_METHOD
+	listMethodArguments+=ArgumentsInBrackets)*;
 
 MapCreation:
 	LEFT_SQUARE_BRACE mapPart+=MapCreationPart (',' mapPart+=MapCreationPart)* RIGHT_SQUARE_BRACE;
@@ -104,8 +105,6 @@ NewListCreation:
 	newListCreation=NewListCreation |
 	newSetCreation=NewSetCreation)?)
 	RIGHT_BRACKET (DOT EMBEDDED_METHOD arguments+=ArgumentsInBrackets)*;
-
-
 
 NewSetCreation:
 	Set {NewSetCreation} (specification=ListSpecification?)
@@ -134,7 +133,7 @@ VariableDeclarationRef:
 	name=[VariableDeclaration|ValuableID];
 
 MethodCall:
-	name=MethodName ((listSpec=ListSpecification|mapSpec=MapSpecification)?) arguments=ArgumentsInBrackets;
+	name=MethodName ((listSpec=ListSpecification | mapSpec=MapSpecification)?) arguments=ArgumentsInBrackets;
 
 OperationQueryOFunctionCall:
 	(name=[Query] | name=[Operation] | name=[Function]) arguments=ArgumentsInBrackets;
@@ -165,8 +164,10 @@ Equality returns Expression:
 	right=Comparison)*;
 
 Comparison returns Expression:
-	PlusOrMinus ({Comparison.left=current} op=(MORE_EQUAL | LESS_EQUAL | MORE | LESS)
+	PlusOrMinus ({Comparison.left=current} op=(MORE_EQUAL | LESS_EQUAL | MORE | LESS | IN)
 	right=PlusOrMinus)*;
+
+
 
 PlusOrMinus returns Expression:
 	MulOrDiv (({Plus.left=current} PlusChar | {Minus.left=current} MinusChar)
@@ -330,10 +331,9 @@ Percent:
 	'%';
 
 EMBEDDED_METHOD:
-	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" | 
-	"removeAt" | "clear" |  "requireNotEmpty" | "upperCase" | "lowerCase"|"map"|"list"|"set"|"empty"  |  "get" | "str" |  "put" | "putAll" | "remove" | "keys" | "values";
-
-
+	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" |
+	"removeAt" | "clear" | "requireNotEmpty" | "upperCase" | "lowerCase" | "map" | "list" | "set" | "empty" | "get" |
+	"str" | "put" | "putAll" | "remove" | "keys" | "values";
 
 ONE_PARAM_METHOD:
 	'abs' | 'is_signer' | 'json';
@@ -343,6 +343,9 @@ TWO_PARAMS_METHOD:
 
 MULTI_PARAMS_METHOD:
 	'log' | 'print';
+
+terminal IN:
+	'in';
 
 terminal RIGHT_SQUARE_BRACE:
 	']';

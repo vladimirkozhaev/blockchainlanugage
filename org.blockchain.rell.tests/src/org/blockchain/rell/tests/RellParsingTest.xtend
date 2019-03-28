@@ -109,22 +109,6 @@ class RellParsingTest {
 	}
 
 
-// check map methods
-	@Test
-	def void testMapMethods() {
-		assertParsingTrue('''
-			record foo { mutable x: integer; }
-			query q1() { val x = map<integer,text?>(); x[123]=null; return ''+x;}
-			query q2() = map<text,foo>() ;
-			query q3() = map<text,integer>().calculate('Bob') ;
-			query q4() = ['Bob':123,'Alice':456].calculate('Bob') ;
-		''')
-	}
-
-
-	
-
-
 // check changing value by position in a set 
 	@Test
 	def void testSetUnderline() {
