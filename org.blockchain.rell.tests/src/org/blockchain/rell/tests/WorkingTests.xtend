@@ -38,7 +38,7 @@ class WorkingTests {
 			query q13() = 3 in set([1, 2, 3]) ;
 			query q14() = 5 in set([1, 2, 3]) ;
 		''')
-	}
+	}	
 	
 	@Test
 	def void testInSet() {
