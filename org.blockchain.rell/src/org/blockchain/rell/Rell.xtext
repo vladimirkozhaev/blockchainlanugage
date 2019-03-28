@@ -332,7 +332,7 @@ Percent:
 
 EMBEDDED_METHOD:
 	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" |
-	"removeAt" | "clear" | "requireNotEmpty" | "upperCase" | "lowerCase" | "map" | "list" | "set" | "empty" | "get" |
+	"removeAt" | "clear" | "requireNotEmpty" | "upperCase" | "lowerCase" | "_map"| "map" | "_list"| "list" | "set"| "_set" | "empty" | "get" |
 	"str" | "put" | "putAll" | "remove" | "keys" | "values";
 
 ONE_PARAM_METHOD:

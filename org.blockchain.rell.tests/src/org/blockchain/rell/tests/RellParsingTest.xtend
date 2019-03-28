@@ -95,17 +95,7 @@ class RellParsingTest {
 	}
 
 
-// check changing value by position in a set 
-	@Test
-	def void testSetUnderline() {
-		assertParsingTrue('''
-			query q1() { val x = [1, 2, 3]; val r = x._set(0, 5); return ''+r+' '+x; }
-			query q2() { val x = [1, 2, 3]; val r = x._set(1, 5); return ''+r+' '+x; }
-			query q3() { val x = [1, 2, 3]; val r = x._set(2, 5); return ''+r+' '+x; }
-			query q4() { val x = [1, 2, 3]; val r = x._set(-1, 5); return ''+r+' '+x; }
-			query q5() { val x = [1, 2, 3]; val r = x._set(3, 5); return ''+r+' '+x; }
-		''')
-	}
+
 
 
 // check map with class
