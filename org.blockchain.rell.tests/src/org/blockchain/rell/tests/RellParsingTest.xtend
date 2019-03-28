@@ -74,21 +74,7 @@ class RellParsingTest {
 	}
 
 
-
-
-
-
-
-
-	@Test
-	def void testInSet() {
-		assertParsingTrue('''
-			query q1() = 123 in set([123, 456]);
-			query q2() = 456 in set([123, 456]);
-			query q3() = 789 in set([123, 456]);
-			query q4() = 123 in set<integer>();	
-		''')
-	}
+	
 
 
 // check add, addAll set 
@@ -144,18 +130,7 @@ class RellParsingTest {
 
 
 
-// check 'in' map
-	@Test
-	def void testMapIn() {
-		assertParsingTrue('''
-			query q1() = 'Bob' in map<text,integer>() ;
-			query q2() = 'Bob' in ['Bob':123] ;
-			query q3() = 'Alice' in ['Bob':123] ;
-			query q4() = 'Bob' in ['Bob':123,'Alice':456] ;
-			query q5() = 'Alice' in ['Bob':123,'Alice':456] ;
-			query q6() = 'Trudy' in ['Bob':123,'Alice':456] ;
-		''')
-	}
+
 
 
 
