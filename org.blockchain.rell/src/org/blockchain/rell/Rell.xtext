@@ -38,11 +38,11 @@ Function:
 	RIGHT_BRACE));
 
 Statement:
-	(methodCall=DotValue | relation=Relational | variable=OperationVariable | varInitiation=VarInitiation) ';';
+	( relation=Relational | variable=OperationVariable | varInitiation=VarInitiation|methodCall=DotValue ) ';';
 
 VarInitiation:
-	name=VariableDeclarationRef ((LEFT_SQUARE_BRACE expr=Expression RIGHT_SQUARE_BRACE)?) (ASSIGNMENT
-	expression=Expression)?;
+	name=VariableDeclarationRef ASSIGNMENT
+	expression=Expression;
 
 OperationVariable:
 	assessModificator=(Var | Val) variable=Variable;

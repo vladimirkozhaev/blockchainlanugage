@@ -19,6 +19,37 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
+	
+	@Test
+	def void testUsageOfAlreadyDeclaredVar(){
+		assertParsingTrue('''
+			query q1() { var x: integer; x = 1; return x; }
+		''')
+	}
+	// check list equal operators ===, !==, ==, !=
+	@Test
+	def void testListReturnFromQueryOne() {
+		assertParsingTrue('''
+			query q1() { var x: list<list<text>>; x = [['Hello', 'World']]; return x; }
+			query q2() { val a: list<integer>? = [1,2,3]; return a === null; }
+			query q3() { val a: list<integer>? = [1,2,3]; return a !== null; }
+			query q4() { val a: list<integer>? = [1,2,3]; return a === [1,2,3]; }
+			query q5() { val a: list<integer>? = [1,2,3]; return a !== [1,2,3]; }
+			query q6() { val a: list<integer>? = [1,2,3]; val b = a; return a === b; }
+			query q7() { val a: list<integer>? = [1,2,3]; val b = a; return a !== b; }
+			query q8() { val a: list<integer>? = null; return a === null; }
+			query q9() { val a: list<integer>? = null; return a !== null; }
+			query q10() { val a: list<integer>? = null; return a === [1,2,3]; }
+			query q11() { val a: list<integer>? = null; return a !== [1,2,3]; }
+			query q12() { val a = [1, 2, 3]; val b = [1, 2, 3]; return a == b; }
+			query q13() { val a = [1, 2, 3]; val b = [1, 2, 3]; return a != b; }
+			query q14() { val a = [1, 2, 3]; val b = [1, 2, 3]; return a === b; }
+			query q15() { val a = [1, 2, 3]; val b = [1, 2, 3]; return a !== b; }
+			query q16() { val a = [1, 2, 3]; val b = a; return a === b; }
+			query q17() { val a = [1, 2, 3]; val b = a; return a !== b; }
+		''')
+	}
+	
 	// check map values() function
 	@Test
 	def void testMapValues() {
