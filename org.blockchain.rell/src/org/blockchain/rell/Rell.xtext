@@ -30,7 +30,7 @@ Query:
 
 Function:
 	"function" name=ID LEFT_BRACKET parameters=RelAttrubutesList? RIGHT_BRACKET
-	(DOUBLE_QUOTE type=TypeReference)?
+	(DOUBLE_QUOTE type=TypeReference QuestionChar? )?
 	((ASSIGNMENT returnExr=Expression ';') |
 	(LEFT_BRACE
 	statements+=Statement*
@@ -77,15 +77,16 @@ CreateClassPart:
 	createWhatPart+=CreateWhatPart)*)? RIGHT_BRACKET;
 
 CreateWhatPart:
-	(DOT? varDeclRef=VariableDeclarationRef (ASSIGNMENT | PLUS_ASSGIN | MINUS_ASSGIN | DIV_ASSGIN | MUL_ASSGIN))?
+	(ASSIGNMENT? DOT? varDeclRef=VariableDeclarationRef (ASSIGNMENT | PLUS_ASSGIN | MINUS_ASSGIN | DIV_ASSGIN | MUL_ASSGIN))?
 	condition+=Expression;
 
 AtOperator:
 	(tableNameWithAlias+=TableNameWithAlias | LEFT_BRACKET tableNameWithAlias+=TableNameWithAlias (','
 	tableNameWithAlias+=TableNameWithAlias)* RIGHT_BRACKET) Ampersand (ampersandModificator=AmpersandModificator?)
 	LEFT_BRACE
-	(conditions+=Expression (',' conditions+=Expression)*)? RIGHT_BRACE
-	tupleValue=TupleValue?;
+	(ASSIGNMENT? conditions+=Expression (',' ASSIGNMENT? conditions+=Expression)*)? RIGHT_BRACE
+	tupleValue=TupleValue?
+	;
 
 TupleValue:
 	LEFT_BRACKET members+=TupleValueMember (',' tuplePart+=TupleValueMember)* RIGHT_BRACKET;

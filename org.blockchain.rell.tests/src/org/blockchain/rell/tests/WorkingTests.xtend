@@ -20,6 +20,15 @@ class WorkingTests {
 	@Inject extension ValidationTestHelper
 	
 	
+	// check map with function 
+	@Test
+	def void testMapWithFunction() {
+		assertParsingTrue('''
+			function f1() : map<integer,text>? = null;
+			function f2() : map<integer,text>? = [123:'Hello',456:'World'];
+		''')
+	}
+	
 	@Test
 	def void testUsageOfAlreadyDeclaredVar(){
 		assertParsingTrue('''

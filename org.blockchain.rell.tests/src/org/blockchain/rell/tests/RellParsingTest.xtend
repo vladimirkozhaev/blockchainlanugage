@@ -215,21 +215,6 @@ class RellParsingTest {
 
 
 
-// check map with function 
-	@Test
-	def void testMapWithFunction() {
-		assertParsingTrue('''
-			function f1() : map<integer,text>? = null;
-			function f2() : map<integer,text>? = [123:'Hello',456:'World'];
-		''')
-	}
-
-
-
-
-
-	
-
 	def void assertParsingTrue(String codeSnippet) {
 		val result = parseHelper.parse(codeSnippet)
 		Assert.assertNotNull(result);
