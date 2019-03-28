@@ -41,7 +41,7 @@ Statement:
 	( relation=Relational | variable=OperationVariable | varInitiation=VarInitiation|methodCall=DotValue ) ';';
 
 VarInitiation:
-	name=VariableDeclarationRef ASSIGNMENT
+	name=Expression ASSIGNMENT
 	expression=Expression;
 
 OperationVariable:

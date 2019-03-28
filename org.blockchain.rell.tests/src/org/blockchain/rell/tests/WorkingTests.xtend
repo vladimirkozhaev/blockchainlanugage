@@ -19,6 +19,27 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
+	// check map type/sub-type
+	@Test
+	def void testMapTypeCompatible() {
+		assertParsingTrue('''
+			query q1() { val x = map<integer?,text>([123:'Hello']); return x[null];}
+			query q2() { val x = map<integer?,text?>([123:'Hello']); return x[null];}
+			query q3() { val x = map<integer,text>(); x[123]='Hello'; return ''+x;}
+			query q4() { val x = map<integer?,text>(); x[123]='Hello'; return ''+x;}
+			query q5() { val x = map<integer?,text>(); x[null]='Hello'; return ''+x;}
+			query q6() { val x = map<integer,text>([123:'Hello']); val y = map<integer,text>(x); return ''+y; }
+			query q7() { val x = map<integer,text>([123:'Hello']); val y = map<integer?,text>(x); return ''+y; }
+			query q8() { val x = map<integer?,text>([123:'Hello']); val y = map<integer?,text>(x); return ''+y; }
+			query q9() { val x = map<integer,text>([123:'Hello']); val y = map<integer,text?>(x); return ''+y; }
+			query q10() { val x = map<integer,text?>([123:'Hello']); val y = map<integer,text?>(x); return ''+y; }
+			query q11() { val x = map<integer,text>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
+			query q12() { val x = map<integer?,text>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
+			query q13() { val x = map<integer,text?>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
+			query q14() { val x = map<integer?,text?>([123:'Hello']); val y = map<integer?,text?>(x); return ''+y; }
+			query q15() { val x: map<integer,text> = map<integer,text>([123:'Hello']); return ''+x; }
+		''')
+	}
 	
 	// check map with function 
 	@Test
