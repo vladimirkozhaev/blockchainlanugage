@@ -20,10 +20,6 @@ class RellParsingTest {
 	extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 
-
-
-
-
 // Read object attributes
 	@Test	
 	def void testReadObjectAtributes() {
@@ -42,41 +38,6 @@ class RellParsingTest {
 		''')
 	}
 
-	
-
-// Operations with Enum type
-	@Test
-	def void testEnumTypeOperation() {
-		assertParsingTrue('''
-			enum countryCode {
-			    AF, AD, BE, BR, CA, EE,
-			    DE, LT, MD, NL, GB, UA,
-			    US, SA, SK, VU, VN, ZW 
-			}
-			
-			enum currency {
-			USD, EUR, GBP
-			}
-			
-			operation op() {
-			    var ccode1 = countryCode.value('UA');
-			    var ccode2 = countryCode.value(5);
-			    
-			    var c: currency;
-			    c = currency.USD;
-			    val eurStr: text = currency.EUR.name;
-			    val eurValue: integer = currency.EUR.value;
-			    
-			    val countryCodes: list<countryCode> = countryCode.values();
-			    val currencies: list<currency> = currency.values();
-			}
-		''')
-	}
-
-
-	
-
-
 // check add, addAll set 
 //	@Test
 	def void testSetAdd() {
@@ -94,10 +55,6 @@ class RellParsingTest {
 		''')
 	}
 
-
-
-
-
 // check map with class
 	@Test
 	def void testMapWithClass() {
@@ -107,8 +64,76 @@ class RellParsingTest {
 			query q() {  return user @ { .firstName == 'Bill' } (=.lastName, '' + map([123:'Hello'])); }
 		''')
 	}
+	
+// check limit
+	@Test
+	def void testLimit() {
+		assertParsingTrue('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
+						
+			query q1() = user @* {} limit 0 ; 
+			query q2() = user @* {} limit 1 ; 
+			query q3() = user @* {} ( .lastName ) limit 0 ; 
+			query q4() = user @* {} ( .lastName ) limit 10 ; 
+		''')
+	}
+	
+// check sort (java.lang.NullPointerException error)
+	@Test
+	def void testSort() {
+		assertParsingTrue('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
 
+			query q1() = '' + user @* {} ( sort .firstName ) ; 
+			query q2() = '' + user @* {} ( -sort .firstName ) ; 
+			query q3() = '' + user @* { .company.name == 'Apple' } ( sort =.firstName, sort =.lastName ) ; 
+			query q4() = '' + user @* { .company.name == 'Apple' } ( sort =.firstName, -sort =.lastName ) ; 
+			query q5() = '' + user @* {} ( sort =.company.name, =.lastName ) ; 
+			query q6() = '' + user @* {} ( sort =.company.name, sort =.lastName ) ; 
+			query q7() = '' + user @* {} ( -sort user ) ; 
+			query q8() = '' + user @* {} ( -sort =.company, =user ) ;
+		''')
+	}
+	
+	@Test
+	def void testAlias() {
+		assertParsingTrue('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
 
+			query q1() = (company: user, user: company) @ { company.firstName == 'Mark', user.name == 'Microsoft' } ;
+			query q2() = (user) @ { user.firstName == 'Bill' } ;
+		''')
+	}
+	
+	// check '=.' in what part
+	@Test 
+	def void testAssignOperatorInWhatPart() {
+		assertParsingTrue('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
+
+			query q1() = user @ { .firstName == 'Bill' } (=.lastName, '' + (123,'Hello')) ; 
+			query q2() = user @ { .firstName == 'Bill' } (=.lastName, '' + list([1,2,3])) ; 
+			query q3() = user @ { .firstName == 'Bill' } (=.lastName, '' + set([1,2,3])) ; 
+			query q4() = user @ { .firstName == 'Bill' } (=.lastName, '' + map([123:'Hello'])) ;
+		''')
+	}
+	
+	// 'companyName' variable as part of company attribute in user class
+	@Test 
+	def void testBuilkAssignOperatorInWhatPart() {
+		assertParsingTrue('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
+			
+			query q1() { val t = user @ { .firstName == 'Bill' } ( .firstName, .lastName, companyName = .company.name ); return t.firstName; }
+			query q2() { val t = user @ { .firstName == 'Bill' } ( .firstName, .lastName, companyName = .company.name ); return t.lastName; }
+			query q3() { val t = user @ { .firstName == 'Bill' } ( .firstName, .lastName, companyName = .company.name ); return t.companyName; }
+		''')
+	}
 
 	def void assertParsingTrue(String codeSnippet) {
 		val result = parseHelper.parse(codeSnippet)

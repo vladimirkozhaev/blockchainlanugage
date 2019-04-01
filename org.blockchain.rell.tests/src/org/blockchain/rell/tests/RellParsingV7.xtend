@@ -17,12 +17,27 @@ class RellParsingV7 {
 	extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
-	
-	
-	
+	@Test
+	def void testIfInExpressions1() {
+		assertParsingTrue('''
+			class company { name: text; }
+			class user { name: text; company; }
+			class optest { b1: boolean;b2: boolean;b3: boolean;i1: integer;i2: integer;i3: integer;t1: text;t2: text;t3: text;
+			ba1: byte_array;ba2: byte_array;ba3: byte_array;j1: json;j2: json;j3: json;user1: user;
+			user2: user;user3: user;company1: company;company2: company;company3: company; }
+			
+			query q1() = optest @ {} ( if (.b1) 1 else 2 ); 
+			query q33() = optest @ {} ( if (.b1) 'Yes' else 'No' ); 
+			query q34() = optest @ {} ( if (.b1) .i2 else .i3 ); 
+			query q35() = optest @ {} ( if (.b1) .t2 else .t3 ); 
+			query q41() = optest @ {} ( .t1.len() ); 
+			query q42() = optest @ {} ( .ba1.len() ); 
+		''')		
+	}
+		
 	// "if" can be used in expressions (Rell v.7)
 	@Test
-	def void testIfInExpressions() {
+	def void testIfInExpressions2() {
 		assertParsingTrue('''
 			query q1() = if (true) 'A' else 'B' + 'C' ;
 			query q2() = if (false) 'A' else 'B' + 'C' ;
@@ -90,6 +105,15 @@ class RellParsingV7 {
 			object country {
 			        name = 'Canada';
 			        countryCode = countryCode.value('CA');
+			}
+		''')
+	}
+	
+	@Test
+	def void testClassAnnotations() {
+		assertParsingTrue('''
+			class user (log) {
+			    name: text;
 			}
 		''')
 	}
