@@ -19,6 +19,43 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
+	@Test
+	def void testQueriesAtExpressionsPart1() {
+		assertParsingTrue('''
+			class country { name: text; }
+			class state { name: text; country; }
+			class city { name: text; state; }
+			class company { name: text; hq: city; }
+			class department { name: text; company; }
+			class person { name: text; city; department; }
+			query q1() = person @* {} ;
+			query q2() = person @* { .city.name == 'San Francisco' } ;
+			query q3() = person @* { .city.name == 'Las Vegas' } ;
+			query q4() = person @* { .city.name == 'Munich' } ;
+			query q5() = person @* { .city.state.name == 'CA' } ;
+			query q6() = person @* { .city.state.name == 'WA' } ;
+			query q7() = person @* { .city.state.country.name == 'USA' } ;
+			query q8() = person @* { .city.state.country.name == 'Germany' } ;
+			query q9() = company @* { .hq.state.country.name == 'USA' } ;
+			query q10() = person @* { .city.name == 'Las Vegas', .department.company.hq.name == 'Cologne' } ;
+			query q11() = person @* { .city.name == 'Stuttgart', .department.company.hq.name == 'Las Vegas' } ;
+			query q12() = (p1: person, p2: person) @* { p1.city.name == 'San Francisco', p2.department.company.name == 'Amazon' } ;
+			query q13() = (p1: person, p2: person) @* { p1.city.name == 'Munich', p2.department.company.name == 'Mercedes' } ;
+			query q14() = person @* { .city == .department.company.hq } ;
+			query q15() = person @* { .city.state == .department.company.hq.state } ;
+			query q16() = person @* { .city.state.country == .department.company.hq.state.country } ;
+			query q17() { val x = city @ { .name == 'Stuttgart' }; return person @* { .city == x }; }
+			query q18() { val x = state @ { .name == 'NV' }; return person @* { .city.state == x }; }
+			query q19() { val x = state @ { .name == 'BY' }; return person @* { .city.state == x }; }
+			query q20() { val x = state @ { .name == 'CA' }; return person @* { .city.state == x }; }
+			query q21() { val x = country @ { .name == 'USA' }; return person @* { .city.state.country == x }; }
+			query q22() = person @* { .department.company.hq.name == 'Seattle' } ;
+			query q23() = person @* { .department.company.hq.name == 'Dusseldorf' } ;
+			query q24() = person @* { .department.company.hq.name == 'Los Angeles' } ;
+			query q25() = person @* { .department.company.hq.state.country.name == 'USA' } ;
+			query q26() = person @* { .department.company.hq.state.country.name == 'Germany' } ;
+		''')		
+	}
 	
 	// check changing value by position in a set 
 	@Test
@@ -1400,6 +1437,32 @@ class WorkingTests {
 			query q4() = ['Bob':123,'Alice':456].calculate('Bob') ;
 			query q5() = ['Bob':123,'Alice':456].calculate('Alice') ;
 			query q6() = ['Bob':123,'Alice':456].calculate('Trudy') ;
+		''')
+	}
+	
+	// check return statement from query with at operator
+	@Test
+	def void testReturnStatementFromQueryAtOpr1() {
+		assertParsingTrue('''
+			class foo { name: text; }
+			class bar { name: text; }
+			class foo_owner { name: text; stuff: foo; foo: foo; bar: bar; }
+			class bar_owner { name: text; stuff: bar; foo: foo; bar: bar; }
+			
+			query q() { val foo1 = foo @ { .name == 'Foo-1' };
+			val foo2 = foo @ { .name == 'Foo-2' };
+			val bar1 = bar @ { .name == 'Bar-1' };
+			val bar2 = bar @ { .name == 'Bar-2' }; val stuff = foo1; return (foo_owner, bar_owner) @* { stuff }; }
+		''')
+	}
+	
+	// check return statement from query
+	@Test
+	def void testReturnStatementFromAtOpr2() {
+		assertParsingTrue('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
+			query q() { val userName = 'Bill'; return user @* { .firstName == userName or userName == '' }; }
 		''')
 	}
 
