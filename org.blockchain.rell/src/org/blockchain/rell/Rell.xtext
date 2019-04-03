@@ -51,7 +51,7 @@ Variable:
 	name=VariableDeclaration ((ASSIGNMENT expression=Expression)?);
 
 Relational:
-	Update | Delete | Create | AtOperator;
+	AtOperator | Update | Delete | Create;
 
 Update:
 	'update' (tableNameWithAlias+=TableNameWithAlias | LEFT_BRACKET tableNameWithAlias+=TableNameWithAlias (','
@@ -82,11 +82,16 @@ CreateWhatPart:
 	condition+=Expression;
 
 AtOperator:
-	(tableNameWithAlias+=TableNameWithAlias | LEFT_BRACKET tableNameWithAlias+=TableNameWithAlias (','
-	tableNameWithAlias+=TableNameWithAlias)* RIGHT_BRACKET) Ampersand (ampersandModificator=AmpersandModificator?)
+	(tableNameWithAlias+=TableNameWithAlias |
+	(LEFT_BRACKET
+	tableNameWithAlias+=TableNameWithAlias (',' tableNameWithAlias+=TableNameWithAlias)*
+	RIGHT_BRACKET))
+	Ampersand
+	(ampersandModificator=AmpersandModificator?)
 	LEFT_BRACE
-	(ASSIGNMENT? conditions+=Expression (',' ASSIGNMENT? conditions+=Expression)*)? RIGHT_BRACE
-	tupleValue=TupleValue?;
+	(ASSIGNMENT? conditions+=Expression (',' ASSIGNMENT? conditions+=Expression)*)?
+	RIGHT_BRACE
+	(tupleValue=TupleValue?);
 
 TupleValue:
 	LEFT_BRACKET members+=TupleValueMember (',' tuplePart+=TupleValueMember)* RIGHT_BRACKET;
@@ -97,21 +102,6 @@ ListCreation:
 
 MapCreation:
 	LEFT_SQUARE_BRACE mapPart+=MapCreationPart (',' mapPart+=MapCreationPart)* RIGHT_SQUARE_BRACE;
-
-NewListCreation:
-	List {NewListCreation} (specification=ListSpecification?)
-	LEFT_BRACKET
-	((listCreation=ListCreation |
-	newListCreation=NewListCreation |
-	newSetCreation=NewSetCreation)?)
-	RIGHT_BRACKET (DOT EMBEDDED_METHOD arguments+=ArgumentsInBrackets)*;
-
-NewSetCreation:
-	Set {NewSetCreation} (specification=ListSpecification?)
-	LEFT_BRACKET
-	((listCreation=ListCreation | newListCreation=NewListCreation | newSetCreation=NewSetCreation)?)
-	RIGHT_BRACKET
-	(DOT EMBEDDED_METHOD arguments+=ArgumentsInBrackets)*;
 
 TupleValueMember:
 	(name=ValuableID ASSIGNMENT)? value=Expression;
@@ -166,8 +156,6 @@ Equality returns Expression:
 Comparison returns Expression:
 	PlusOrMinus ({Comparison.left=current} op=(MORE_EQUAL | LESS_EQUAL | MORE | LESS | IN)
 	right=PlusOrMinus)*;
-
-
 
 PlusOrMinus returns Expression:
 	MulOrDiv (({Plus.left=current} PlusChar | {Minus.left=current} MinusChar)
@@ -332,7 +320,8 @@ Percent:
 
 EMBEDDED_METHOD:
 	"add" | "addAll" | "contains" | "containsAll" | "removeAll" | "calculate" | "sub" | "size" |
-	"removeAt" | "clear" | "requireNotEmpty" | "upperCase" | "lowerCase" | "_map"| "map" | "_list"| "list" | "set"| "_set" | "empty" | "get" |
+	"removeAt" | "clear" | "requireNotEmpty" | "upperCase" | "lowerCase" | "_map" | "map" | "_list" | "list" | "set" |
+	"_set" | "empty" | "get" |
 	"str" | "put" | "putAll" | "remove" | "keys" | "values";
 
 ONE_PARAM_METHOD:
