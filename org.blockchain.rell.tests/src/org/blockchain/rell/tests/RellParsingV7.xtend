@@ -92,7 +92,7 @@ class RellParsingV7 {
 			}
 		''')
 	}
-	
+
 	@Test
 	def void testEnumAsObjectAttribute() {
 		assertParsingTrue('''
@@ -110,11 +110,36 @@ class RellParsingV7 {
 	}
 	
 	@Test
+	def void testEnumEnumClassObject() {
+		assertParsingTrue('''
+			enum foo { A, B, C }
+			class cls { name; f: foo; }
+			object obj { mutable f: foo = foo.A; }
+			query q() = cls @* {} ( =.name, =.f ) ;
+		''')
+	}
+	
+	@Test
 	def void testClassAnnotations() {
 		assertParsingTrue('''
 			class user (log) {
 			    name: text;
 			}
+		''')
+	}
+	
+	@Test
+	def void testLog() {
+		assertParsingTrue('''
+			class foo(log) { x: integer; }
+			query q1() { val f = foo@{}; return f.x; }
+			query q2() { val f = foo@{}; return f.transaction.tx_rid; }
+			query q3() { val f = foo@{}; return f.transaction.tx_hash; }
+			query q4() { val f = foo@{}; return f.transaction.tx_data; }
+			query q5() { val f = foo@{}; return f.transaction.block; }
+			query q6() { val f = foo@{}; return f.transaction.block.block_height; }
+			query q7() { val f = foo@{}; return f.transaction.block.block_rid; }
+			query q8() { val f = foo@{}; return f.transaction.block.timestamp; }
 		''')
 	}
 	
