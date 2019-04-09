@@ -136,13 +136,7 @@ class RellParsingTest {
 		''')
 	}
 	
-	@Test 
-	def void testAtOperatorWithSizeInAttribute() {
-		assertParsingTrue('''
-			class foo { x: integer; k: integer = (bar@*{ .v > 0 }).size(); }
-			class bar { v: integer; }
-		''')
-	}
+	
 	
 	@Test 
 	def void testSingleTuple() {

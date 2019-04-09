@@ -20,6 +20,14 @@ class WorkingTests {
 	@Inject extension ValidationTestHelper
 	
 	@Test 
+	def void testAtOperatorWithSizeInAttribute() {
+		assertParsingTrue('''
+			class foo { x: integer; k: integer = (bar@*{ .v > 0 }).size(); }
+			class bar { v: integer; }
+		''')
+	}
+	
+	@Test 
 	def void testMicSubtypes1Min() {
 		assertParsingTrue('''
 			query q() { val x: (integer,text) = (123,'Hello'); val y: (integer?,text) = x; return y; }
