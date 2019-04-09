@@ -297,6 +297,15 @@ class WorkingTests {
 	}
 	
 	@Test
+	def void testMiscellaneusExpInQueryReturnMinTest() {
+		assertParsingTrue('''
+			class user { id: integer; name1: text; name2: text; v1: integer; v2: integer; }
+			query q1() { return user @* {} (.id+0, (.name1 + .name2).size()); }
+			
+		''')
+	}
+	
+	@Test
 	def void testMiscellaneusExpInQueryReturnSt() {
 		assertParsingTrue('''
 			class user { id: integer; name1: text; name2: text; v1: integer; v2: integer; }

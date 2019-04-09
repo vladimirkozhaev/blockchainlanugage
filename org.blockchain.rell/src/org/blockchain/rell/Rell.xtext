@@ -126,7 +126,7 @@ MethodCall:
 	name=MethodName ((listSpec=ListSpecification | mapSpec=MapSpecification)?) arguments=ArgumentsInBrackets;
 
 OperationQueryOFunctionCall:
-	(name=[Query] | name=[Operation] | name=[Function]) arguments=ArgumentsInBrackets;
+	(name=[Query] | name=[Operation] | name=[Function])  arguments=ArgumentsInBrackets;
 
 Arguments:
 	listPart+=Expression (',' listPart+=Expression)*;
@@ -166,11 +166,11 @@ MulOrDiv returns Expression:
 	right=Primary)*;
 
 Primary returns Expression:
-	prefixChar=(PlusChar | MinusChar | MulChar | DivChar | NOT) expression=Primary |
-	DotValue;
+	prefixChar=(PlusChar | MinusChar | MulChar | DivChar | NOT) expression=Primary
+	| DotValue;
 
 DotValue:
-	(LEFT_BRACKET DotValue RIGHT_BRACKET) | ((atom=Atomic (accesToList=AccessToList?) (DOT dotPart=DotValue)?));
+	((LEFT_BRACKET expr=Expression RIGHT_BRACKET) | atom=Atomic) (accesToList=AccessToList?) ((DOT dotPart=DotValue)?);
 
 Atomic returns Expression:
 	{IntConstant} value=IntWithMinus
