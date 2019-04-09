@@ -223,7 +223,7 @@ MapSpecification:
 	LESS keySpec=TypeReference (QuestionChar?) ',' valSpec=TypeReference (QuestionChar?) MORE;
 
 TupleType:
-	LEFT_BRACKET varDecl+=TupleVarDeclaration (',' varDecl+=TupleVarDeclaration)* RIGHT_BRACKET;
+	LEFT_BRACKET varDecl+=TupleVarDeclaration (QuestionChar?) (',' varDecl+=TupleVarDeclaration (QuestionChar?))* RIGHT_BRACKET;
 
 OneParamMethodCall:
 	methodName=ONE_PARAM_METHOD LEFT_BRACKET arg=Expression RIGHT_BRACKET;

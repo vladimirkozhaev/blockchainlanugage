@@ -19,6 +19,36 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
+	@Test 
+	def void testMicSubtypes1Min() {
+		assertParsingTrue('''
+			query q() { val x: (integer,text) = (123,'Hello'); val y: (integer?,text) = x; return y; }
+		''')
+	}
+	
+	
+	@Test 
+	def void testMicSubtypes1() {
+		assertParsingTrue('''
+			query q() { val x: (integer,text) = (123,'Hello'); val y: (integer?,text) = x; return y; }
+			query q() { val x: (integer?,text) = (123,'Hello'); val y: (integer?,text) = x; return y; }
+			query q() { val x: (integer?,text) = (null,'Hello'); val y: (integer?,text) = x; return y; }
+			query q() { val x: (integer,text) = (123,'Hello'); val y: (integer,text?) = x; return y; }
+			query q() { val x: (integer,text?) = (123,'Hello'); val y: (integer,text?) = x; return y; }
+			query q() { val x: (integer,text?) = (123,null); val y: (integer,text?) = x; return y; }
+			query q() { val x: (integer,text) = (123,'Hello'); val y: (integer?,text?) = x; return y; }
+			query q() { val x: (integer?,text) = (123,'Hello'); val y: (integer?,text?) = x; return y; }
+			query q() { val x: (integer?,text) = (null,'Hello'); val y: (integer?,text?) = x; return y; }
+			query q() { val x: (integer,text?) = (123,'Hello'); val y: (integer?,text?) = x; return y; }
+			query q() { val x: (integer,text?) = (123,null); val y: (integer?,text?) = x; return y; }
+			query q() { val x: (integer?,text?) = (123,'Hello'); val y: (integer?,text?) = x; return y; }
+			query q() { val x: (integer?,text?) = (null,'Hello'); val y: (integer?,text?) = x; return y; }
+			query q() { val x: (integer?,text?) = (123,null); val y: (integer?,text?) = x; return y; }
+			query q() { val x: (integer?,text?) = (null,null); val y: (integer?,text?) = x; return y; }
+		''')
+	}
+	
+	
 	@Test
 	def void testQueriesAtExpressionsPart1() {
 		assertParsingTrue('''

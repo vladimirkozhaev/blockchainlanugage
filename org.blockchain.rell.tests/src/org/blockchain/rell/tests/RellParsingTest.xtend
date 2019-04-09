@@ -286,28 +286,7 @@ class RellParsingTest {
 			operation o() { foo.x *= 55; }
 		''')
 	}
-	
-	@Test 
-	def void testMicSubtypes1() {
-		assertParsingTrue('''
-			query q() { val x: (integer,text) = (123,'Hello'); val y: (integer?,text) = x; return y; }
-			query q() { val x: (integer?,text) = (123,'Hello'); val y: (integer?,text) = x; return y; }
-			query q() { val x: (integer?,text) = (null,'Hello'); val y: (integer?,text) = x; return y; }
-			query q() { val x: (integer,text) = (123,'Hello'); val y: (integer,text?) = x; return y; }
-			query q() { val x: (integer,text?) = (123,'Hello'); val y: (integer,text?) = x; return y; }
-			query q() { val x: (integer,text?) = (123,null); val y: (integer,text?) = x; return y; }
-			query q() { val x: (integer,text) = (123,'Hello'); val y: (integer?,text?) = x; return y; }
-			query q() { val x: (integer?,text) = (123,'Hello'); val y: (integer?,text?) = x; return y; }
-			query q() { val x: (integer?,text) = (null,'Hello'); val y: (integer?,text?) = x; return y; }
-			query q() { val x: (integer,text?) = (123,'Hello'); val y: (integer?,text?) = x; return y; }
-			query q() { val x: (integer,text?) = (123,null); val y: (integer?,text?) = x; return y; }
-			query q() { val x: (integer?,text?) = (123,'Hello'); val y: (integer?,text?) = x; return y; }
-			query q() { val x: (integer?,text?) = (null,'Hello'); val y: (integer?,text?) = x; return y; }
-			query q() { val x: (integer?,text?) = (123,null); val y: (integer?,text?) = x; return y; }
-			query q() { val x: (integer?,text?) = (null,null); val y: (integer?,text?) = x; return y; }
-		''')
-	}
-	
+		
 	@Test 
 	def void testMiscSubtypes2() {
 		assertParsingTrue('''
