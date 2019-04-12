@@ -126,7 +126,7 @@ MethodCall:
 	name=MethodName ((listSpec=ListSpecification | mapSpec=MapSpecification)?) arguments=ArgumentsInBrackets;
 
 OperationQueryOFunctionCall:
-	(name=[Query] | name=[Operation] | name=[Function])  arguments=ArgumentsInBrackets;
+	(name=[Query] | name=[Operation] | name=[Function]) arguments=ArgumentsInBrackets;
 
 Arguments:
 	listPart+=Expression (',' listPart+=Expression)*;
@@ -166,14 +166,21 @@ MulOrDiv returns Expression:
 	right=Primary)*;
 
 Primary returns Expression:
-	prefixChar=(PlusChar | MinusChar | MulChar | DivChar | NOT) expression=Primary
-	| DotValue;
+	DotValue;
+
+UnaryOperation:
+	prefixChar=(PlusChar | MinusChar | MulChar | DivChar | NOT) expression=Primary;
+
+ExprInBrackets:
+	(LEFT_BRACKET expr=Expression RIGHT_BRACKET);
 
 DotValue:
-	((LEFT_BRACKET expr=Expression RIGHT_BRACKET) | atom=Atomic) (accesToList=AccessToList?) ((DOT dotPart=DotValue)?);
+	atom=Atomic (accesToList=AccessToList?) ((DOT dotPart=DotValue)?);
 
 Atomic returns Expression:
-	{IntConstant} value=IntWithMinus
+	{ExprInBrackets} value=ExprInBrackets
+	| {UnaryOperation} value=UnaryOperation
+	| {IntConstant} value=IntWithMinus
 	| {StringConstant} value=STRING |
 	{ByteArrayConstant} value=BYTE_ARRAY_VALUE |
 	{BoolConstant} value=('true' | 'false') |
@@ -223,7 +230,8 @@ MapSpecification:
 	LESS keySpec=TypeReference (QuestionChar?) ',' valSpec=TypeReference (QuestionChar?) MORE;
 
 TupleType:
-	LEFT_BRACKET varDecl+=TupleVarDeclaration (QuestionChar?) (',' varDecl+=TupleVarDeclaration (QuestionChar?))* RIGHT_BRACKET;
+	LEFT_BRACKET varDecl+=TupleVarDeclaration (QuestionChar?) (',' varDecl+=TupleVarDeclaration (QuestionChar?))*
+	RIGHT_BRACKET;
 
 OneParamMethodCall:
 	methodName=ONE_PARAM_METHOD LEFT_BRACKET arg=Expression RIGHT_BRACKET;
