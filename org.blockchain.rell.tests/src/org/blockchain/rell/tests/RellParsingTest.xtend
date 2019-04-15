@@ -181,16 +181,7 @@ class RellParsingTest {
 		''')
 	}
 	
-	@Test 
-	def void testTextSubtypes() {
-		assertParsingTrue('''
-			query q() { val x: text? = 'Hello'; return x?.upperCase(); }
-			query q() { val x: text? = null; return x?.upperCase(); }
-			query q() { val x: text? = 'Hello'; return x?.upperCase()?.lowerCase(); }
-			query q() { val x: text? = null; return x?.upperCase()?.lowerCase(); }
-			query q() { val x: text? = 'Hello'; return x?.upperCase()?.lowerCase()?.size(); }
-		''')
-	}
+	
 
 	@Test 
 	def void testTypeOf() {

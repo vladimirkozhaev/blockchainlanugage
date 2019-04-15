@@ -175,7 +175,7 @@ ExprInBrackets:
 	(LEFT_BRACKET expr=Expression RIGHT_BRACKET);
 
 DotValue:
-	atom=Atomic (accesToList=AccessToList?) ((DOT dotPart=DotValue)?);
+	atom=Atomic (accesToList=AccessToList?) (QuestionChar?) ((DOT dotPart=DotValue)?);
 
 Atomic returns Expression:
 	{ExprInBrackets} value=ExprInBrackets
@@ -206,7 +206,7 @@ RelAttrubutesList:
 	value+=Variable (',' value+=Variable)*;
 
 VariableDeclaration:
-	name=ValuableID ((DOUBLE_QUOTE type=TypeReference)?);
+	name=ValuableID ((DOUBLE_QUOTE type=TypeReference QuestionChar?)?);
 
 TupleVarDeclaration:
 	(name=ValuableID DOUBLE_QUOTE)? type=TypeReference;

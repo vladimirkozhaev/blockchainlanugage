@@ -20,6 +20,17 @@ class WorkingTests {
 	@Inject extension ValidationTestHelper
 	
 	@Test 
+	def void testTextSubtypes() {
+		assertParsingTrue('''
+			query q() { val x: text? = 'Hello'; return x?.upperCase(); }
+			query q() { val x: text? = null; return x?.upperCase(); }
+			query q() { val x: text? = 'Hello'; return x?.upperCase()?.lowerCase(); }
+			query q() { val x: text? = null; return x?.upperCase()?.lowerCase(); }
+			query q() { val x: text? = 'Hello'; return x?.upperCase()?.lowerCase()?.size(); }
+		''')
+	}
+	
+	@Test 
 	def void testRange() {
 		assertParsingTrue('''
 			query q1() { val a = range(123); val b = range(123); return a == b; }
