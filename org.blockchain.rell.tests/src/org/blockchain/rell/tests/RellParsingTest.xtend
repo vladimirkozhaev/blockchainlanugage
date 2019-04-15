@@ -65,19 +65,7 @@ class RellParsingTest {
 		''')
 	}
 	
-// check limit
-	@Test
-	def void testLimit() {
-		assertParsingTrue('''
-			class company { name: text; }
-			class user { firstName: text; lastName: text; company; }
-						
-			query q1() = user @* {} limit 0 ; 
-			query q2() = user @* {} limit 1 ; 
-			query q3() = user @* {} ( .lastName ) limit 0 ; 
-			query q4() = user @* {} ( .lastName ) limit 10 ; 
-		''')
-	}
+
 	
 // check sort (java.lang.NullPointerException error)
 	@Test

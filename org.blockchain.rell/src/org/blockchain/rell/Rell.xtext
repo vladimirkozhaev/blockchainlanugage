@@ -91,7 +91,7 @@ AtOperator:
 	LEFT_BRACE
 	(ASSIGNMENT? conditions+=Expression (',' ASSIGNMENT? conditions+=Expression)*)?
 	RIGHT_BRACE
-	(tupleValue=TupleValue?);
+	(tupleValue=TupleValue?) (('limit' limitExpr=Expression)?);
 
 TupleValue:
 	LEFT_BRACKET members+=TupleValueMember (',' tuplePart+=TupleValueMember)* RIGHT_BRACKET;

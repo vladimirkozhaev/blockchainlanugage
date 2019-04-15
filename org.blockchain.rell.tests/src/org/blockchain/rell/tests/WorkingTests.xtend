@@ -19,6 +19,20 @@ class WorkingTests {
 	@Inject extension ParseHelper<Model> parseHelper
 	@Inject extension ValidationTestHelper
 	
+	// check limit
+	@Test
+	def void testLimit() {
+		assertParsingTrue('''
+			class company { name: text; }
+			class user { firstName: text; lastName: text; company; }
+						
+			query q1() = user @* {} limit 0 ; 
+			query q2() = user @* {} limit 1 ; 
+			query q3() = user @* {} ( .lastName ) limit 0 ; 
+			query q4() = user @* {} ( .lastName ) limit 10 ; 
+		''')
+	}
+	
 	@Test 
 	def void testTextSubtypes() {
 		assertParsingTrue('''
