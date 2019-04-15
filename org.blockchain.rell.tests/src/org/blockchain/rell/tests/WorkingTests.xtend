@@ -20,6 +20,18 @@ class WorkingTests {
 	@Inject extension ValidationTestHelper
 	
 	@Test 
+	def void testRange() {
+		assertParsingTrue('''
+			query q1() { val a = range(123); val b = range(123); return a == b; }
+			query q2() { val a = range(123); val b = range(123); return a != b; }
+			query q3() { val a = range(123); val b = range(123); return a === b; }
+			query q4() { val a = range(123); val b = range(123); return a !== b; }
+			query q5() { val a = range(123); val b = a; return a === b; }
+			query q6() { val a = range(123); val b = a; return a !== b; }
+		''')
+	}
+	
+	@Test 
 	def void testAtOperatorWithSizeInAttribute() {
 		assertParsingTrue('''
 			class foo { x: integer; k: integer = (bar@*{ .v > 0 }).size(); }

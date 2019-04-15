@@ -333,7 +333,7 @@ EMBEDDED_METHOD:
 	"str" | "put" | "putAll" | "remove" | "keys" | "values";
 
 ONE_PARAM_METHOD:
-	'abs' | 'is_signer' | 'json';
+	'abs' | 'is_signer' | 'json'|'range';
 
 TWO_PARAMS_METHOD:
 	'max' | 'min';
