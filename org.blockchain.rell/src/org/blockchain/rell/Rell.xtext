@@ -137,6 +137,15 @@ ArgumentsInBrackets:
 MethodName:
 	EMBEDDED_METHOD;
 
+IntegerMethods:Integer DOT IntStatic;
+
+IntStatic:
+	MIN_VALUE|MAX_VALUE|(PARSE_HEX LEFT_BRACKET expr=Expression RIGHT_BRACKET)
+;
+
+
+
+
 AccessToList:
 	LEFT_SQUARE_BRACE expr=Expression RIGHT_SQUARE_BRACE;
 
@@ -190,6 +199,7 @@ Atomic returns Expression:
 	| {ListCreation} value=ListCreation
 	| {MapCreation} value=MapCreation
 	| {TheNull} value=NULL
+	| {IntegerMethods} value=IntegerMethods
 	| {OneParamMethodCall} value=OneParamMethodCall
 	| {TwoParamsMethodCall} value=TwoParamsMethodCall
 	| {MultiParamsMethodCall} value=MultiParamsMethodCall
@@ -198,6 +208,8 @@ Atomic returns Expression:
 	| {CreateClassPart} value=CreateClassPart
 	| {ClassMemberDef} value=ClassMemberDefinition
 	| {VariableDeclarationRef} value=VariableDeclarationRef;
+
+
 
 MapCreationPart:
 	exprKey=Expression DOUBLE_QUOTE exprValue=Expression;
@@ -333,13 +345,25 @@ EMBEDDED_METHOD:
 	"str" | "put" | "putAll" | "remove" | "keys" | "values";
 
 ONE_PARAM_METHOD:
-	'abs' | 'is_signer' | 'json'|'range';
+	'abs' | 'is_signer' | 'json'|'range'|Integer;
 
 TWO_PARAMS_METHOD:
 	'max' | 'min';
 
 MULTI_PARAMS_METHOD:
 	'log' | 'print';
+	
+terminal PARSE_HEX:
+	'parseHex'
+;
+
+terminal MAX_VALUE:
+	'MAX_VALUE'
+;
+
+terminal MIN_VALUE:
+	'MIN_VALUE'
+;
 
 terminal IN:
 	'in';

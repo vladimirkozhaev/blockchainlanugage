@@ -133,17 +133,7 @@ class RellParsingTest {
 		''')
 	}
 	
-	@Test 
-	def void testIntegerOperations() {
-		assertParsingTrue('''
-			class user { name: text; score: integer; }
-			query q1() = user @ { .score == integer('-5678') } ( .name ) ;
-			query q2() = user @ { .score == -integer.parseHex('162e') } ( .name ) ;
-			query q3() = user @ { .score < integer.MAX_VALUE } ( .name ) ;
-			query q4() = user @* { .score < integer.MIN_VALUE } ( .name ) ;
-			query q5() = user @ { integer.MAX_VALUE + .score == 9223372036854770129 } ( .name ) ;
-		''')
-	}
+	
 	
 	
 	
