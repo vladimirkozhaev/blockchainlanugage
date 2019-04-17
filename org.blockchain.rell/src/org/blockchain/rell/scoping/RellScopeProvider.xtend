@@ -22,14 +22,13 @@ import org.blockchain.rell.rell.SelectOp
 import org.blockchain.rell.rell.TableNameWithAlias
 import org.blockchain.rell.rell.TupleValue
 import org.blockchain.rell.rell.TupleValueMember
+import org.blockchain.rell.rell.UnaryOperation
 import org.blockchain.rell.rell.Update
-import org.blockchain.rell.rell.Variable
 import org.blockchain.rell.rell.VariableDeclaration
 import org.blockchain.rell.rell.VariableDeclarationRef
 import org.blockchain.rell.typing.RellClassType
 import org.blockchain.rell.typing.RellModelUtil
 import org.blockchain.rell.typing.RellTypeProvider
-import org.blockchain.rell.typing.VariableReferenceInfo
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
@@ -37,6 +36,7 @@ import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
+import java.util.function.UnaryOperator
 
 /**
  * This class contains custom scoping description.
@@ -63,7 +63,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 		}
 	}
 
-	def List<VariableDeclaration> getVariableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef,
+	def  getVariableDeclarationRefScope(VariableDeclarationRef variableDeclarationRef,
 		EReference ref) {
 
 		val container = variableDeclarationRef.eContainer;
@@ -91,6 +91,13 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 							}
 
 						}
+//						case (parent instanceof UnaryOperation): {
+//							val AtOperator atOperator = EcoreUtil2.getContainerOfType(parent, AtOperator) as AtOperator
+//							return atOperator.tableNameWithAlias.flatMap [ x |
+//								x.getClassDefinitionByTableNameWithAlias
+//							].toList
+//
+//						}
 						case (parent.eContainer instanceof CreateWhatPart): {
 							val variablesList = makeWhatPartVariableDeclarations(parent.eContainer.eContainer)
 							val operation = EcoreUtil2.getContainerOfType(variableDeclarationRef, Operation)
@@ -460,8 +467,7 @@ class RellScopeProvider extends AbstractDeclarativeScopeProvider {
 
 				val List<VariableDeclaration> varDeclList = getVariableDeclarationRefScope(
 					context as VariableDeclarationRef, reference);
-					
-				
+
 				varDeclList.addAll(getMethodContainerParameterList(context))
 				if (varDeclList === null || varDeclList.length == 0) {
 					super.getScope(context, reference);

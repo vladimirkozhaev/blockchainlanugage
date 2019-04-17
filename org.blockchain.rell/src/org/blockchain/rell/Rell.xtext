@@ -109,6 +109,8 @@ TupleValueMember:
 ClassMemberDefinition:
 	(classRef=[TableNameWithAlias])? DOT (variableDeclarationRef=VariableDeclarationRef);
 
+
+
 TableNameWithAlias:
 	classRefDecl=ClassRefDecl |
 	justNameDecl=JustNameDecl;
@@ -143,9 +145,6 @@ IntStatic:
 	MIN_VALUE|MAX_VALUE|(PARSE_HEX LEFT_BRACKET expr=Expression RIGHT_BRACKET)
 ;
 
-
-
-
 AccessToList:
 	LEFT_SQUARE_BRACE expr=Expression RIGHT_SQUARE_BRACE;
 
@@ -178,7 +177,11 @@ Primary returns Expression:
 	DotValue;
 
 UnaryOperation:
-	prefixChar=(PlusChar | MinusChar | MulChar | DivChar | NOT) expression=Primary;
+	prefixChar=(PlusChar | MinusChar | MulChar | DivChar | NOT|SORT| ASSIGNMENT) (table=[ClassDefinition]|dotValue=DotValue);
+
+
+
+
 
 ExprInBrackets:
 	(LEFT_BRACKET expr=Expression RIGHT_BRACKET);
@@ -188,6 +191,7 @@ DotValue:
 
 Atomic returns Expression:
 	{ExprInBrackets} value=ExprInBrackets
+	
 	| {UnaryOperation} value=UnaryOperation
 	| {IntConstant} value=IntWithMinus
 	| {StringConstant} value=STRING |
@@ -200,6 +204,7 @@ Atomic returns Expression:
 	| {MapCreation} value=MapCreation
 	| {TheNull} value=NULL
 	| {IntegerMethods} value=IntegerMethods
+	//| {TableNameWithAliasRef} value=[TableNameWithAlias]
 	| {OneParamMethodCall} value=OneParamMethodCall
 	| {TwoParamsMethodCall} value=TwoParamsMethodCall
 	| {MultiParamsMethodCall} value=MultiParamsMethodCall
@@ -364,6 +369,8 @@ terminal MAX_VALUE:
 terminal MIN_VALUE:
 	'MIN_VALUE'
 ;
+
+terminal SORT:'sort';
 
 terminal IN:
 	'in';

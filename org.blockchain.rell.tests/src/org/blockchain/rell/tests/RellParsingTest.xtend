@@ -67,23 +67,7 @@ class RellParsingTest {
 	
 
 	
-// check sort (java.lang.NullPointerException error)
-	@Test
-	def void testSort() {
-		assertParsingTrue('''
-			class company { name: text; }
-			class user { firstName: text; lastName: text; company; }
 
-			query q1() = '' + user @* {} ( sort .firstName ) ; 
-			query q2() = '' + user @* {} ( -sort .firstName ) ; 
-			query q3() = '' + user @* { .company.name == 'Apple' } ( sort =.firstName, sort =.lastName ) ; 
-			query q4() = '' + user @* { .company.name == 'Apple' } ( sort =.firstName, -sort =.lastName ) ; 
-			query q5() = '' + user @* {} ( sort =.company.name, =.lastName ) ; 
-			query q6() = '' + user @* {} ( sort =.company.name, sort =.lastName ) ; 
-			query q7() = '' + user @* {} ( -sort user ) ; 
-			query q8() = '' + user @* {} ( -sort =.company, =user ) ;
-		''')
-	}
 	
 	@Test
 	def void testAlias() {
